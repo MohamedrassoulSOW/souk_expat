@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Souk Expat{% endblock %}
+
+{% block body %}
+    {{ include('layouts/navBar.html.twig') }}
+
+    <main class="container py-5">
+      <h2 class="mb-4">Catégories populaires</h2>
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <a href="listings.html?cat=Meubles" class="card text-center p-3">
+            <div class="fs-2">🪑</div>
+            <div>Meubles</div>
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="listings.html?cat=Électronique" class="card text-center p-3">
+            <div class="fs-2">📱</div>
+            <div>Électronique</div>
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="listings.html?cat=Vêtements" class="card text-center p-3">
+            <div class="fs-2">👗</div>
+            <div>Vêtements</div>
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="listings.html?cat=Véhicules" class="card text-center p-3">
+            <div class="fs-2">🚗</div>
+            <div>Véhicules</div>
+          </a>
+        </div>
+      </div>
+
+      <h2 class="mt-5 mb-4">Annonces récentes</h2>
+      <div class="row g-4" id="recent-list">
+        <!-- sample cards (duplicate server-side) -->
+        <div class="col-6 col-md-4">
+          <div class="card">
+            <img src="assets/img/sample1.jpg" class="card-img-top" alt="">
+            <div class="card-body">
+              <h5 class="card-title">Canapé 3 places</h5>
+              <p class="card-text small text-muted">Casablanca • 600 MAD</p>
+              <a href="announce.html" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+    
+    {{ include('layouts/footer.html.twig') }}
+{% endblock %}
+

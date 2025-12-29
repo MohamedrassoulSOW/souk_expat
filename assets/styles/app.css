@@ -1,3 +1,55 @@
-body {
-    background-color: skyblue;
+body{
+    background:#f8f9fa;
+    padding-top: 57px;
+}
+.hero {
+    background-image: url('/images/slider/souk_expat.png');
+    background-size: cover;
+    background-position: center;
+    height: 40vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero .container {
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,.5);
+    text-align: center;        /* centre le texte */
+}
+
+.card img{object-fit:cover;height:180px}
+.thumb{cursor:pointer;opacity:.9}
+.thumb:hover{opacity:1}
+
+/* Cards */
+.product-card {
+  transition: 0.2s;
+  background: #fff;
+}
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+/* Image wrapper for subtle zoom */
+.product-img-wrapper {
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+}
+.product-img-wrapper img {
+  transition: 0.3s;
+}
+.product-img-wrapper img:hover {
+  transform: scale(1.07);
+}
+
+.card {
+    border-radius: 12px;
+}
+
+@media (max-width: 576px) {
+    .card {
+        border-radius: 0;
+    }
 }

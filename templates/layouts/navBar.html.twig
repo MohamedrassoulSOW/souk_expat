@@ -1,0 +1,57 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">Expat Souk</a>
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="">Annonces</a></li>
+        <li class="nav-item"><a class="nav-link" href="">Publier</a></li>
+        <li class="nav-item"><a class="nav-link" href="">Contact</a></li>
+        <li class="nav-item"><a class="nav-link" href="">Aide</a></li>
+        <li class="nav-item"><a class="nav-link" href=""></a></li>
+        <li class="nav-item"><a class="nav-link" href=""></a></li>
+        {% if app.user %}
+            <li class="nav-item">
+                <span class="nav-link fw-bold">Bonjour {{ app.user.firstName|default('Utilisateur') }}</span>
+            </li>
+            <li class="nav-item">
+                <a class="btn btn-outline-danger" href="{{ path('app_logout') }}">Déconnexion</a>
+            </li>
+
+        {% else %}
+            <li class="nav-item">
+                <a class="btn btn-outline-success" href="{{ path('app_login') }}">Connexion</a>
+            </li>
+            <li class="nav-item ms-2">
+                <a class="btn btn-outline-warning" href="{{ path('app_register') }}">Inscription</a>
+            </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <header class="hero d-flex align-items-center">
+      <div class="container text-center text-white">
+        <h1 class="display-5 fw-bold">Achetez et vendez facilement au Maroc</h1>
+        <p>Pour les expatriés, étudiants et personnes en déménagement</p>
+        <form class="row g-2 justify-content-center mt-3" action="">
+          <div class="col-8 col-sm-5">
+            <input class="form-control" name="q" placeholder="Que cherchez-vous ?">
+          </div>
+          <div class="col-4 col-sm-2">
+            <select class="form-select" name="city">
+              <option value="">Ville</option>
+              <option>Casablanca</option>
+              <option>Rabat</option>
+              <option>Marrakech</option>
+            </select>
+          </div>
+          <div class="col-12 col-sm-2">
+            <button class="btn btn-primary w-100">Rechercher</button>
+          </div>
+        </form>
+      </div>
+    </header>
