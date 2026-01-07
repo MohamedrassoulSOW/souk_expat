@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ annonce.title }} | Souk Expat{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<main class="container py-5">
+    {# Fil d'ariane / Retour #}
+    <nav class="mb-4">
+        <a href="{{ path('app_annonce_index') }}" class="text-decoration-none text-muted small">
+            <i class="bi bi-chevron-left"></i> Retour aux annonces
+        </a>
+    </nav>
+
+    <div class="row g-5">
+        {# --- COLONNE GAUCHE : VISUELS --- #}
+        <div class="col-lg-7">
+            {% if annonce.annonceImages|length > 0 %}
+                <div id="carouselAnnonce" class="carousel slide shadow-sm rounded-4 overflow-hidden" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in annonce.annonceImages %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <img src="{{ asset('uploads/annonces/' ~ image.imadeName) }}" 
+                                     class="d-block w-100" 
+                                     style="aspect-ratio: 4/3; object-fit: cover;" 
+                                     alt="{{ annonce.title }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if annonce.annonceImages|length > 1 %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselAnnonce" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon p-3 bg-dark rounded-circle" aria-hidden="true"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselAnnonce" data-bs-slide="next">
+                            <span class="carousel-control-next-icon p-3 bg-dark rounded-circle" aria-hidden="true"></span>
+                        </button>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="rounded-4 bg-light d-flex align-items-center justify-content-center" style="aspect-ratio: 4/3;">
+                    <i class="bi bi-image text-muted display-1"></i>
+                </div>
+            {% endif %}
+        </div>
+
+        {# --- COLONNE DROITE : INFOS & CONTACT --- #}
+        <div class="col-lg-5">
+            <div class="sticky-top" style="top: 100px;">
+                {# Catégorie & Ville #}
+                <div class="d-flex gap-2 mb-2">
+                    <span class="badge rounded-pill px-3 py-2" style="background-color: rgba(66, 177, 206, 0.1); color: #42B1CE;">
+                        {{ annonce.category.name }}
+                    </span>
+                    <span class="text-muted small d-flex align-items-center">
+                        <i class="bi bi-geo-alt me-1"></i> {{ annonce.city.name }}
+                    </span>
+                </div>
+
+                <h1 class="fw-bold h2 mb-3">{{ annonce.title }}</h1>
+                
+                <div class="display-6 fw-bold mb-4" style="color: #42B1CE;">
+                    {{ annonce.price|number_format(0, '.', ' ') }} <small class="fs-4">MAD</small>
+                </div>
+
+                <hr class="my-4 opacity-25">
+
+                <h5 class="fw-bold mb-3">Description</h5>
+                <p class="text-secondary lh-lg mb-5">
+                    {{ annonce.description }}
+                </p>
+
+                {# Actions de Contact #}
+                <div class="d-grid gap-3">
+                    {% if app.user and app.user != annonce.user %}
+                        <a href="{{ path('app_chat_check', {id: annonce.id}) }}" class="btn btn-custom-cyan btn-lg rounded-pill fw-bold py-3 shadow-sm">
+                            <i class="bi bi-chat-dots-fill me-2"></i> Envoyer un message
+                        </a>
+                    {% elseif not app.user %}
+                        <a href="{{ path('app_login') }}" class="btn btn-custom-cyan btn-lg rounded-pill fw-bold py-3">
+                            Connectez-vous pour contacter
+                        </a>
+                    {% endif %}
+
+                    {% if annonce.phone %}
+                        <a href="tel:{{ annonce.phone }}" class="btn btn-outline-dark btn-lg rounded-pill fw-bold py-3">
+                            <i class="bi bi-telephone me-2"></i> {{ annonce.phone }}
+                        </a>
+                    {% endif %}
+                </div>
+
+                {# Actions Propriétaire #}
+                {% if app.user and app.user.id == annonce.user.id %}
+                    <div class="mt-5 p-3 rounded-4 bg-light border d-flex align-items-center justify-content-between">
+                        <span class="small fw-bold text-muted">Gérer mon annonce</span>
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_annonce_edit', {id: annonce.id}) }}" class="btn btn-sm btn-warning rounded-pill px-3">Modifier</a>
+                            {{ include('annonce/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+
+{{ include('layouts/footer.html.twig') }}
+
+<style>
+    .btn-custom-cyan {
+        background-color: #42B1CE;
+        border: none;
+        color: white;
+        transition: 0.3s;
+    }
+    .btn-custom-cyan:hover {
+        background-color: #369ab3;
+        color: white;
+        transform: translateY(-3px);
+    }
+    
+    /* Style du carrousel */
+    .carousel-control-prev-icon, .carousel-control-next-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    h1 { color: #2d3436; }
+    
+    @media (max-width: 991px) {
+        .sticky-top { position: static; }
+    }
+</style>
+{% endblock %}

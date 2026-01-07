@@ -1,0 +1,212 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contactez Expat-Souk{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<div class="container-fluid bg-contact-gradient py-5">
+    <div class="container py-4">
+        {# --- ALERTES --- #}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success border-0 shadow-lg rounded-4 p-4 mb-5 animate__animated animate__fadeInDown" role="alert">
+                <div class="d-flex align-items-center">
+                    <div class="icon-circle bg-success text-white me-3">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold">Message envoyé avec succès !</h6>
+                        <small>{{ message }}</small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {# --- EN-TÊTE --- #}
+        <div class="text-center mb-5 mt-3">
+            <span class="badge rounded-pill px-3 py-2 mb-3 shadow-sm" style="background-color: #42B1CE20; color: #42B1CE; letter-spacing: 1px;">CONTACTEZ-NOUS</span>
+            <h1 class="display-4 fw-bold text-dark mb-3">Parlons de votre projet</h1>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                Une question sur votre expatriation ? Notre équipe d'experts est là pour vous accompagner.
+            </p>
+        </div>
+
+        <div class="row g-4 align-items-stretch">
+            {# --- COLONNE INFOS (STYLE CARTE MODERNE) --- #}
+            <div class="col-lg-5">
+                <div class="contact-info-card p-5 rounded-5 shadow-lg text-white h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #42B1CE 0%, #2a8da7 100%);">
+                    <div class="position-absolute top-0 end-0 p-5 opacity-10">
+                        <i class="bi bi-envelope-paper-fill" style="font-size: 10rem;"></i>
+                    </div>
+                    
+                    <h3 class="fw-bold mb-4 position-relative">Informations de contact</h3>
+                    <p class="mb-5 opacity-75 position-relative" style="color:black;">Votre message sera traité sous 24 à 48 heures ouvrées.</p>
+                    
+                    <div class="d-flex align-items-center mb-4 position-relative info-item">
+                        <div class="icon-box me-3 rounded-4 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div>
+                            <span class="d-block small opacity-75">Notre siège</span>
+                            <span class="fw-medium"  style="color:black;">Anfa Place, 20250 Casablanca, Maroc</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-4 position-relative info-item">
+                        <div class="icon-box me-3 rounded-4 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-envelope-at"></i>
+                        </div>
+                        <div>
+                            <span class="d-block small opacity-75">Email direct</span>
+                            <span class="fw-medium"  style="color:black;">no-play@expat-souk.com</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-5 position-relative info-item">
+                        <div class="icon-box me-3 rounded-4 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                        <div>
+                            <span class="d-block small opacity-75">Support technique</span>
+                            <span class="fw-medium"  style="color:black;">Disponible du Lun-Ven, 9h-18h</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-5 border-top border-white border-opacity-25 position-relative">
+                        <p class="small mb-3 opacity-75">Suivez-nous sur les réseaux :</p>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# --- COLONNE FORMULAIRE (STYLE ÉPURÉ) --- #}
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm p-4 p-md-5 rounded-5 h-100 bg-white">
+                    {{ form_start(contactForm, {'attr': {'novalidate': 'novalidate'}}) }}
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                {{ form_label(contactForm.name, 'Votre Nom Complet', {'label_attr': {'class': 'form-label fw-bold small text-muted text-uppercase mb-2'}}) }}
+                                {{ form_widget(contactForm.name, {'attr': {'class': 'form-control custom-input', 'placeholder': 'Ex: Jean Dupont'}}) }}
+                                <div class="text-danger small mt-1">{{ form_errors(contactForm.name) }}</div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                {{ form_label(contactForm.email, 'Adresse Email', {'label_attr': {'class': 'form-label fw-bold small text-muted text-uppercase mb-2'}}) }}
+                                {{ form_widget(contactForm.email, {'attr': {'class': 'form-control custom-input', 'placeholder': 'exemple@email.com'}}) }}
+                                <div class="text-danger small mt-1">{{ form_errors(contactForm.email) }}</div>
+                            </div>
+
+                            <div class="col-12">
+                                {{ form_label(contactForm.subject, 'Sujet du message', {'label_attr': {'class': 'form-label fw-bold small text-muted text-uppercase mb-2'}}) }}
+                                {{ form_widget(contactForm.subject, {'attr': {'class': 'form-select custom-input'}}) }}
+                                <div class="text-danger small mt-1">{{ form_errors(contactForm.subject) }}</div>
+                            </div>
+
+                            <div class="col-12">
+                                {{ form_label(contactForm.message, 'Votre Message', {'label_attr': {'class': 'form-label fw-bold small text-muted text-uppercase mb-2'}}) }}
+                                {{ form_widget(contactForm.message, {'attr': {
+                                    'class': 'form-control custom-input',
+                                    'rows': '5', 
+                                    'placeholder': 'Comment pouvons-nous vous aider ?'
+                                }}) }}
+                                <div class="text-danger small mt-1">{{ form_errors(contactForm.message) }}</div>
+                            </div>
+
+                            <div class="col-12 mt-5">
+                                <button type="submit" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-cyan w-100 fw-bold transition-up" style="background-color: #42B1CE; border: none;">
+                                    Envoyer le message <i class="bi bi-send ms-2"></i>
+                                </button>
+                                <p class="text-center text-muted small mt-3">
+                                    <i class="bi bi-shield-check me-1"></i> Vos données sont protégées et ne seront jamais partagées.
+                                </p>
+                            </div>
+                        </div>
+                    {{ form_end(contactForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Gradient de fond très doux */
+    .bg-contact-gradient {
+        background: radial-gradient(circle at top right, #42B1CE05 0%, #f8f9fa 100%);
+    }
+
+    /* Style des Inputs */
+    .custom-input {
+        background-color: #f8f9fa !important;
+        border: 2px solid #f8f9fa !important;
+        padding: 0.8rem 1.2rem;
+        border-radius: 12px !important;
+        transition: all 0.3s ease;
+    }
+
+    .custom-input:focus {
+        background-color: #fff !important;
+        border-color: #42B1CE50 !important;
+        box-shadow: 0 10px 20px rgba(66, 177, 206, 0.08) !important;
+        transform: translateY(-2px);
+    }
+
+    /* Carte d'infos */
+    .icon-box {
+        width: 45px;
+        height: 45px;
+        background: rgba(255, 255, 255, 0.15);
+        font-size: 1.2rem;
+    }
+
+    .social-link {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    .social-link:hover {
+        background: white;
+        color: #42B1CE;
+        transform: translateY(-3px);
+    }
+
+    .shadow-cyan {
+        box-shadow: 0 10px 25px rgba(66, 177, 206, 0.3);
+    }
+
+    .transition-up {
+        transition: all 0.3s ease;
+    }
+
+    .transition-up:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(66, 177, 206, 0.4) !important;
+    }
+
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    @media (max-width: 991px) {
+        .contact-info-card { height: auto !important; margin-bottom: 2rem; }
+    }
+</style>
+
+{{ include('layouts/footer.html.twig') }}
+{% endblock %}

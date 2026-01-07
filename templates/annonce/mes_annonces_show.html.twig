@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<div class="container py-5">
+    {# Fil d'Ariane Minimaliste #}
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ path('app_home') }}" class="text-decoration-none text-muted">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('app_mes_annonces') }}" class="text-decoration-none text-muted">Ma gestion</a></li>
+            <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Suivi de l'annonce</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        {# --- COLONNE GAUCHE : RÉSUMÉ --- #}
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                {# Header de la carte avec couleur thématique #}
+                <div class="p-4 border-bottom bg-white">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h2 class="fw-bold h4 mb-0">{{ annonce.title }}</h2>
+                        <div class="text-end">
+                            {% if annonce.status == 'approved' %}
+                                <span class="badge rounded-pill px-3 py-2 bg-success-subtle text-success border border-success border-opacity-25">
+                                    <i class="bi bi-patch-check-fill me-1"></i> En ligne
+                                </span>
+                            {% elseif annonce.status == 'pending' %}
+                                <span class="badge rounded-pill px-3 py-2 bg-warning-subtle text-warning border border-warning border-opacity-25">
+                                    <i class="bi bi- hourglass-split me-1"></i> En révision
+                                </span>
+                            {% else %}
+                                <span class="badge rounded-pill px-3 py-2 bg-danger-subtle text-danger border border-danger border-opacity-25">
+                                    <i class="bi bi-exclamation-octagon me-1"></i> Refusée
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-4 align-items-center mt-2">
+                        <div class="h4 fw-bold mb-0" style="color: #42B1CE;">{{ annonce.price|number_format(0, '.', ' ') }} MAD</div>
+                        <div class="text-muted small"><i class="bi bi-calendar3 me-1"></i> {{ "now"|date("d/m/Y") }}</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-light-subtle">
+                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Description de l'annonce</h6>
+                    <p class="text-secondary mb-0" style="white-space: pre-line;">{{ annonce.description }}</p>
+                </div>
+            </div>
+            
+            {# Petit rappel de sécurité/conseil #}
+            <div class="mt-4 p-3 rounded-4 border-start border-4 shadow-sm bg-white" style="border-color: #42B1CE !important;">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-info-circle-fill fs-4 me-3" style="color: #42B1CE;"></i>
+                    <p class="small mb-0 text-secondary">
+                        <strong>Conseil :</strong> Une annonce avec des photos claires et un prix juste reçoit en moyenne 4x plus de messages.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        {# --- COLONNE DROITE : ACTIONS --- #}
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
+                <h5 class="fw-bold mb-4">Gestion de l'offre</h5>
+                
+                <div class="d-grid gap-3">
+                    <a href="{{ path('app_annonce_edit', {id: annonce.id}) }}" class="btn btn-custom-cyan rounded-pill py-2 fw-bold shadow-sm">
+                        <i class="bi bi-pencil-square me-2"></i> Modifier
+                    </a>
+                    
+                    <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" class="btn btn-outline-dark rounded-pill py-2 fw-bold">
+                        <i class="bi bi-eye me-2"></i> Aperçu public
+                    </a>
+
+                    <div class="my-2 border-top"></div>
+
+                    <form method="post" action="{{ path('app_annonce_delete', {id: annonce.id}) }}" onsubmit="return confirm('Supprimer définitivement cette annonce ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ annonce.id) }}">
+                        <button class="btn btn-link text-danger w-100 text-decoration-none small fw-bold">
+                            <i class="bi bi-trash3 me-2"></i> Supprimer l'annonce
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modale de Confirmation Style iOS/Moderne #}
+<div class="modal fade" id="waitingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+            <div class="modal-body text-center p-5">
+                <div class="mb-4 d-inline-block p-4 rounded-circle bg-light">
+                    <i class="bi bi-stars" style="font-size: 3rem; color: #42B1CE;"></i>
+                </div>
+                <h3 class="fw-bold mb-3">Presque en ligne !</h3>
+                <p class="text-secondary mb-4 px-lg-3">
+                    Votre annonce <strong>"{{ annonce.title }}"</strong> a bien été enregistrée. 
+                    Elle sera examinée par notre équipe sous <strong>24 heures</strong>.
+                </p>
+                <button type="button" class="btn btn-custom-cyan rounded-pill px-5 py-2 fw-bold" data-bs-dismiss="modal">
+                    Génial, j'attends !
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-custom-cyan {
+        background-color: #42B1CE;
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-custom-cyan:hover {
+        background-color: #369ab3;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(66, 177, 206, 0.3);
+    }
+    .bg-light-subtle { background-color: #f8f9fa; }
+    .breadcrumb-item + .breadcrumb-item::before { content: "›"; }
+    .rounded-5 { border-radius: 2rem !important; }
+</style>
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if app.flashes('show_waiting_modal') is not empty %}
+                const myModal = new bootstrap.Modal(document.getElementById('waitingModal'));
+                myModal.show();
+            {% endif %}
+        });
+    </script>
+{% endblock %}
+{% endblock %}

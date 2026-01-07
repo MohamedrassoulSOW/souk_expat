@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails Ville - {{ city.name }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid p-0">
+    <div class="row g-0">
+
+        <main class="col-12 col-md-9 col-lg-10 p-4 bg-light min-vh-100">
+            
+            {# Fil d'Ariane / Header #}
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-1">
+                            <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ path('app_city_index') }}" class="text-decoration-none">Villes</a></li>
+                            <li class="breadcrumb-item active">{{ city.name }}</li>
+                        </ol>
+                    </nav>
+                    <h3 class="fw-bold mb-0">Détails de la ville</h3>
+                </div>
+                <a href="{{ path('app_city_index') }}" class="btn btn-outline-secondary text-danger rounded-pill px-3">
+                    <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+                </a>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="card-header bg-white border-bottom p-3">
+                            <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-info-circle me-2 text-info"></i>Informations générales</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table mb-0">
+                                <tbody>
+                                    <tr class="border-bottom">
+                                        <th class="ps-4 py-3 bg-light" style="width: 30%;">ID</th>
+                                        <td class="ps-4 py-3 font-monospace text-muted">#{{ city.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="ps-4 py-3 bg-light">Nom de la ville</th>
+                                        <td class="ps-4 py-3 fw-bold text-dark fs-5">{{ city.name }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer bg-white border-top p-3 d-flex gap-2">
+                            <a href="{{ path('app_city_edit', {'id': city.id}) }}" class="btn btn-primary rounded-pill px-4" style="background-color: #42B1CE; border: none;">
+                                <i class="bi bi-pencil-square me-2"></i>Modifier
+                            </a>
+                            
+                            {# Formulaire de suppression stylisé #}
+                            <div class="ms-auto">
+                                {{ include('city/_delete_form.html.twig') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Optionnel : Une carte d'aperçu de l'activité dans cette ville #}
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100 d-flex flex-column align-items-center justify-content-center text-center">
+                        <div class="rounded-circle mb-3 d-flex align-items-center justify-content-center" style="background: #42B1CE15; width: 80px; height: 80px;">
+                            <i class="bi bi-geo-alt-fill fs-1" style="color: #42B1CE;"></i>
+                        </div>
+                        <h5 class="fw-bold">{{ city.name }}</h5>
+                        <p class="text-muted small">Toutes les annonces publiées dans cette zone géographique seront liées à cette localité.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<style>
+    /* On garde le style de la sidebar pour la cohérence */
+    .breadcrumb-item a { color: #42B1CE; }
+    .bg-light { background-color: #f8f9fa !important; }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+{% endblock %}

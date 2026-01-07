@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if category is defined %}
+        Annonces {{ category.name }} | Expat Souk
+    {% else %}
+        Toutes les annonces | Expat Souk
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    {{ include('layouts/navBar.html.twig') }}
+
+    <div class="container mt-5">
+        {# --- EN-TÊTE DE PAGE --- #}
+        <div class="row mb-4">
+            <div class="col-md-8">
+                {% if category is defined %}
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                            <li class="breadcrumb-item active">{{ category.name }}</li>
+                        </ol>
+                    </nav>
+                    <h1 class="fw-bold">Toutes les annonces : <span class="text-primary">{{ category.name }}</span></h1>
+                {% else %}
+                    <h1 class="fw-bold">Toutes les <span class="text-primary">Annonces</span></h1>
+                {% endif %}
+                <p class="text-muted">{{ annonces.getTotalItemCount }} résultats trouvés</p>
+            </div>
+            <div class="col-md-4 text-md-end align-self-end">
+                <a href="{{ path('app_annonce_new') }}" class="btn btn-primary rounded-pill px-4">
+                    <i class="bi bi-plus-circle me-2"></i>Déposer une annonce
+                </a>
+            </div>
+        </div>
+
+        <hr class="mb-5">
+
+        {# --- GRILLE D'ANNONCES --- #}
+        <div class="row g-4">
+            {% for annonce in annonces %}
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative annonce-card">
+                        
+                        {# Badge Prix #}
+                        <div class="position-absolute top-0 end-0 m-3" style="z-index: 2;">
+                            <span class="badge bg-white text-primary fs-6 shadow-sm rounded-pill px-3">
+                                {{ annonce.price }} MAD
+                            </span>
+                        </div>
+
+                        {# Image #}
+                        <div class="ratio ratio-4x3">
+                            {% if annonce.annonceImages|length > 0 %}
+                                <img src="{{ asset('uploads/annonces/' ~ annonce.annonceImages[0].imadeName) }}" 
+                                     class="card-img-top object-fit-cover" 
+                                     alt="{{ annonce.title }}">
+                            {% else %}
+                                <img src="{{ asset('images/no-image.jpg') }}" 
+                                     class="card-img-top object-fit-cover" 
+                                     alt="Pas d'image">
+                            {% endif %}
+                        </div>
+
+                        {# Contenu #}
+                        <div class="card-body d-flex flex-column p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-light text-muted fw-normal">{{ annonce.category.name }}</span>
+                                <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ annonce.city.name }}</small>
+                            </div>
+                            
+                            <h5 class="card-title fw-bold mb-3">
+                                <a href="{{ path('app_annonce_show', {'id': annonce.id}) }}" class="text-dark text-decoration-none stretched-link">
+                                    {{ annonce.title|u.truncate(45, '...') }}
+                                </a>
+                            </h5>
+                            
+                            <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                                <span class="small text-muted">{{ annonce.createdAt|date('d/m/Y') }}</span>
+                                <span class="btn btn-link p-0 text-primary"><i class="bi bi-arrow-right-circle fs-5"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12 text-center py-5">
+                    <div class="mb-3">
+                        <i class="bi bi- megaphone fs-1 text-muted"></i>
+                    </div>
+                    <h4>Aucune annonce trouvée</h4>
+                    <p class="text-muted">Il n'y a pas encore d'annonces dans cette catégorie.</p>
+                    <a href="{{ path('app_home') }}" class="btn btn-outline-primary rounded-pill px-4 mt-3">Retour à l'accueil</a>
+                </div>
+            {% endfor %}
+        </div>
+
+        {# --- NAVIGATION (PAGINATION) --- #}
+        <div class="d-flex justify-content-center mt-5 mb-5">
+            <div class="pagination-wrapper">
+                {{ knp_pagination_render(annonces) }}
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .annonce-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .annonce-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+        .pagination {
+            gap: 5px;
+        }
+        .page-link {
+            border-radius: 50% !important;
+            border: none;
+            color: #42B1CE;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-item.active .page-link {
+            background-color: #42B1CE;
+            color: white;
+        }
+    </style>
+
+    {{ include('layouts/footer.html.twig') }}
+{% endblock %}

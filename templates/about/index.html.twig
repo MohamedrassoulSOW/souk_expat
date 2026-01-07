@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}À propos de Expat-Souk{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+<div class="container my-5">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1 class="display-4 fw-bold text-primary">Bienvenue sur Expat-Souk</h1>
+            <p class="lead">La passerelle entre les expatriés et les meilleures opportunités locales.</p>
+            <p>
+                Expat-Souk est né d'une idée simple : faciliter la vie des expatriés en créant un espace sécurisé 
+                pour acheter, vendre et échanger des biens. Que vous cherchiez un appartement, un véhicule 
+                ou des services de proximité, nous sommes là pour vous.
+            </p>
+            <div class="mt-4">
+                <a href="{{ path('app_annonce_new') }}" class="btn btn-primary btn-lg">Déposer une annonce</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <img src="{{ asset('images/souk_expat.jpg') }}" 
+            alt="Communauté Expat" 
+            class="img-fluid rounded-4 shadow-lg hover-zoom" 
+            style="transition: transform .3s text-align: center;">
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="p-3">
+                <i class="bi bi-shield-check display-5 text-success"></i>
+                <h3 class="mt-3">Sécurité</h3>
+                <p>Toutes nos annonces sont modérées par nos administrateurs avant publication.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3">
+                <i class="bi bi-people display-5 text-success"></i>
+                <h3 class="mt-3">Communauté</h3>
+                <p>Un réseau solide d'expatriés partageant les mêmes besoins et valeurs.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3">
+                <i class="bi bi-lightning display-5 text-success"></i>
+                <h3 class="mt-3">Rapidité</h3>
+                <p>Une interface fluide pour trouver ce dont vous avez besoin en quelques clics.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ include('layouts/footer.html.twig') }}
+{% endblock %}

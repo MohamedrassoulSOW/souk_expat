@@ -1,0 +1,89 @@
+{# templates/reset_password/email.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Base */
+        body { background-color: #f4f7f9; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        .wrapper { background-color: #f4f7f9; padding: 40px 20px; }
+        
+        /* Card */
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        
+        /* Header */
+        .header { background-color: #42B1CE; padding: 40px 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+        
+        /* Content */
+        .content { padding: 40px 30px; line-height: 1.6; color: #444444; }
+        .content h2 { color: #333333; margin-top: 0; font-size: 22px; }
+        
+        /* Button */
+        .button-wrapper { text-align: center; margin: 35px 0; }
+        .button { 
+            background-color: #42B1CE; 
+            color: #ffffff !important; 
+            padding: 16px 32px; 
+            text-decoration: none; 
+            border-radius: 50px; 
+            font-weight: bold; 
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(66, 177, 206, 0.3);
+        }
+        
+        /* Security note */
+        .security-note { 
+            background-color: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 12px; 
+            font-size: 14px; 
+            color: #777777; 
+            margin-top: 30px;
+            border-left: 4px solid #42B1CE;
+        }
+
+        /* Footer */
+        .footer { padding: 30px; text-align: center; color: #999999; font-size: 13px; }
+        .expiry { color: #e67e22; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            {# En-tête avec la couleur officielle #}
+            <div class="header">
+                <h1>EXPAT SOUK</h1>
+            </div>
+            
+            <div class="content">
+                <h2>Bonjour,</h2>
+                <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte <strong>Expat Souk</strong>.</p>
+                
+                <p>Pas d'inquiétude, cliquez sur le bouton ci-dessous pour en choisir un nouveau :</p>
+                
+                <div class="button-wrapper">
+                    <a href="{{ url('app_reset_password', {token: resetToken.token}) }}" class="button">
+                        Réinitialiser mon mot de passe
+                    </a>
+                </div>
+                
+                <p>⚠️ Attention : Ce lien est temporaire et expirera dans <span class="expiry">{{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}</span>.</p>
+                
+                <div class="security-note">
+                    <strong>Vous n'êtes pas à l'origine de cette demande ?</strong><br>
+                    Ignorez simplement cet e-mail. Votre mot de passe actuel restera en sécurité et aucune modification ne sera effectuée.
+                </div>
+                
+                <p style="margin-top: 30px;">À très vite,<br><strong>L'équipe Expat Souk</strong></p>
+            </div>
+            
+            <div class="footer">
+                &copy; {{ "now"|date("Y") }} Expat Souk<br>
+                La plateforme préférée des expatriés.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

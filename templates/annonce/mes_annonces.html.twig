@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Annonces | Expat Souk{% endblock %}
+
+{% block body %}
+    {{ include('layouts/navBar.html.twig') }}
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="fw-bold">Mon Tableau de <span class="text-primary">Bord</span></h1>
+                <p class="text-muted">Gérez vos publications et suivez leur état de validation.</p>
+            </div>
+            <a href="{{ path('app_annonce_new') }}" class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-plus-lg me-2"></i>Nouvelle annonce
+            </a>
+        </div>
+
+        {# Affichage des messages Flash (Succès/Erreur) #}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Annonce</th>
+                            <th>Statut</th>
+                            <th>Prix</th>
+                            <th>Date</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for annonce in annonces %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        {% if annonce.annonceImages|length > 0 %}
+                                            <img src="{{ asset('uploads/annonces/' ~ annonce.annonceImages[0].imadeName) }}" 
+                                                 class="rounded-3 me-3" style="width: 60px; height: 60px; object-fit: cover;" alt="">
+                                        {% else %}
+                                            <div class="bg-light rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ annonce.title|u.truncate(40, '...') }}</div>
+                                            <span class="text-muted small">{{ annonce.category.name }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if annonce.status == 'approved' %}
+                                        <span class="badge rounded-pill bg-success-subtle text-success px-3">En ligne</span>
+                                    {% elseif annonce.status == 'pending' %}
+                                        <span class="badge rounded-pill bg-warning-subtle text-warning px-3">En révision</span>
+                                    {% else %}
+                                        <span class="badge rounded-pill bg-danger-subtle text-danger px-3">Refusée</span>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold">{{ annonce.price }} €</td>
+                                <td class="text-muted small">{{ annonce.createdAt|date('d/m/Y') }}</td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" class="btn btn-sm btn-outline-secondary" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_annonce_edit', {id: annonce.id}) }}" class="btn btn-sm btn-outline-primary" title="Modifier">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        {# Formulaire de suppression avec Token CSRF #}
+                                        <form method="post" action="{{ path('app_annonce_delete', {id: annonce.id}) }}" 
+                                              onsubmit="return confirm('Voulez-vous vraiment supprimer cette annonce ?');" style="display:inline-block;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ annonce.id) }}">
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    Vous n'avez pas encore publié d'annonces.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# --- PAGINATION --- #}
+        <div class="d-flex justify-content-center mt-4 mb-5">
+            {{ knp_pagination_render(annonces) }}
+        </div>
+    </div>
+
+    <style>
+        .table thead th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .bg-success-subtle { background-color: #d1e7dd; }
+        .bg-warning-subtle { background-color: #fff3cd; }
+        .bg-danger-subtle { background-color: #f8d7da; }
+    </style>
+
+    {{ include('layouts/footer.html.twig') }}
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin - Annonces Approuvées{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-success"><i class="bi bi-check-all me-2"></i>Annonces Approuvées</h1>
+        <a href="{{ path('admin_annonces_pending') }}" class="btn btn-outline-primary rounded-pill">
+            <i class="bi bi-clock me-1"></i> Voir les attentes
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded-4 bg-white p-3">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Annonceur</th>
+                    <th>Titre</th>
+                    <th>Catégorie</th>
+                    <th>Prix</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for annonce in annonces %}
+                    <tr>
+                        <td><small class="fw-bold">{{ annonce.user.firstName }} {{ annonce.user.lastName }}</small></td>
+                        <td>{{ annonce.title }}</td>
+                        <td><span class="badge bg-info-subtle text-info">{{ annonce.category.name }}</span></td>
+                        <td><strong>{{ annonce.price }} MAD</strong></td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" class="btn btn-sm btn-light" title="Voir">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {# Option : Permettre de rejeter une annonce déjà approuvée en cas d'erreur #}
+                                <form method="post" action="{{ path('admin_annonce_reject', {id: annonce.id}) }}" onsubmit="return confirm('Suspendre cette annonce ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ annonce.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="5" class="text-center py-4">Aucune annonce approuvée.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

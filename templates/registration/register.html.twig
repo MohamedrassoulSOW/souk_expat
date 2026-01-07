@@ -1,82 +1,148 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription | Expat Souk{% endblock %}
 
 {% block body %}
-    <main class="container py-4 py-md-5">
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+{{ include('layouts/navBar.html.twig') }}
 
-                <div class="card shadow-sm border-0 p-4 p-md-5">
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
 
-                    <h4 class="text-center mb-4 fw-bold">
-                        Create your <span class="text-primary">Expat Souk</span> account
-                    </h4>
+            {# Logo ou Badge de bienvenue #}
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle shadow-sm mb-3 bg-white" style="width: 80px; height: 80px;">
+                    <i class="bi bi-person-plus-fill fs-1" style="color: #42B1CE;"></i>
+                </div>
+                <h2 class="fw-bold h3 mb-1">Rejoignez le Souk</h2>
+                <p class="text-muted small text-uppercase letter-spacing-1">Créez votre compte en 1 minute</p>
+            </div>
 
-                    {{ form_start(registrationForm) }}
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-body p-4 p-md-5 bg-white">
 
-                    {# Erreurs globales #}
-                    {{ form_errors(registrationForm) }}
+                    {{ form_start(registrationForm, {'attr': {'class': 'needs-validation'}}) }}
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form_row(registrationForm.firstName, {
-                                attr: { class: 'form-control form-control-lg' }
-                            }) }}
+                        {# Erreurs de formulaire stylisées #}
+                        {% if form_errors(registrationForm) %}
+                            <div class="alert alert-danger border-0 small shadow-sm mb-4">
+                                {{ form_errors(registrationForm) }}
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-3">
+                            {# Prénom #}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small fw-bold text-muted">Prénom</label>
+                                {{ form_widget(registrationForm.firstName, {
+                                    attr: { class: 'form-control form-control-lg border-light-subtle bg-light shadow-none ps-3 rounded-3', placeholder: 'Ex: Mahou' }
+                                }) }}
+                            </div>
+
+                            {# Nom #}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small fw-bold text-muted">Nom</label>
+                                {{ form_widget(registrationForm.lastName, {
+                                    attr: { class: 'form-control form-control-lg border-light-subtle bg-light shadow-none ps-3 rounded-3', placeholder: 'Ex: SOW' }
+                                }) }}
+                            </div>
                         </div>
 
-                        <div class="col-md-6 mb-3">
-                            {{ form_row(registrationForm.lastName, {
-                                attr: { class: 'form-control form-control-lg' }
-                            }) }}
+                        {# Email #}
+                        <div class="mb-3 mt-2">
+                            <label class="form-label small fw-bold text-muted">Adresse Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light-subtle"><i class="bi bi-envelope text-muted"></i></span>
+                                {{ form_widget(registrationForm.email, {
+                                    attr: { class: 'form-control form-control-lg border-light-subtle bg-light shadow-none ps-0 rounded-end-3', placeholder: 'votre@email.com' }
+                                }) }}
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        {{ form_row(registrationForm.email, {
-                            attr: {
-                                class: 'form-control form-control-lg',
-                                placeholder: 'name@example.com'
-                            }
-                        }) }}
-                    </div>
+                        {# Mot de passe #}
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted">Mot de passe</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light-subtle"><i class="bi bi-shield-lock text-muted"></i></span>
+                                {{ form_widget(registrationForm.plainPassword, {
+                                    attr: { class: 'form-control form-control-lg border-light-subtle bg-light shadow-none ps-0 rounded-end-3', placeholder: '••••••••' }
+                                }) }}
+                            </div>
+                            <div class="form-text extra-small text-muted mt-2">8 caractères minimum conseillés.</div>
+                        </div>
 
-                    <div class="mb-3">
-                        {{ form_row(registrationForm.plainPassword, {
-                            label: 'Password',
-                            attr: {
-                                class: 'form-control form-control-lg',
-                                placeholder: '••••••••'
-                            }
-                        }) }}
-                    </div>
+                        {# CGU #}
+                        <div class="form-check mb-4 custom-checkbox">
+                            {{ form_widget(registrationForm.agreeTerms, {
+                                attr: { class: 'form-check-input' }
+                            }) }}
+                            <label class="form-check-label small text-muted ms-2" for="{{ registrationForm.agreeTerms.vars.id }}">
+                                J'accepte les <a href="#" class="text-decoration-none fw-bold" style="color: #42B1CE;">conditions d'utilisation</a> d'Expat Souk.
+                            </label>
+                            {{ form_errors(registrationForm.agreeTerms) }}
+                        </div>
 
-                    <div class="form-check mb-4">
-                        {{ form_widget(registrationForm.agreeTerms, {
-                            attr: { class: 'form-check-input' }
-                        }) }}
-                        {{ form_label(registrationForm.agreeTerms, null, {
-                            label_attr: { class: 'form-check-label' }
-                        }) }}
-                        {{ form_errors(registrationForm.agreeTerms) }}
-                    </div>
+                        {# Bouton d'inscription #}
+                        <button type="submit" class="btn btn-register-custom btn-lg w-100 py-3 rounded-pill fw-bold shadow-sm mb-3">
+                            S'inscrire maintenant
+                        </button>
 
-                    <button type="submit" class="btn btn-primary btn-lg w-100">
-                        Sign up
-                    </button>
-
-                    <div class="text-center mt-4 small">
-                        Already have an account?
-                        <a href="{{ path('app_login') }}" class="fw-semibold text-decoration-none">
-                            Log in
-                        </a>
-                    </div>
+                        {# Lien de connexion #}
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <p class="text-muted small mb-0">
+                                Vous avez déjà un compte ? 
+                                <a href="{{ path('app_login') }}" class="fw-bold text-decoration-none ms-1" style="color: #42B1CE;">
+                                    Connectez-vous ici
+                                </a>
+                            </p>
+                        </div>
 
                     {{ form_end(registrationForm) }}
 
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
+<style>
+    /* --- Styles Personnalisés --- */
+    .btn-register-custom {
+        background-color: #42B1CE;
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-register-custom:hover {
+        background-color: #369ab3;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(66, 177, 206, 0.2) !important;
+    }
+
+    .form-control:focus {
+        background-color: #fff !important;
+        border-color: #42B1CE !important;
+        box-shadow: 0 0 0 0.25rem rgba(66, 177, 206, 0.1) !important;
+    }
+
+    .letter-spacing-1 { letter-spacing: 1px; }
+    .extra-small { font-size: 0.7rem; }
+    
+    .input-group-text {
+        border-right: none !important;
+    }
+    
+    /* Style Checkbox */
+    .form-check-input:checked {
+        background-color: #42B1CE;
+        border-color: #42B1CE;
+    }
+
+    @media (max-width: 576px) {
+        .card-body { padding: 1.5rem !important; }
+    }
+</style>
+
+{{ include('layouts/footer.html.twig') }}
 {% endblock %}

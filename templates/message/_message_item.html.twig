@@ -1,0 +1,75 @@
+{# templates/message/_message_item.html.twig #}
+{% set isMine = (message.sender == app.user) %}
+
+<div class="d-flex {{ isMine ? 'justify-content-end' : 'justify-content-start' }} mb-3 animate-message">
+    <div style="max-width: 80%;">
+        {# La bulle de message #}
+        <div class="p-3 shadow-sm {{ isMine ? 'bubble-mine' : 'bubble-other' }}">
+            
+            {# Contenu du message #}
+            <p class="mb-1 message-text">{{ message.content }}</p>
+            
+            {# Heure et statut #}
+            <div class="d-flex align-items-center {{ isMine ? 'justify-content-end' : 'justify-content-start' }}">
+                <small class="message-time">
+                    {{ message.createdAt|date('H:i') }}
+                    {% if isMine %}
+                        <i class="bi bi-check2-all ms-1"></i>
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Message envoyé (Moi) */
+    .bubble-mine {
+        background-color: #42B1CE;
+        color: white;
+        border-radius: 18px 18px 2px 18px;
+        position: relative;
+    }
+
+    /* Message reçu (L'autre) */
+    .bubble-other {
+        background-color: #ffffff;
+        color: #333;
+        border-radius: 18px 18px 18px 2px;
+        border: 1px solid #f0f0f0;
+    }
+
+    /* Typographie */
+    .message-text {
+        font-size: 0.92rem;
+        line-height: 1.4;
+        word-wrap: break-word;
+    }
+
+    .message-time {
+        font-size: 0.68rem;
+        opacity: 0.75;
+    }
+
+    /* Animation d'apparition du message */
+    .animate-message {
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from { 
+            opacity: 0; 
+            transform: translateY(10px); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+    }
+
+    /* Adaptation pour les liens dans les messages */
+    .bubble-mine a { color: #ffffff; text-decoration: underline; }
+    .bubble-other a { color: #42B1CE; text-decoration: none; font-weight: bold; }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">

@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Villes | Expat Souk{% endblock %}
+
+{% block body %}
+<div class="container-fluid p-0">
+    <div class="row g-0">
+
+        <main class="col-12 col-md-9 col-lg-10 p-4 bg-light min-vh-100">
+            
+            {# Header de la liste #}
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                <div class="d-flex flex-column">
+                    <a href="{{ path('app_dashboard') }}" class="text-decoration-none text-muted mb-1">
+                        <i class="bi bi-house-door-fill me-1"></i> Tableau de bord
+                    </a>
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-1">🌍 Villes & Localisations</h3>
+                    <p class="text-muted small mb-0">Gérez les zones géographiques disponibles pour les annonces.</p>
+                </div>
+                <a href="{{ path('app_city_new') }}" class="btn btn-primary rounded-pill px-4 shadow-sm" style="background-color: #42B1CE; border: none;">
+                    <i class="bi bi-plus-lg me-2"></i>Ajouter une ville
+                </a>
+            </div>
+
+            {# Card de la table #}
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-0 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Liste des enregistrements</h5>
+                        <div class="badge bg-soft-info text-info rounded-pill px-3">{{ cities|length }} villes au total</div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-muted small">
+                                <tr>
+                                    <th class="ps-4 py-3 border-0" style="width: 100px;">ID</th>
+                                    <th class="py-3 border-0">NOM DE LA VILLE</th>
+                                    <th class="py-3 border-0 text-end pe-4">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for city in cities %}
+                                <tr class="border-bottom border-light">
+                                    <td class="ps-4 py-3">
+                                        <span class="badge bg-light text-dark border rounded-pill px-3">#{{ city.id }}</span>
+                                    </td>
+                                    <td class="py-3 fw-bold text-dark">
+                                        {{ city.name }}
+                                    </td>
+                                    <td class="text-end pe-4 py-3">
+                                        <div class="btn-group shadow-sm rounded-pill overflow-hidden bg-white border">
+                                            <a href="{{ path('app_city_show', {'id': city.id}) }}" class="btn btn-sm btn-white px-3 border-0" title="Voir">
+                                                <i class="bi bi-eye text-primary"></i>
+                                            </a>
+                                            <a href="{{ path('app_city_edit', {'id': city.id}) }}" class="btn btn-sm btn-white px-3 border-start" title="Modifier">
+                                                <i class="bi bi-pencil-square text-warning"></i>
+                                            </a>
+                                            {# Le bouton delete est souvent géré via un petit formulaire ou un lien spécifique dans la vue show/edit pour éviter les erreurs #}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-5">
+                                        <div class="text-muted">
+                                            <i class="bi bi-geo-alt fs-1 opacity-25 d-block mb-3"></i>
+                                            Aucune ville trouvée dans la base de données.
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {# Pagination ou Infos supplémentaires #}
+            <div class="mt-4 d-flex justify-content-between align-items-center px-2">
+                <small class="text-muted">Affichage de 1 à {{ cities|length }} sur {{ cities|length }} villes</small>
+                {# Ici vous pourriez ajouter la pagination Symfony (KnpPaginator) #}
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<style>
+    .bg-soft-info { background-color: #42B1CE15; }
+    
+    .table thead th {
+        letter-spacing: 0.5px;
+        font-weight: 700;
+    }
+
+    .btn-white {
+        background-color: white;
+        transition: all 0.2s;
+    }
+
+    .btn-white:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.05);
+    }
+
+    .table tbody tr {
+        transition: background-color 0.2s;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa !important;
+    }
+
+    /* Style spécifique pour le groupe de boutons action */
+    .btn-group .btn {
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+{% endblock %}

@@ -1,0 +1,62 @@
+{# templates/city/_form.html.twig #}
+
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+    
+    <div class="mb-4">
+        {# Style du Label #}
+        {{ form_label(form.name, 'Nom de la ville', {'label_attr': {'class': 'form-label fw-bold text-dark small text-uppercase'}}) }}
+        
+        {# Style du Champ Saisie #}
+        {{ form_widget(form.name, {
+            'attr': {
+                'class': 'form-control form-control-lg shadow-none custom-input',
+                'placeholder': 'Ex: Casablanca, Paris, Montréal...'
+            }
+        }) }}
+        
+        {# Affichage des erreurs de validation #}
+        <div class="text-danger small mt-1">
+            {{ form_errors(form.name) }}
+        </div>
+    </div>
+
+    {# Bouton d'action #}
+    <div class="d-grid gap-2 mt-4">
+        <button class="btn btn-primary btn-lg shadow-sm rounded-pill py-3 fw-bold">
+            <i class="bi bi-save2 me-2"></i>
+            {{ button_label|default('Enregistrer les modifications') }}
+        </button>
+    </div>
+
+{{ form_end(form) }}
+
+<style>
+    /* Style personnalisé pour les champs de saisie */
+    .custom-input {
+        border: 2px solid #f0f2f5 !important;
+        border-radius: 12px !important;
+        transition: all 0.3s ease !important;
+        font-size: 1rem !important;
+    }
+
+    .custom-input:focus {
+        border-color: #42B1CE !important;
+        background-color: #fff !important;
+        box-shadow: 0 0 0 4px rgba(66, 177, 206, 0.1) !important;
+    }
+
+    /* Style du bouton (couleur signature) */
+    .btn-primary {
+        background-color: #42B1CE !important;
+        border: none !important;
+        transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+
+    .btn-primary:hover {
+        background-color: #369db7 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 15px rgba(66, 177, 206, 0.2) !important;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">

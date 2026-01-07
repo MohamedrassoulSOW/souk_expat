@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Email envoyé - Expat Souk{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+        <div class="col-md-7 col-lg-5 text-center">
+            
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                {# Bande décorative supérieure #}
+                <div style="height: 6px; background-color: #42B1CE;"></div>
+                
+                <div class="card-body p-4 p-md-5">
+                    {# Icône Succès #}
+                    <div class="bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle mb-4" style="width: 90px; height: 90px;">
+                        <i class="bi bi-envelope-check-fill text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    
+                    <h2 class="fw-bold h3 mb-3">Vérifiez vos emails</h2>
+                    
+                    <p class="text-muted mb-4 lead fs-6">
+                        Si un compte correspond à <br>
+                        <strong class="text-dark">{{ resetToken.user.email|default('votre adresse') }}</strong>, 
+                        un lien de réinitialisation vous a été envoyé.
+                    </p>
+
+                    {# Info Expiration #}
+                    <div class="d-flex align-items-center justify-content-center alert border-0 rounded-3 mb-4 py-2" style="background-color: #fef9e7; color: #9a7d0a;">
+                        <i class="bi bi-hourglass-split me-2"></i>
+                        <span class="small fw-bold">Le lien expire dans 1 heure.</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-4">
+                        <p class="small text-secondary mb-0">
+                            Rien reçu ? Vérifiez vos <strong>courriers indésirables (spams)</strong> ou 
+                            <a href="{{ path('app_forgot_password_request') }}" class="fw-bold text-decoration-none" style="color: #42B1CE;">réessayez</a>.
+                        </p>
+                    </div>
+
+                    {# Actions #}
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_login') }}" class="btn btn-cyan-outline rounded-pill py-2 fw-bold">
+                            <i class="bi bi-arrow-left me-2"></i>Retour à la connexion
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mt-4 text-muted small">
+                Besoin d'aide ? <a href="#" class="text-decoration-none" style="color: #42B1CE;">Contactez le support</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Style du bouton contourné avec votre couleur */
+    .btn-cyan-outline {
+        border: 2px solid #42B1CE;
+        color: #42B1CE;
+        transition: all 0.3s ease;
+    }
+    .btn-cyan-outline:hover {
+        background-color: #42B1CE;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(66, 177, 206, 0.2);
+    }
+
+    /* Animation d'apparition */
+    .card {
+        animation: scaleUp 0.4s ease-out;
+    }
+    @keyframes scaleUp {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Lettre espacée pour le titre */
+    h2 {
+        letter-spacing: -0.5px;
+    }
+</style>
+{% endblock %}

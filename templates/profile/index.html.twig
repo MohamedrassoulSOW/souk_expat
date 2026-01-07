@@ -1,0 +1,192 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil - Expat-Souk{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            
+            {# Navigation supérieure #}
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a href="{{ path('app_home') }}" class="text-decoration-none text-muted small fw-bold hover-cyan">
+                    <i class="bi bi-chevron-left"></i> RETOUR ACCUEIL
+                </a>
+                <span class="badge bg-white shadow-sm rounded-pill px-3 py-2 border" style="color: #42B1CE;">
+                    <i class="bi bi-patch-check-fill me-1"></i> Compte Utilisateur
+                </span>
+            </div>
+
+            {# Messages Flash Stylisés #}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label == 'danger' ? 'danger' : 'success' }} border-0 shadow-sm rounded-4 alert-dismissible fade show mb-4 py-3">
+                        <i class="bi {{ label == 'danger' ? 'bi-exclamation-triangle' : 'bi-check-circle' }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                {# Header avec Dégradé Custom #}
+                <div class="profile-header-custom"></div>
+                
+                <div class="card-body pt-0 px-4 px-md-5 pb-5">
+                    {# Avatar Section #}
+                    <div class="text-center avatar-container-custom mb-4">
+                        <div class="d-inline-block position-relative">
+                            <img src="{{ user.avatar ? asset('uploads/avatars/' ~ user.avatar) : asset('uploads/avatars/avatar.png') }}"
+                                 class="rounded-circle avatar-img-custom shadow bg-white" 
+                                 id="avatarPreview" alt="Avatar">
+                            
+                            {# Formulaire Avatar #}
+                            {{ form_start(formAvatar, {'action': path('app_profile_avatar_update'), 'attr': {'id': 'avatarForm'}}) }}
+                                {{ form_widget(formAvatar.avatar, {'attr': {'class': 'd-none', 'id': 'avatarInput'}}) }}
+                                <button type="button" id="btnTriggerUpload"
+                                        class="btn btn-cyan-round position-absolute bottom-0 end-0 shadow border border-3 border-white">
+                                    <i class="bi bi-camera-fill"></i>
+                                </button>
+                            {{ form_end(formAvatar) }}
+                        </div>
+                        <h2 class="fw-bold mt-3 mb-0 text-dark">{{ user.firstName }} {{ user.lastName }}</h2>
+                        <p class="text-muted"><i class="bi bi-envelope-at me-1"></i> {{ user.email }}</p>
+                    </div>
+
+                    <div class="row g-4 mt-2">
+                        {# Détails #}
+                        <div class="col-md-7">
+                            <div class="bg-light-cyan rounded-4 p-4 h-100 border border-white shadow-sm">
+                                <h6 class="fw-bold mb-4 text-dark text-uppercase small letter-spacing">Détails personnels</h6>
+                                <div class="row g-3">
+                                    <div class="col-6 border-end">
+                                        <label class="info-label">Prénom</label>
+                                        <p class="fs-6 fw-bold text-dark mb-0">{{ user.firstName }}</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="info-label">Nom</label>
+                                        <p class="fs-6 fw-bold text-dark mb-0">{{ user.lastName }}</p>
+                                    </div>
+                                    <div class="col-12 mt-4 pt-3 border-top">
+                                        <label class="info-label">Membre depuis</label>
+                                        <p class="mb-0 fw-medium text-dark"><i class="bi bi-calendar3 me-2" style="color: #42B1CE;"></i>Janvier 2024</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Actions #}
+                        <div class="col-md-5">
+                            <div class="d-grid gap-2 h-100">
+                                <a href="{{ path('app_profile_edit') }}" class="btn btn-action-profile py-3 px-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="bi bi-person-gear me-2"></i> Éditer le profil</span>
+                                        <i class="bi bi-chevron-right small opacity-50"></i>
+                                    </div>
+                                </a>
+                                <a href="{{ path('app_profile_password') }}" class="btn btn-action-profile-outline py-3 px-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="bi bi-lock me-2"></i> Mot de passe</span>
+                                        <i class="bi bi-chevron-right small opacity-50"></i>
+                                    </div>
+                                </a>
+                                {% if user.avatar %}
+                                    <form method="post" action="{{ path('app_profile_avatar_delete') }}" onsubmit="return confirm('Supprimer la photo ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_avatar') }}">
+                                        <button type="submit" class="btn btn-link text-danger w-100 text-decoration-none small mt-2">
+                                            <i class="bi bi-trash3 me-1"></i> Supprimer l'avatar
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Statistiques #}
+            <div class="row mt-4 g-3 text-center">
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 stat-card-hover">
+                        <div class="mb-2"><i class="bi bi-megaphone display-6" style="color: #42B1CE;"></i></div>
+                        <h4 class="fw-bold mb-0">{{ user.annonces|length }}</h4>
+                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Annonces</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 stat-card-hover">
+                        <div class="mb-2"><i class="bi bi-chat-dots display-6" style="color: #42B1CE;"></i></div>
+                        <h4 class="fw-bold mb-0">{{ user.messagesAsSender|length }}</h4>
+                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Messages</small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    /* --- Styles Custom #42B1CE --- */
+    .profile-header-custom {
+        height: 140px;
+        background: linear-gradient(135deg, #42B1CE 0%, #2980b9 100%);
+    }
+    .avatar-container-custom { margin-top: -70px; }
+    .avatar-img-custom {
+        width: 140px; height: 140px;
+        object-fit: cover; border: 5px solid #fff;
+    }
+    .btn-cyan-round {
+        background-color: #42B1CE;
+        color: white; border-radius: 50%;
+        width: 40px; height: 40px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .btn-cyan-round:hover { background-color: #369ab3; color: white; }
+    
+    .bg-light-cyan { background-color: #f0faff; }
+    .info-label { font-size: 0.65rem; color: #95a5a6; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    
+    /* Boutons Actions */
+    .btn-action-profile {
+        background-color: #2d3436; color: white;
+        border-radius: 15px; border: none; transition: 0.3s;
+        font-weight: 600;
+    }
+    .btn-action-profile:hover { background-color: #42B1CE; transform: translateX(5px); color: white; }
+    
+    .btn-action-profile-outline {
+        background-color: transparent; color: #2d3436;
+        border-radius: 15px; border: 2px solid #2d3436; transition: 0.3s;
+        font-weight: 600;
+    }
+    .btn-action-profile-outline:hover { border-color: #42B1CE; color: #42B1CE; }
+
+    .stat-card-hover { transition: 0.3s; border: 1px solid transparent !important; }
+    .stat-card-hover:hover { transform: translateY(-5px); border-color: #42B1CE !important; }
+    
+    .hover-cyan:hover { color: #42B1CE !important; }
+    .letter-spacing { letter-spacing: 1.5px; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('btnTriggerUpload');
+        const input = document.getElementById('avatarInput');
+        if (btn && input) {
+            btn.addEventListener('click', () => input.click());
+            input.addEventListener('change', () => {
+                if (input.files && input.files[0]) {
+                    document.getElementById('avatarPreview').style.opacity = '0.5';
+                    document.getElementById('avatarForm').submit();
+                }
+            });
+        }
+    });
+</script>
+
+{{ include('layouts/footer.html.twig') }}
+{% endblock %}

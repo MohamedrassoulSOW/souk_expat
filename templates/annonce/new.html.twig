@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Annonce{% endblock %}
+
+{% block body %}
+
+    <div class="container mt-4 text-end">
+        <a href="{{ path('app_annonce_index') }}" class="btn btn-outline-secondary btn-sm mb-3">
+            ← Retour aux annonces
+        </a>
+    </div>
+
+    {{ include('annonce/_form.html.twig') }}
+
+{% endblock %}

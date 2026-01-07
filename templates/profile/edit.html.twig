@@ -1,0 +1,145 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paramètres du profil - Expat-Souk{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+
+            {# Lien de retour stylisé #}
+            <div class="mb-4">
+                <a href="{{ path('app_profile') }}" class="text-decoration-none text-muted small fw-bold hover-cyan">
+                    <i class="bi bi-arrow-left me-1"></i> RETOUR AU PROFIL
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                {# Header coloré #}
+                <div class="p-4 text-white text-center" style="background-color: #42B1CE;">
+                    <h4 class="fw-bold mb-0">Modifier mes informations</h4>
+                    <p class="small opacity-75 mb-0">Gardez vos coordonnées à jour</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    {# Preview de l'avatar avec effet de cercle #}
+                    <div class="text-center mb-5">
+                        <div class="position-relative d-inline-block">
+                            <img id="avatar-preview"
+                                 src="{{ user.avatar ? asset('uploads/avatars/' ~ user.avatar) : asset('uploads/avatars/avatar.png') }}"
+                                 alt="Avatar"
+                                 class="rounded-circle shadow-sm border border-4 border-white"
+                                 style="width:130px; height:130px; object-fit:cover; background-color: #f8f9fa;">
+                            <div class="position-absolute bottom-0 end-0 bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; border: 1px solid #eee;">
+                                <i class="bi bi-pencil-fill src" style="color: #42B1CE; font-size: 0.8rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'enctype': 'multipart/form-data'}}) }}
+                        
+                        <div class="row g-3">
+                            {# Prénom #}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Prénom</label>
+                                {{ form_widget(form.firstName, {'attr': {'class': 'form-control rounded-3 py-2', 'placeholder': 'Votre prénom'}}) }}
+                                <div class="text-danger small">{{ form_errors(form.firstName) }}</div>
+                            </div>
+
+                            {# Nom #}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Nom</label>
+                                {{ form_widget(form.lastName, {'attr': {'class': 'form-control rounded-3 py-2', 'placeholder': 'Votre nom'}}) }}
+                                <div class="text-danger small">{{ form_errors(form.lastName) }}</div>
+                            </div>
+
+                            {# Email #}
+                            <div class="col-12 mb-3">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Adresse Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                                    {{ form_widget(form.email, {'attr': {'class': 'form-control border-start-0 ps-0 py-2', 'placeholder': 'nom@exemple.com'}}) }}
+                                </div>
+                                <div class="text-danger small">{{ form_errors(form.email) }}</div>
+                            </div>
+
+                            {# Upload Avatar #}
+                            <div class="col-12 mb-4">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Changer la photo de profil</label>
+                                {{ form_widget(form.avatar, {'attr': {'class': 'form-control rounded-3'}}) }}
+                                <div class="form-text extra-small text-muted">Format recommandé : JPG ou PNG (max 2Mo).</div>
+                                <div class="text-danger small">{{ form_errors(form.avatar) }}</div>
+                            </div>
+
+                            {# Bouton Submit #}
+                            <div class="col-12 mt-2">
+                                <button type="submit" class="btn btn-cyan-profile w-100 py-3 rounded-pill fw-bold shadow-sm">
+                                    <i class="bi bi-check2-circle me-2"></i>Enregistrer les modifications
+                                </button>
+                            </div>
+                        </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            
+            {# Footer de page #}
+            <div class="text-center mt-4">
+                <p class="text-muted small">Besoin de changer votre mot de passe ? <a href="{{ path('app_profile_password') }}" class="fw-bold text-decoration-none" style="color: #42B1CE;">Cliquez ici</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-cyan-profile {
+        background-color: #42B1CE;
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-cyan-profile:hover {
+        background-color: #369ab3;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(66, 177, 206, 0.3) !important;
+    }
+    .form-control:focus {
+        border-color: #42B1CE;
+        box-shadow: 0 0 0 0.25rem rgba(66, 177, 206, 0.1);
+    }
+    .hover-cyan:hover {
+        color: #42B1CE !important;
+    }
+    .extra-small {
+        font-size: 0.75rem;
+    }
+    label.form-label {
+        letter-spacing: 0.5px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarInput = document.querySelector('#{{ form.avatar.vars.id }}');
+        const avatarPreview = document.getElementById('avatar-preview');
+
+        if(avatarInput) {
+            avatarInput.addEventListener('change', function(e){
+                const file = e.target.files[0];
+                if(file){
+                    const reader = new FileReader();
+                    reader.onload = function(event){
+                        avatarPreview.src = event.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
+
+{{ include('layouts/footer.html.twig') }}
+{% endblock %}

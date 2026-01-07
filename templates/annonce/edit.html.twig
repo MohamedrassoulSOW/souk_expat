@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon annonce | Souk Expat{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            
+            {# Retour rapide #}
+            <div class="mb-4">
+                <a href="{{ path('app_mes_annonces') }}" class="text-decoration-none text-muted small">
+                    <i class="bi bi-arrow-left me-1"></i> Retour à ma gestion
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                {# Header contextuel #}
+                <div class="p-4 text-white d-flex justify-content-between align-items-center" style="background-color: #42B1CE;">
+                    <div>
+                        <h3 class="fw-bold mb-0">Modifier l'annonce</h3>
+                        <p class="mb-0 opacity-75 small text-white-50">Mettez à jour vos informations en quelques clics</p>
+                    </div>
+                    <i class="bi bi-pencil-square fs-1 opacity-25"></i>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    {# Inclusion du formulaire stylisé (celui créé précédemment) #}
+                    {{ include('annonce/_form.html.twig', {'button_label': 'Enregistrer les modifications'}) }}
+                </div>
+
+                {# Zone de danger (Suppression) #}
+                <div class="card-footer bg-light-subtle p-4 border-top">
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                        <div class="text-center text-md-start">
+                            <h6 class="fw-bold text-danger mb-1">Zone de danger</h6>
+                            <p class="text-muted small mb-0">La suppression est définitive et retirera l'annonce du Souk.</p>
+                        </div>
+                        <div class="ms-md-auto">
+                            {{ include('annonce/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    /* --- Styles spécifiques à l'édition --- */
+    .btn-custom-cyan {
+        background-color: #42B1CE !important;
+        border: none !important;
+        padding: 12px 35px !important;
+    }
+    
+    .bg-light-subtle {
+        background-color: #fefefe;
+    }
+
+    /* Harmonisation du bouton de suppression si nécessaire */
+    .card-footer form button {
+        border-radius: 50px !important;
+        padding: 8px 20px !important;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+</style>
+
+{{ include('layouts/footer.html.twig') }}
+{% endblock %}

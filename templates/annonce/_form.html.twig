@@ -1,0 +1,136 @@
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            {# Carte Principale #}
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                {# Header de la carte #}
+                <div class="p-4 text-white text-center" style="background-color: #42B1CE;">
+                    <h3 class="fw-bold mb-1">Créer une annonce</h3>
+                    <p class="mb-0 opacity-75 small">Remplissez les détails pour attirer les acheteurs</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5 bg-white">
+                    {{ form_start(form, {'attr': {'class': 'row g-4', 'id': 'createAd', 'enctype': 'multipart/form-data'}}) }}
+
+                        {# TITRE #}
+                        <div class="col-12 col-md-7">
+                            <label class="form-label fw-bold small text-uppercase text-muted">Titre de l'annonce</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-tag text-muted"></i></span>
+                                {{ form_widget(form.title, {'attr': {'class': 'form-control border-start-0 ps-0', 'placeholder': 'Ex: iPhone 15 Pro Max...'}}) }}
+                            </div>
+                            {{ form_errors(form.title) }}
+                        </div>
+
+                        {# PRIX #}
+                        <div class="col-6 col-md-5">
+                            <label class="form-label fw-bold small text-uppercase text-muted">Prix (MAD)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-cash text-muted"></i></span>
+                                {{ form_widget(form.price, {'attr': {'class': 'form-control border-start-0 ps-0', 'placeholder': '0.00'}}) }}
+                            </div>
+                            {{ form_errors(form.price) }}
+                        </div>
+
+                        {# CATÉGORIE #}
+                        <div class="col-6 col-md-6">
+                            <label class="form-label fw-bold small text-uppercase text-muted">Catégorie</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-grid text-muted"></i></span>
+                                {{ form_widget(form.category, {'attr': {'class': 'form-select border-start-0 ps-0'}}) }}
+                            </div>
+                            {{ form_errors(form.category) }}
+                        </div>
+
+                        {# VILLE #}
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-bold small text-uppercase text-muted">Ville / Quartier</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-geo-alt text-muted"></i></span>
+                                {{ form_widget(form.city, {'attr': {'class': 'form-control border-start-0 ps-0'}}) }}
+                            </div>
+                            {{ form_errors(form.city) }}
+                        </div>
+
+                        {# DESCRIPTION #}
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-uppercase text-muted">Description détaillée</label>
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control rounded-3', 'rows': 5, 'placeholder': 'Décrivez votre objet, son état, etc.'}}) }}
+                            {{ form_errors(form.description) }}
+                        </div>
+
+                        {# TÉLÉPHONE #}
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-uppercase text-muted">Contact (téléphone)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone text-muted"></i></span>
+                                {{ form_widget(form.phone, {'attr': {'class': 'form-control border-start-0 ps-0', 'value': app.user.phone|default('')}}) }}
+                            </div>
+                            {{ form_errors(form.phone) }}
+                        </div>
+
+                        {# IMAGES - Zone de dépôt stylisée #}
+                        <div class="col-12">
+                            <div class="upload-zone p-4 rounded-4 border-dashed text-center position-relative bg-light">
+                                <i class="bi bi-cloud-arrow-up display-5 text-muted mb-2 d-block"></i>
+                                <label class="form-label fw-bold mb-1">Images de l'annonce</label>
+                                <p class="small text-muted mb-3">Plusieurs photos augmentent vos chances de vente</p>
+                                {{ form_widget(form.images, {'attr': {'class': 'form-control form-control-sm'}}) }}
+                                {{ form_errors(form.images) }}
+                            </div>
+                        </div>
+
+                        {# BOUTON VALIDER #}
+                        <div class="col-12 text-center pt-3">
+                            <button type="submit" class="btn btn-custom-cyan btn-lg rounded-pill px-5 fw-bold shadow-sm">
+                                {{ button_label|default('Publier l\'annonce') }}
+                            </button>
+                        </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    /* --- Couleur Thème --- */
+    .btn-custom-cyan {
+        background-color: #42B1CE;
+        border-color: #42B1CE;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-custom-cyan:hover {
+        background-color: #369ab3;
+        border-color: #369ab3;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* --- Form Styling --- */
+    .form-control:focus, .form-select:focus {
+        border-color: #42B1CE;
+        box-shadow: 0 0 0 0.25rem rgba(66, 177, 206, 0.15);
+    }
+
+    .input-group-text {
+        border: 1px solid #dee2e6;
+    }
+
+    .border-dashed {
+        border: 2px dashed #dee2e6 !important;
+        transition: 0.3s;
+    }
+    .upload-zone:hover {
+        border-color: #42B1CE !important;
+        background-color: #f8fdff !important;
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 576px) {
+        .card-body { padding: 1.5rem !important; }
+        .btn-lg { width: 100%; }
+    }
+</style>

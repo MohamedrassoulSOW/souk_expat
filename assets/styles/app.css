@@ -1,55 +1,230 @@
 body{
     background:#f8f9fa;
-    padding-top: 57px;
 }
-.hero {
-    background-image: url('/images/slider/souk_expat.png');
-    background-size: cover;
-    background-position: center;
-    height: 40vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.hero-height {
+    height: 60vh; /* Ajuste la hauteur ici */
+    min-height: 400px;
 }
 
-.hero .container {
-    color: #fff;
-    text-shadow: 0 2px 8px rgba(0,0,0,.5);
-    text-align: center;        /* centre le texte */
+.carousel-item {
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
 }
 
-.card img{object-fit:cover;height:180px}
-.thumb{cursor:pointer;opacity:.9}
-.thumb:hover{opacity:1}
-
-/* Cards */
-.product-card {
-  transition: 0.2s;
-  background: #fff;
-}
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+.search-overlay {
+    position: absolute;
+    bottom: 10%; /* Place la barre à 10% du bas du slider */
+    left: 0;
+    right: 0;
+    z-index: 10;
 }
 
-/* Image wrapper for subtle zoom */
-.product-img-wrapper {
-  overflow: hidden;
-  border-radius: 20px 20px 0 0;
-}
-.product-img-wrapper img {
-  transition: 0.3s;
-}
-.product-img-wrapper img:hover {
-  transform: scale(1.07);
+/* Animation douce pour le changement d'image */
+.carousel-fade .carousel-item {
+    transition-duration: 1s;
 }
 
-.card {
-    border-radius: 12px;
-}
-
-@media (max-width: 576px) {
-    .card {
-        border-radius: 0;
+@media (max-width: 768px) {
+    .search-overlay {
+        position: relative; /* On remet la barre sous le slider sur mobile */
+        bottom: 0;
+        margin-top: -30px; /* Effet de chevauchement léger */
+        padding: 0 15px;
+    }
+    .hero-height {
+        height: 50vh; /* On réduit un peu la hauteur sur mobile */
     }
 }
+
+.carousel-item {
+    background-color: #222; /* Fond noir en attendant l'image */
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+}
+
+/* Styles personnalisés pour moderniser de la page annonces */
+    .transition-hover {
+        transition: transform 0.3s ease, shadow 0.3s ease;
+    }
+    .transition-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
+    }
+    .z-index-10 { z-index: 10; }
+    .card-img-container img {
+        transition: transform 0.5s ease;
+    }
+    .card:hover .card-img-container img {
+        transform: scale(1.05);
+    }
+    .badge {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+/* Styles pour le navbar */
+
+.nav-link { position: relative; transition: color 0.3s ease; }
+    .nav-link:after {
+        content: ''; position: absolute; width: 0; height: 2px;
+        bottom: 5px; left: 50%; background-color: var(--bs-primary);
+        transition: all 0.3s ease; transform: translateX(-50%);
+    }
+    .nav-link:hover:after { width: 60%; }
+    .avatar-circle {
+        width: 40px; height: 40px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Design moderne et épuré pour la page Annonce */
+    .modern-card {
+        border-radius: 20px;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border: 1px solid rgba(0,0,0,0.05) !important;
+    }
+    
+    .modern-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+    }
+
+    .card-img-wrapper {
+        border-radius: 20px 20px 0 0;
+        height: 220px;
+    }
+
+    .card-img-wrapper img {
+        transition: transform 0.6s ease;
+    }
+
+    .modern-card:hover .card-img-wrapper img {
+        transform: scale(1.1);
+    }
+
+    .price-tag {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.95);
+        color: #000;
+        padding: 6px 14px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 1.1rem;
+    }
+
+    .bg-soft-primary {
+        background-color: #eef2ff;
+        font-size: 0.75rem;
+    }
+
+    .carousel-control-prev, .carousel-control-next {
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .modern-card:hover .carousel-control-prev, 
+    .modern-card:hover .carousel-control-next {
+        opacity: 1;
+    }
+
+    .pulse-animation:hover {
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    /* Styles pour la page d'accueil */
+        .modern-card {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+        .modern-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12) !important;
+        }
+        .img-zoom {
+            transition: transform 0.5s ease;
+        }
+        .modern-card:hover .img-zoom {
+            transform: scale(1.1);
+        }
+        .bg-soft-primary {
+            background-color: #e7f0ff;
+        }
+        .z-index-2 {
+            z-index: 2;
+        }
+        .chat-quick-link {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .chat-quick-link:hover {
+            background: #0d6efd !important;
+        }
+        .chat-quick-link:hover i {
+            color: white !important;
+        }
+
+        /* Personnalisation de la barre de défilement messagerie*/
+    #message-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    #message-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    #message-container::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 10px;
+    }
+
+
+    /* Bulles de message avec coins arrondis asymétriques  */
+    .message-bubble {
+        position: relative;
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+
+    .my-message {
+        border-radius: 18px 18px 2px 18px !important;
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7) !important;
+    }
+
+    .other-message {
+        border-radius: 18px 18px 18px 2px !important;
+        border: 1px solid #f0f0f0 !important;
+    }
+
+    /* Animation d'apparition douce */
+    .animate__fadeInUp {
+        animation-duration: 0.4s;
+    }
+
+    /* Effet de survol discret */
+    .message-bubble:hover {
+        filter: brightness(0.98);
+        transition: filter 0.2s ease;
+    }
+
+    /* Styles pour les cartes d'annonces sur la page d'accueil */
+    .transition-hover {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background: #fff;
+    }
+    .transition-hover:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+        z-index: 5;
+    }

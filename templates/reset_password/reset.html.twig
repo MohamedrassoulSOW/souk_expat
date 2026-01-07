@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau mot de passe - Expat Souk{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 65vh;">
+        <div class="col-md-6 col-lg-5 col-xl-4">
+            
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                {# Header avec la signature visuelle Expat Souk #}
+                <div class="p-4 text-center text-white" style="background-color: #42B1CE;">
+                    <div class="bg-white bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-key-fill fs-1"></i>
+                    </div>
+                    <h2 class="fw-bold h4 mb-1">Réinitialisation</h2>
+                    <p class="small mb-0 opacity-75">Choisissez un nouveau mot de passe</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <p class="text-muted small text-center mb-4">
+                        Assurez-vous de choisir un mot de passe robuste pour protéger votre compte.
+                    </p>
+
+                    {{ form_start(resetForm) }}
+                        {# Nouveau mot de passe #}
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Nouveau mot de passe</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-lock-fill text-muted"></i></span>
+                                {{ form_widget(resetForm.plainPassword.first, {
+                                    'attr': {
+                                        'class': 'form-control form-control-lg border-0 bg-light shadow-none ps-0',
+                                        'placeholder': '••••••••'
+                                    }
+                                }) }}
+                            </div>
+                            <div class="text-danger small mt-1">{{ form_errors(resetForm.plainPassword.first) }}</div>
+                        </div>
+
+                        {# Confirmation #}
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Confirmez le mot de passe</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-shield-check text-muted"></i></span>
+                                {{ form_widget(resetForm.plainPassword.second, {
+                                    'attr': {
+                                        'class': 'form-control form-control-lg border-0 bg-light shadow-none ps-0',
+                                        'placeholder': '••••••••'
+                                    }
+                                }) }}
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-2">
+                            <button type="submit" class="btn btn-cyan-save btn-lg rounded-pill py-3 fw-bold shadow-sm">
+                                Enregistrer le mot de passe
+                            </button>
+                        </div>
+                    {{ form_end(resetForm) }}
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="small text-muted">
+                    <i class="bi bi-question-circle me-1"></i> 
+                    Un problème ? <a href="mailto:support@expat-souk.com" class="text-decoration-none fw-bold" style="color: #42B1CE;">Contactez-nous</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Bouton personnalisé #42B1CE */
+    .btn-cyan-save {
+        background-color: #42B1CE;
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-cyan-save:hover {
+        background-color: #369ab3;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(66, 177, 206, 0.2) !important;
+    }
+
+    /* Style des inputs au focus */
+    .form-control:focus {
+        background-color: #ffffff !important;
+        border: 1px solid #42B1CE !important;
+        box-shadow: 0 0 0 0.25rem rgba(66, 177, 206, 0.1) !important;
+    }
+
+    .input-group-text {
+        border-right: none !important;
+    }
+
+    /* Animation d'entrée douce */
+    .card {
+        animation: fadeInScale 0.4s ease-out;
+    }
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.98) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+</style>
+{% endblock %}

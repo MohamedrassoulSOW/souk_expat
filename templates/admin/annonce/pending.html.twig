@@ -1,0 +1,113 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modération | Annonces en attente{% endblock %}
+
+{% block body %}
+    {# On inclut les composants globaux si besoin #}
+    {{ include('layouts/flush_message.html.twig') }}
+
+    <main class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0 text-gray-800">⏳ Annonces à modérer</h1>
+            <span class="badge bg-primary rounded-pill text-center">{{ annonces|length }} en attente</span>
+            <div class="mt-4 text-end">
+            <a href="{{ path('app_dashboard') }}" class="btn btn-link text-decoration-none text-end p-0">
+                ← Retour au tableau de bord
+            </a>
+        </div>
+        </div>
+
+        {% if annonces is empty %}
+            <div class="card border-0 shadow-sm text-center py-5">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <i class="bi bi-check2-circle text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="text-muted">Félicitations !</h4>
+                    <p class="mb-0">Toutes les annonces ont été traitées. Aucune tâche en attente 🎉</p>
+                </div>
+            </div>
+        {% else %}
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Annonce</th>
+                                <th>Auteur</th>
+                                <th>Prix</th>
+                                <th>Date de dépôt</th>
+                                <th class="text-end pe-4">Actions de modération</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for annonce in annonces %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            {# Petit aperçu de l'image si elle existe #}
+                                            {% if annonce.annonceImages|length > 0 %}
+                                                <img src="{{ asset('uploads/annonces/' ~ annonce.annonceImages[0].imadeName) }}" 
+                                                     class="rounded me-3" style="width: 45px; height: 45px; object-fit: cover;" alt="">
+                                            {% endif %}
+                                            <div>
+                                                <div class="fw-bold text-dark">{{ annonce.title }}</div>
+                                                <small class="text-muted">{{ annonce.city.name|default('Ville non définie') }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="small">{{ annonce.user.email }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark fw-normal">
+                                            {{ annonce.price|number_format(0, '.', ' ') }} MAD
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="small text-muted">
+                                            {{ annonce.createdAt|date('d/m/Y') }}<br>
+                                            <small>{{ annonce.createdAt|date('H:i') }}</small>
+                                        </div>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group shadow-sm">
+                                            {# Bouton Voir #}
+                                            <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" 
+                                               class="btn btn-outline-secondary btn-sm me-2" 
+                                               title="Prévisualiser">
+                                                👁️
+                                            </a>
+
+                                            {# Formulaire Approuver #}
+                                            <form method="post" 
+                                                  action="{{ path('admin_annonce_approve', {id: annonce.id}) }}" 
+                                                  class="d-inline me-1"
+                                                  onsubmit="return confirm('Voulez-vous vraiment APPROUVER cette annonce ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ annonce.id) }}">
+                                                <button class="btn btn-success btn-sm border-start-0" title="Approuver">
+                                                    ✅ Valider
+                                                </button>
+                                            </form>
+
+                                            {# Formulaire Rejeter #}
+                                            <form method="post" 
+                                                  action="{{ path('admin_annonce_reject', {id: annonce.id}) }}" 
+                                                  class="d-inline ms-1"
+                                                  onsubmit="return confirm('Voulez-vous vraiment REJETER cette annonce ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ annonce.id) }}">
+                                                <button class="btn btn-danger btn-sm" title="Rejeter">
+                                                    ❌ Refuser
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </main>
+{% endblock %}

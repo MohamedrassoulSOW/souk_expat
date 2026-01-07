@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin - Annonces Rejetées{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-danger"><i class="bi bi-trash me-2"></i>Annonces Rejetées</h1>
+        <a href="{{ path('admin_annonces_pending') }}" class="btn btn-outline-primary rounded-pill">
+            <i class="bi bi-clock me-1"></i> Voir les attentes
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded-4 bg-white p-3">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Annonceur</th>
+                    <th>Titre</th>
+                    <th>Prix</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for annonce in annonces %}
+                    <tr>
+                        <td>{{ annonce.user.firstName }} {{ annonce.user.lastName }}</td>
+                        <td>{{ annonce.title }}</td>
+                        <td>{{ annonce.price }} MAD</td>
+                        <td class="text-end">
+                            {# Donner une seconde chance : Repasser en approuvé #}
+                            <form method="post" action="{{ path('admin_annonce_approve', {id: annonce.id}) }}" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ annonce.id) }}">
+                                <button class="btn btn-sm btn-success rounded-pill px-3">
+                                    <i class="bi bi-check-lg me-1"></i> Ré-approuver
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4" class="text-center py-4 text-muted">La corbeille est vide.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
