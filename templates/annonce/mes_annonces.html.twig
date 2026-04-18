@@ -8,18 +8,20 @@
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h1 class="fw-bold">Mon Tableau de <span class="text-primary">Bord</span></h1>
+                {# Couleur Cyan appliquée au mot "Bord" #}
+                <h1 class="fw-bold">Mon Tableau de <span style="color: #42B1CE;">Bord</span></h1>
                 <p class="text-muted">Gérez vos publications et suivez leur état de validation.</p>
             </div>
-            <a href="{{ path('app_annonce_new') }}" class="btn btn-primary rounded-pill px-4">
+            {# Bouton personnalisé Cyan #}
+            <a href="{{ path('app_annonce_new') }}" class="btn btn-custom-cyan rounded-pill px-4 shadow-sm">
                 <i class="bi bi-plus-lg me-2"></i>Nouvelle annonce
             </a>
         </div>
 
-        {# Affichage des messages Flash (Succès/Erreur) #}
+        {# Affichage des messages Flash #}
         {% for label, messages in app.flashes %}
             {% for message in messages %}
-                <div class="alert alert-{{ label }} alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+                <div class="alert alert-{{ label }} alert-dismissible fade show rounded-4 shadow-sm border-0" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -45,9 +47,9 @@
                                     <div class="d-flex align-items-center">
                                         {% if annonce.annonceImages|length > 0 %}
                                             <img src="{{ asset('uploads/annonces/' ~ annonce.annonceImages[0].imadeName) }}" 
-                                                 class="rounded-3 me-3" style="width: 60px; height: 60px; object-fit: cover;" alt="">
+                                                 class="rounded-3 me-3 border" style="width: 60px; height: 60px; object-fit: cover;" alt="">
                                         {% else %}
-                                            <div class="bg-light rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                            <div class="bg-light rounded-3 me-3 d-flex align-items-center justify-content-center border" style="width: 60px; height: 60px;">
                                                 <i class="bi bi-image text-muted"></i>
                                             </div>
                                         {% endif %}
@@ -59,28 +61,28 @@
                                 </td>
                                 <td>
                                     {% if annonce.status == 'approved' %}
-                                        <span class="badge rounded-pill bg-success-subtle text-success px-3">En ligne</span>
+                                        <span class="badge rounded-pill bg-success-subtle text-success px-3 border border-success-subtle">En ligne</span>
                                     {% elseif annonce.status == 'pending' %}
-                                        <span class="badge rounded-pill bg-warning-subtle text-warning px-3">En révision</span>
+                                        <span class="badge rounded-pill bg-warning-subtle text-warning px-3 border border-warning-subtle">En révision</span>
                                     {% else %}
-                                        <span class="badge rounded-pill bg-danger-subtle text-danger px-3">Refusée</span>
+                                        <span class="badge rounded-pill bg-danger-subtle text-danger px-3 border border-danger-subtle">Refusée</span>
                                     {% endif %}
                                 </td>
-                                <td class="fw-bold">{{ annonce.price }} €</td>
+                                <td class="fw-bold" style="color: #2d3436;">{{ annonce.price }} MAD</td>
                                 <td class="text-muted small">{{ annonce.createdAt|date('d/m/Y') }}</td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group">
-                                        <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" class="btn btn-sm btn-outline-secondary" title="Voir">
+                                        <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" class="btn btn-sm btn-outline-secondary btn-action" title="Voir">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ path('app_annonce_edit', {id: annonce.id}) }}" class="btn btn-sm btn-outline-primary" title="Modifier">
+                                        {# Bouton Edit en Cyan #}
+                                        <a href="{{ path('app_annonce_edit', {id: annonce.id}) }}" class="btn btn-sm btn-outline-cyan btn-action" title="Modifier">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        {# Formulaire de suppression avec Token CSRF #}
                                         <form method="post" action="{{ path('app_annonce_delete', {id: annonce.id}) }}" 
                                               onsubmit="return confirm('Voulez-vous vraiment supprimer cette annonce ?');" style="display:inline-block;">
                                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ annonce.id) }}">
-                                            <button class="btn btn-sm btn-outline-danger">
+                                            <button class="btn btn-sm btn-outline-danger btn-action">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -89,7 +91,8 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
+                                <td colspan="5" class="text-center py-5 text-muted italic">
+                                    <i class="bi bi-inbox d-block display-4 mb-2 opacity-25"></i>
                                     Vous n'avez pas encore publié d'annonces.
                                 </td>
                             </tr>
@@ -99,25 +102,73 @@
             </div>
         </div>
 
-        {# --- PAGINATION --- #}
+        {# Pagination #}
         <div class="d-flex justify-content-center mt-4 mb-5">
             {{ knp_pagination_render(annonces) }}
         </div>
     </div>
 
     <style>
-        .table thead th {
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-            padding-top: 1rem;
-            padding-bottom: 1rem;
+        /* --- Nouveaux Styles de Couleur --- */
+        .btn-custom-cyan {
+            background-color: #42B1CE;
+            border-color: #42B1CE;
+            color: white;
+            transition: all 0.3s ease;
         }
-        .bg-success-subtle { background-color: #d1e7dd; }
-        .bg-warning-subtle { background-color: #fff3cd; }
-        .bg-danger-subtle { background-color: #f8d7da; }
-    </style>
 
-    {{ include('layouts/footer.html.twig') }}
+        .btn-custom-cyan:hover {
+            background-color: #369ab3;
+            border-color: #369ab3;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-cyan {
+            color: #42B1CE;
+            border-color: #42B1CE;
+        }
+
+        .btn-outline-cyan:hover {
+            background-color: #42B1CE;
+            border-color: #42B1CE;
+            color: white;
+        }
+
+        /* --- Amélioration Table --- */
+        .table thead th {
+            color: #636e72;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            padding: 1.2rem 1rem;
+            border-bottom: 2px solid #f1f2f6;
+        }
+
+        .btn-action {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px !important;
+            margin: 0 2px;
+        }
+
+        .bg-success-subtle { background-color: #e6f4ea !important; }
+        .bg-warning-subtle { background-color: #fff9e6 !important; }
+        .bg-danger-subtle { background-color: #fdeaea !important; }
+
+        /* Style pour la pagination (KNP) */
+        .pagination .page-item.active .page-link {
+            background-color: #42B1CE;
+            border-color: #42B1CE;
+        }
+        .pagination .page-link {
+            color: #42B1CE;
+            border-radius: 8px;
+            margin: 0 3px;
+        }
+    </style>
 {% endblock %}

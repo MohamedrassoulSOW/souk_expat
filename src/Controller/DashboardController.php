@@ -11,8 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\ContactRepository; // <-- Ajouté
+use App\Repository\ThreadRepository;
 
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_EDITOR')]
 class DashboardController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_dashboard')]
@@ -21,7 +22,8 @@ class DashboardController extends AbstractController
         AnnonceRepository $annonceRepository,
         SliderRepository $sliderRepository,   // <-- Injecté ici
         CategoryRepository $categoryRepository, // <-- Injecté ici
-        ContactRepository $contactRepository // <-- Injecté ici
+        ContactRepository $contactRepository, // <-- Injecté ici
+        ThreadRepository $threadRepository
     ): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -34,25 +36,23 @@ class DashboardController extends AbstractController
         $rejectedCount = 0;
         $messageCount = 0;
         $messageCountTrue = 0;
+        $chatThreadCount = 0;
         
         // Initialisation avec les vraies valeurs
         $sliderCount = $sliderRepository->count([]);     // <-- Récupère le vrai nombre
         $categoryCount = $categoryRepository->count([]); // <-- Récupère le vrai nombre
 
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $utilisateurs = $userRepository->findAll();
-            $userCount = $userRepository->count([]);
-            $messageCount = $contactRepository->count([
-            'isProcessed' => false
-            ]);
-            $messageCountTrue = $contactRepository->count([
-            'isProcessed' => true
-        ]);
-
-
+        if ($this->isGranted('ROLE_EDITOR')) {
+            $messageCount = $contactRepository->count(['isProcessed' => false]);
+            $messageCountTrue = $contactRepository->count(['isProcessed' => true]);
             $pendingCount = $annonceRepository->count(['status' => 'pending']);
             $approvedCount = $annonceRepository->count(['status' => 'approved']);
             $rejectedCount = $annonceRepository->count(['status' => 'rejected']);
+            $chatThreadCount = $threadRepository->count([]);
+        }
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $utilisateurs = $userRepository->findAll();
+            $userCount = $userRepository->count([]);
         }
 
         $user = $this->getUser();
@@ -72,6 +72,7 @@ class DashboardController extends AbstractController
             'categoryCount' => $categoryCount,
             'messageCount' => $messageCount,
             'messageCountTrue' => $messageCountTrue,
+            'chatThreadCount' => $chatThreadCount,
         ]);
     }
 }

@@ -1,4 +1,9 @@
 security:
+    # Les administrateurs héritent des droits éditeur (hors /admin/user réservé à ROLE_ADMIN).
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_USER, ROLE_EDITOR]
+        ROLE_EDITOR: [ROLE_USER]
+
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
@@ -29,18 +34,15 @@ security:
                 path: app_logout
 
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        
-        # 1. L'administration reste réservée aux admins
-        - { path: ^/admin, roles: ROLE_ADMIN }
-
-        # 2. Les routes publiques (Consultation)
-        # On autorise l'accès complet à la consultation des catégories et index
+        # Réservé au super-admin : tout ce qui est sous /admin/user
+        - { path: ^/admin/user, roles: ROLE_ADMIN }
+        # Le reste du back-office (annonces, contacts, contenus…) : admin ou éditeur
+        - { path: ^/admin, roles: ROLE_EDITOR }
+        - { path: ^/dashboard, roles: ROLE_EDITOR }
+        - { path: ^/city, roles: ROLE_EDITOR }
         - { path: ^/annonce/category, roles: PUBLIC_ACCESS }
         - { path: ^/annonce/$, roles: PUBLIC_ACCESS }
-        
-        # 3. Les routes protégées pour les utilisateurs (Publication / Edition)
-        # Ces lignes doivent être APRES les routes publiques
         - { path: ^/annonce/new, roles: ROLE_USER }
         - { path: ^/annonce/mes-annonces, roles: ROLE_USER }
         - { path: ^/annonce/\d+/edit, roles: ROLE_USER }
+        - { path: ^/annonce/admin, roles: ROLE_EDITOR }

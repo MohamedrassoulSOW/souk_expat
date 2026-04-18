@@ -1,17 +1,26 @@
-{% for message in app.flashes('success') %}
-    <div class="alert alert-success alert-dismissible fade show">
-        {{ message }}
-    </div>
+{# Consommé une fois par requête — inclus depuis base.html.twig #}
+{% set all_flashes = [] %}
+{% for label in ['success', 'danger', 'warning', 'info'] %}
+    {% for msg in app.flashes(label) %}
+        {% set all_flashes = all_flashes|merge([{ type: label, message: msg }]) %}
+    {% endfor %}
 {% endfor %}
-
-{% for message in app.flashes('danger') %}
-    <div class="alert alert-danger alert-dismissible fade show">
-        {{ message }}
-    </div>
+{# Types SymfonyCasts / legacy — mappés en danger pour les toasts #}
+{% for msg in app.flashes('reset_password_error') %}
+    {% set all_flashes = all_flashes|merge([{ type: 'danger', message: msg }]) %}
 {% endfor %}
-
-{% for message in app.flashes('info') %}
-    <div class="alert alert-info alert-dismissible fade show">
-        {{ message }}
+{% for msg in app.flashes('error') %}
+    {% set all_flashes = all_flashes|merge([{ type: 'danger', message: msg }]) %}
+{% endfor %}
+{% if all_flashes is not empty %}
+<script type="application/json" id="app-flash-data">{{ all_flashes|json_encode|raw }}</script>
+<noscript>
+    <div class="container mt-3">
+        {% for f in all_flashes %}
+            <div class="alert alert-{{ f.type == 'danger' ? 'danger' : (f.type == 'success' ? 'success' : (f.type == 'warning' ? 'warning' : 'info')) }} rounded-3 shadow-sm">
+                {{ f.message }}
+            </div>
+        {% endfor %}
     </div>
-{% endfor %} 
+</noscript>
+{% endif %}

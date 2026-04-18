@@ -40,4 +40,12 @@ class CityRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * @return list<City>
+     */
+    public function findAllOrderedByName(): array
+    {
+        return $this->findBy([], ['name' => 'ASC']);
+    }
 }

@@ -1,0 +1,64 @@
+{# Gabarit commun — pages institutionnelles (couleurs Expat Souk : #42B1CE) #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<header class="static-page-hero text-white py-5 mb-0">
+    <div class="container">
+        <div class="text-center mx-auto" style="max-width: 720px;">
+            <span class="static-badge text-uppercase small fw-semibold">{% block page_badge %}{% endblock %}</span>
+            <h1 class="display-5 fw-bold mt-3 mb-3">{% block page_heading %}{% endblock %}</h1>
+            <p class="lead mb-0 opacity-90">{% block page_lead %}{% endblock %}</p>
+        </div>
+    </div>
+</header>
+
+<main class="pb-5">
+    <div class="container py-4 py-md-5">
+        {% block static_body %}{% endblock %}
+    </div>
+</main>
+
+{{ include('layouts/footer.html.twig') }}
+
+<style>
+    .static-page-hero {
+        background: linear-gradient(135deg, #42B1CE 0%, #2a8da7 100%);
+        border-bottom-left-radius: 28px;
+        border-bottom-right-radius: 28px;
+        box-shadow: 0 12px 40px rgba(66, 177, 206, 0.22);
+    }
+    .static-badge {
+        display: inline-block;
+        letter-spacing: 1.5px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        color: #fff;
+        font-size: 0.72rem;
+    }
+    .static-card-soft {
+        border-radius: 16px;
+        border: 1px solid rgba(66, 177, 206, 0.14);
+        background: #fafcfd;
+        transition: box-shadow .2s ease, transform .2s ease;
+    }
+    .static-card-soft:hover {
+        box-shadow: 0 10px 35px rgba(42, 141, 167, 0.12);
+    }
+    .static-icon-circle {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        background: rgba(66, 177, 206, 0.12);
+        color: #2a8da7;
+    }
+    .text-cyan-brand { color: #42B1CE !important; }
+</style>
+{% endblock %}

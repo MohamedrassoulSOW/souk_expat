@@ -2,7 +2,6 @@
 
 namespace App\Form;
 
-use App\DTO\ContactDTO;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -19,22 +18,23 @@ class ContactType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Votre Nom',
-                'attr' => ['placeholder' => 'Jean Dupont', 'class' => 'form-control-lg bg-light border-0 shadow-none']
+                'attr' => ['placeholder' => 'Moussa Ly', 'class' => 'form-control-lg bg-light border-0 shadow-none']
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Votre Email',
-                'attr' => ['placeholder' => 'jean@example.com', 'class' => 'form-control-lg bg-light border-0 shadow-none']
+                'attr' => ['placeholder' => 'moussa@example.com', 'class' => 'form-control-lg bg-light border-0 shadow-none']
             ])
             ->add('subject', ChoiceType::class, [
                 'label' => 'Sujet',
-                'choices'  => [
-                    'Choisir un sujet' => null,
-                    'Aide sur une annonce' => 'aide',
+                'placeholder' => 'Choisir un sujet',
+                'choices' => [
+                    'Aide sur une annonce' => 'Aide sur une annonce',
                     'Signaler un contenu' => 'signalement',
                     'Partenariat' => 'partenariat',
                     'Autre' => 'autre',
                 ],
-                'attr' => ['class' => 'form-select-lg bg-light border-0 shadow-none']
+                'required' => true,
+                'attr' => ['class' => 'form-select-lg bg-light border-0 shadow-none'],
             ])
             ->add('message', TextareaType::class, [
                 'label' => 'Message',
@@ -46,7 +46,7 @@ class ContactType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Contact::class, // REMPLACEZ ContactDTO::class PAR Contact::class
+            'data_class' => Contact::class,
         ]);
     }
 }

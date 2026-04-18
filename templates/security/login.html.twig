@@ -21,9 +21,9 @@
 
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                 {# Header de connexion #}
-                <div class="p-4 text-center text-white" style="background-color: #42B1CE;">
-                    <div class="bg-white bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
-                        <i class="bi bi-person-lock fs-2"></i>
+                <div class="p-4 text-center text-white" style="background: linear-gradient(135deg, #42B1CE 0%, #2a8da7 100%);">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2 overflow-hidden border border-2 border-white border-opacity-50 shadow-sm bg-white" style="width: 64px; height: 64px;">
+                        <img src="{{ asset('logo-souk-expat.png') }}" alt="Expat Souk" width="64" height="64" class="w-100 h-100" style="object-fit: cover;">
                     </div>
                     <h4 class="fw-bold mb-0">Bon retour !</h4>
                     <p class="small mb-0 opacity-75">Connectez-vous à Expat Souk</p>
@@ -71,7 +71,7 @@
                                     Se souvenir de moi
                                 </label>
                             </div>
-                            <a href="" class="small text-decoration-none fw-semibold" style="color: #42B1CE;">Oublié ?</a>
+                            <a href="{{ path('app_forgot_password_request') }}" class="small text-decoration-none fw-semibold" style="color: #42B1CE;">Oublié ?</a>
                         </div>
 
                         {# Bouton de connexion #}

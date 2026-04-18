@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Notification;
+use App\Entity\User;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,8 +18,13 @@ class NotificationController extends AbstractController
     #[Route('/notification/read/{id}', name: 'app_notification_read')]
     public function read(Notification $notification, EntityManagerInterface $em): Response
     {
-        // Sécurité : Vérifier que la notification appartient bien à l'utilisateur connecté
-        if ($notification->getUser() !== $this->getUser()) {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $owner = $notification->getUser();
+        if (!$owner || $owner->getId() !== $user->getId()) {
             throw $this->createAccessDeniedException('Vous ne pouvez pas lire cette notification.');
         }
 
@@ -36,8 +42,10 @@ class NotificationController extends AbstractController
     public function readAll(EntityManagerInterface $em, NotificationRepository $notifRepo): Response
     {
         $user = $this->getUser();
-        
-        // On cherche les notifications directement par le Repository
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         $notifications = $notifRepo->findBy([
             'user' => $user,
             'isRead' => false
@@ -56,8 +64,10 @@ class NotificationController extends AbstractController
     public function deleteAll(EntityManagerInterface $em, NotificationRepository $notificationRepository): Response
     {
         $user = $this->getUser();
-        
-        // On récupère les notifications directement via le repository
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         $notifications = $notificationRepository->findBy(['user' => $user]);
 
         foreach ($notifications as $notification) {

@@ -1,0 +1,65 @@
+{% extends 'page/static_base.html.twig' %}
+
+{% block title %}Blog & conseils — Expat Souk{% endblock %}
+
+{% block page_badge %}Inspiration{% endblock %}
+{% block page_heading %}Blog & conseils{% endblock %}
+{% block page_lead %}Idées, bons plans et repères pour simplifier votre vie d’expatrié au Maroc.{% endblock %}
+
+{% block static_body %}
+<div class="row g-4">
+    <div class="col-12 col-md-6 col-lg-4">
+        <article class="h-100 p-4 static-card-soft d-flex flex-column">
+            <div class="static-icon-circle mb-3 align-self-start"><i class="bi bi-sun"></i></div>
+            <h2 class="h5 fw-bold">Bien s’installer à Casablanca</h2>
+            <p class="text-secondary small flex-grow-1">Quartiers, transport, coût de la vie : les bases pour poser vos valises sereinement et trouver un logement adapté.</p>
+            <span class="text-cyan-brand small fw-semibold"><i class="bi bi-book me-1"></i>Conseil pratique</span>
+        </article>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <article class="h-100 p-4 static-card-soft d-flex flex-column">
+            <div class="static-icon-circle mb-3 align-self-start"><i class="bi bi-currency-exchange"></i></div>
+            <h2 class="h5 fw-bold">Vendre ses meubles avant un déménagement</h2>
+            <p class="text-secondary small flex-grow-1">Rédiger une annonce claire, fixer le bon prix, et organiser un retrait sans stress : notre check-list.</p>
+            <span class="text-cyan-brand small fw-semibold"><i class="bi bi-book me-1"></i>Seconde main</span>
+        </article>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <article class="h-100 p-4 static-card-soft d-flex flex-column">
+            <div class="static-icon-circle mb-3 align-self-start"><i class="bi bi-people"></i></div>
+            <h2 class="h5 fw-bold">S’intégrer et rencontrer du monde</h2>
+            <p class="text-secondary small flex-grow-1">Clubs, sports, réseaux d’expats : comment tisser des liens et se sentir chez soi, loin de chez soi.</p>
+            <span class="text-cyan-brand small fw-semibold"><i class="bi bi-book me-1"></i>Communauté</span>
+        </article>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <article class="h-100 p-4 static-card-soft d-flex flex-column">
+            <div class="static-icon-circle mb-3 align-self-start"><i class="bi bi-shield-check"></i></div>
+            <h2 class="h5 fw-bold">Acheter en toute confiance</h2>
+            <p class="text-secondary small flex-grow-1">Vérifiez l’annonce, privilégiez la messagerie Expat Souk, et gardez une trace des accords importants.</p>
+            <span class="text-cyan-brand small fw-semibold"><i class="bi bi-book me-1"></i>Sécurité</span>
+        </article>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <article class="h-100 p-4 static-card-soft d-flex flex-column">
+            <div class="static-icon-circle mb-3 align-self-start"><i class="bi bi-palette"></i></div>
+            <h2 class="h5 fw-bold">Mettre en valeur ses photos d’annonce</h2>
+            <p class="text-secondary small flex-grow-1">Lumière naturelle, fond neutre et plusieurs angles : trois astuces qui font la différence.</p>
+            <span class="text-cyan-brand small fw-semibold"><i class="bi bi-book me-1"></i>Annonces</span>
+        </article>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <article class="h-100 p-4 static-card-soft d-flex flex-column">
+            <div class="static-icon-circle mb-3 align-self-start"><i class="bi bi-globe2"></i></div>
+            <h2 class="h5 fw-bold">Adapter son budget au quotidien</h2>
+            <p class="text-secondary small flex-grow-1">Courses, restaurants, sorties : ordres de grandeur pour mieux piloter vos dépenses locales.</p>
+            <span class="text-cyan-brand small fw-semibold"><i class="bi bi-book me-1"></i>Budget</span>
+        </article>
+    </div>
+</div>
+
+<p class="text-center text-muted small mt-5 mb-0">
+    Une question précise ? <a href="{{ path('app_contact') }}" class="text-cyan-brand fw-semibold text-decoration-none">Écrivez-nous</a>
+    ou consultez la <a href="{{ path('app_faq') }}" class="text-cyan-brand fw-semibold text-decoration-none">FAQ</a>.
+</p>
+{% endblock %}

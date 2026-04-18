@@ -29,8 +29,6 @@
 
             <div class="row justify-content-center">
                 <div class="col-12 col-xl-7">
-                    {{ include('layouts/flush_message.html.twig') }}
-
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                         <div class="card-header bg-white border-bottom p-4">
                             <div class="d-flex align-items-center">
@@ -45,7 +43,7 @@
                         </div>
                         
                         <div class="card-body p-4">
-                            {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                            {{ form_start(form, {'attr': {'class': 'needs-validation', 'enctype': 'multipart/form-data'}}) }}
                                 <div class="mb-4">
                                     {{ form_label(form.name, 'Nom de la catégorie', {'label_attr': {'class': 'form-label fw-bold text-dark small text-uppercase'}}) }}
                                     {{ form_widget(form.name, {
@@ -60,6 +58,13 @@
                                     <div class="form-text mt-2 small">
                                         <i class="bi bi-info-circle me-1"></i> Le slug sera généré automatiquement à partir du nom.
                                     </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    {{ form_label(form.imageFile, 'Image (reconnaissance visuelle)', {'label_attr': {'class': 'form-label fw-bold text-dark small text-uppercase'}}) }}
+                                    {{ form_widget(form.imageFile) }}
+                                    <div class="form-text small">{{ form_help(form.imageFile) }}</div>
+                                    <div class="text-danger small mt-2">{{ form_errors(form.imageFile) }}</div>
                                 </div>
 
                                 <div class="d-grid mt-5">

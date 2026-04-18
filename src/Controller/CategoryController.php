@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -22,7 +23,7 @@ final class CategoryController extends AbstractController
     public function index(CategoryRepository $categoryRepository): Response
     {
         // Sécurité : Seul l'admin accède à ce fichier
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
         return $this->render('category/index.html.twig', [
             'categories' => $categoryRepository->findAll(),
@@ -36,16 +37,24 @@ final class CategoryController extends AbstractController
     public function addCategory(
         EntityManagerInterface $entityManager,
         Request $request,
-        SluggerInterface $slugger
+        SluggerInterface $slugger,
+        CategoryRepository $categoryRepository,
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
         $category = new Category();
         $form = $this->createForm(CategoryFormType::class, $category);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $category->setSlug($slugger->slug($category->getName())->lower());
+            $baseSlug = (string) $slugger->slug((string) $category->getName())->lower();
+            $category->setSlug($this->resolveUniqueCategorySlug($categoryRepository, $baseSlug, null));
+
+            /** @var UploadedFile|null $imageFile */
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile instanceof UploadedFile) {
+                $category->setImageName($this->storeCategoryImage($imageFile));
+            }
 
             $entityManager->persist($category);
             $entityManager->flush();
@@ -67,15 +76,29 @@ final class CategoryController extends AbstractController
         EntityManagerInterface $entityManager,
         Request $request,
         SluggerInterface $slugger,
-        Category $category
+        CategoryRepository $categoryRepository,
+        Category $category,
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
         $form = $this->createForm(CategoryFormType::class, $category);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $category->setSlug($slugger->slug($category->getName())->lower());
+            $baseSlug = (string) $slugger->slug((string) $category->getName())->lower();
+            $category->setSlug($this->resolveUniqueCategorySlug(
+                $categoryRepository,
+                $baseSlug,
+                $category->getId(),
+            ));
+
+            /** @var UploadedFile|null $imageFile */
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile instanceof UploadedFile) {
+                $this->deleteCategoryImageFile($category->getImageName());
+                $category->setImageName($this->storeCategoryImage($imageFile));
+            }
+
             $entityManager->flush();
 
             $this->addFlash('success', 'Catégorie mise à jour !');
@@ -96,7 +119,9 @@ final class CategoryController extends AbstractController
         EntityManagerInterface $entityManager,
         Category $category
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
+
+        $this->deleteCategoryImageFile($category->getImageName());
 
         $entityManager->remove($category);
         $entityManager->flush();
@@ -105,5 +130,56 @@ final class CategoryController extends AbstractController
         return $this->redirectToRoute('app_category');
     }
 
-    // --- LA MÉTHODE PUBLIQUE A ÉTÉ SUPPRIMÉE D'ICI POUR ÉVITER LE 404 ---
+    /**
+     * Garantit un slug unique (suffixe -2, -3, … si le nom d’affiche produit un slug déjà pris).
+     */
+    private function resolveUniqueCategorySlug(
+        CategoryRepository $categoryRepository,
+        string $baseSlug,
+        ?int $ignoreCategoryId,
+    ): string {
+        $slug = $baseSlug;
+        $n = 2;
+        while (true) {
+            $existing = $categoryRepository->findOneBy(['slug' => $slug]);
+            if (
+                $existing === null
+                || ($ignoreCategoryId !== null && $existing->getId() === $ignoreCategoryId)
+            ) {
+                return $slug;
+            }
+            $slug = $baseSlug . '-' . $n;
+            ++$n;
+        }
+    }
+
+    private function categoriesUploadDir(): string
+    {
+        $dir = $this->getParameter('kernel.project_dir') . '/public/uploads/categories';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+
+        return $dir;
+    }
+
+    private function storeCategoryImage(UploadedFile $imageFile): string
+    {
+        $ext = $imageFile->guessExtension() ?: 'jpg';
+        $filename = uniqid('cat_', true) . '.' . $ext;
+        $imageFile->move($this->categoriesUploadDir(), $filename);
+
+        return $filename;
+    }
+
+    private function deleteCategoryImageFile(?string $imageName): void
+    {
+        if ($imageName === null || $imageName === '') {
+            return;
+        }
+        $path = $this->categoriesUploadDir() . '/' . $imageName;
+        if (is_file($path)) {
+            unlink($path);
+        }
+    }
 }

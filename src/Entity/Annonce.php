@@ -19,6 +19,9 @@ class Annonce
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
 
+    /** Durée pendant laquelle une annonce validée reste visible avant suppression automatique. */
+    public const APPROVED_VISIBLE_DAYS = 30;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -47,6 +50,10 @@ class Annonce
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    /** Date à laquelle l’admin a accepté l’annonce ; sert au calcul des 30 jours en ligne. */
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $approvedAt = null;
 
     // 🔹 Relation vers User, nullable temporairement pour éviter l'erreur setUser()
     #[ORM\ManyToOne(inversedBy: 'annonces')]
@@ -108,6 +115,15 @@ class Annonce
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
     public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self { $this->updatedAt = $updatedAt; return $this; }
+
+    public function getApprovedAt(): ?\DateTimeImmutable { return $this->approvedAt; }
+
+    public function setApprovedAt(?\DateTimeImmutable $approvedAt): self
+    {
+        $this->approvedAt = $approvedAt;
+
+        return $this;
+    }
 
     // 🔹 Relation User
     public function getUser(): ?User { return $this->user; }

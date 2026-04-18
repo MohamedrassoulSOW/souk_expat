@@ -28,7 +28,7 @@
                             <div class="avatar-circle-custom">
                                 {{ interlocuteur.userIdentifier|slice(0, 1)|upper }}
                             </div>
-                            <span class="position-absolute status-indicator bg-success rounded-circle"></span>
+                            <span class="position-absolute status-indicator rounded-circle"></span>
                         </div>
 
                         {# Infos Conversation #}
@@ -111,6 +111,7 @@
         width: 14px; height: 14px;
         border: 3px solid white;
         bottom: -2px; right: -2px;
+        background: linear-gradient(135deg, #42B1CE, #2a8da7);
     }
 
     /* Zone vide droite */
@@ -142,6 +143,4 @@
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
 </style>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 {% endblock %}

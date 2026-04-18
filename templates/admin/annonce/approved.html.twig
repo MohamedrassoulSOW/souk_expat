@@ -30,14 +30,15 @@
                         <td><span class="badge bg-info-subtle text-info">{{ annonce.category.name }}</span></td>
                         <td><strong>{{ annonce.price }} MAD</strong></td>
                         <td class="text-end">
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" class="btn btn-sm btn-light" title="Voir">
-                                    <i class="bi bi-eye"></i>
+                            <div class="d-flex flex-wrap justify-content-end gap-1 shadow-sm rounded" role="group" aria-label="Actions annonce {{ annonce.id }}">
+                                <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" class="btn btn-sm btn-outline-primary" title="Voir l'annonce sur le site">
+                                    <i class="bi bi-eye" aria-hidden="true"></i><span class="d-none d-md-inline ms-1">Voir</span>
                                 </a>
-                                {# Option : Permettre de rejeter une annonce déjà approuvée en cas d'erreur #}
-                                <form method="post" action="{{ path('admin_annonce_reject', {id: annonce.id}) }}" onsubmit="return confirm('Suspendre cette annonce ?');">
+                                <form method="post" action="{{ path('admin_annonce_reject', {id: annonce.id}) }}" class="d-inline" onsubmit="return confirm('Suspendre cette annonce ?');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ annonce.id) }}">
-                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i></button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Rejeter ou suspendre cette annonce">
+                                        <i class="bi bi-x-circle" aria-hidden="true"></i><span class="d-none d-md-inline ms-1">Rejeter</span>
+                                    </button>
                                 </form>
                             </div>
                         </td>

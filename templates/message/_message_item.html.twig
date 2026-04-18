@@ -1,75 +1,161 @@
-{# templates/message/_message_item.html.twig #}
+{# Bulles alignées charte Expat Souk (#42B1CE) #}
 {% set isMine = (message.sender == app.user) %}
 
-<div class="d-flex {{ isMine ? 'justify-content-end' : 'justify-content-start' }} mb-3 animate-message">
-    <div style="max-width: 80%;">
-        {# La bulle de message #}
-        <div class="p-3 shadow-sm {{ isMine ? 'bubble-mine' : 'bubble-other' }}">
-            
-            {# Contenu du message #}
-            <p class="mb-1 message-text">{{ message.content }}</p>
-            
-            {# Heure et statut #}
-            <div class="d-flex align-items-center {{ isMine ? 'justify-content-end' : 'justify-content-start' }}">
-                <small class="message-time">
-                    {{ message.createdAt|date('H:i') }}
-                    {% if isMine %}
-                        <i class="bi bi-check2-all ms-1"></i>
-                    {% endif %}
-                </small>
+<div class="wa-row d-flex {{ isMine ? 'justify-content-end' : 'justify-content-start' }} mb-2">
+    <div class="wa-col">
+        <div class="wa-bubble {{ isMine ? 'wa-sent' : 'wa-received' }} animate-message">
+
+            {% if message.kind == constant('App\\Entity\\Message::KIND_IMAGE') %}
+                {% if message.imageFilename %}
+                    {% set imgSrc = asset('uploads/messages/' ~ message.imageFilename) %}
+                    <div class="wa-media-wrap mb-1">
+                        <button type="button" class="wa-photo-btn p-0 border-0 bg-transparent w-100">
+                            <img src="{{ imgSrc }}" alt="" class="wa-photo-thumb" data-wa-full="{{ imgSrc }}">
+                        </button>
+                    </div>
+                {% endif %}
+                {% if message.content %}
+                    <p class="mb-0 wa-msg-text">{{ message.content }}</p>
+                {% endif %}
+
+            {% elseif message.kind == constant('App\\Entity\\Message::KIND_LOCATION')
+                and message.latitude is not null and message.longitude is not null %}
+                {% set lat, lon = message.latitude, message.longitude %}
+                {% set osm = 'https://www.openstreetmap.org/?mlat=' ~ lat ~ '&mlon=' ~ lon ~ '#map=15/' ~ lat ~ '/' ~ lon %}
+                {% set staticMap = 'https://staticmap.openstreetmap.de/staticmap.php?center=' ~ lat ~ ',' ~ lon ~ '&zoom=15&size=280x140&markers=' ~ lat ~ ',' ~ lon ~ ',lightblue1' %}
+                <div class="wa-location-card mb-1 overflow-hidden rounded-2" style="border: 1px solid rgba(66, 177, 206, 0.18);">
+                    <a href="{{ osm }}" target="_blank" rel="noopener noreferrer" class="d-block">
+                        <img src="{{ staticMap }}" alt="" class="w-100 d-block wa-location-map" loading="lazy">
+                    </a>
+                    <div class="wa-location-meta px-2 py-2 small bg-white">
+                        <div class="text-dark fw-semibold text-truncate">{{ message.locationLabel ?: 'Position partagée' }}</div>
+                        <a href="{{ osm }}" target="_blank" rel="noopener noreferrer" class="wa-location-link small">Voir sur la carte</a>
+                    </div>
+                </div>
+                {% if message.content %}
+                    <p class="mb-0 wa-msg-text">{{ message.content }}</p>
+                {% endif %}
+
+            {% else %}
+                <p class="mb-0 wa-msg-text">{{ message.content }}</p>
+            {% endif %}
+
+            <div class="wa-meta-line">
+                <span class="wa-time">{{ message.createdAt|date('H:i') }}</span>
+                {% if isMine %}
+                    <span class="wa-ticks" title="Envoyé"><i class="bi bi-check2-all"></i></span>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Message envoyé (Moi) */
-    .bubble-mine {
-        background-color: #42B1CE;
-        color: white;
-        border-radius: 18px 18px 2px 18px;
+    .wa-col { max-width: min(380px, 92vw); }
+
+    .wa-row {
+        --chat-brand: #42B1CE;
+        --chat-brand-d: #2a8da7;
+    }
+
+    .wa-bubble {
         position: relative;
+        display: inline-block;
+        max-width: 100%;
+        padding: 6px 8px 6px 10px;
+        border-radius: 8px;
+        box-shadow: 0 1px 0.5px rgba(42, 109, 128, 0.12);
+        font-size: 14.2px;
+        line-height: 19px;
+        overflow: hidden;
     }
 
-    /* Message reçu (L'autre) */
-    .bubble-other {
-        background-color: #ffffff;
-        color: #333;
-        border-radius: 18px 18px 18px 2px;
-        border: 1px solid #f0f0f0;
+    .wa-sent {
+        background: linear-gradient(180deg, #dff3f8 0%, #cde9f2 100%);
+        color: #142a30;
+        border-radius: 8px 8px 0 8px;
+        border: 1px solid rgba(66, 177, 206, 0.22);
     }
 
-    /* Typographie */
-    .message-text {
-        font-size: 0.92rem;
-        line-height: 1.4;
+    .wa-received {
+        background: #fff;
+        color: #142a30;
+        border-radius: 8px 8px 8px 0;
+        border: 1px solid rgba(66, 177, 206, 0.12);
+    }
+
+    .wa-msg-text {
         word-wrap: break-word;
+        white-space: pre-wrap;
     }
 
-    .message-time {
-        font-size: 0.68rem;
-        opacity: 0.75;
+    .wa-meta-line {
+        float: right;
+        margin: 2px 0 -2px 8px;
+        clear: both;
+        display: inline-flex;
+        align-items: flex-end;
+        gap: 3px;
+        vertical-align: bottom;
+        user-select: none;
     }
 
-    /* Animation d'apparition du message */
+    .wa-time {
+        font-size: 11px;
+        color: #5a7580;
+        line-height: 14px;
+    }
+
+    .wa-ticks {
+        font-size: 14px;
+        color: var(--chat-brand-d);
+        line-height: 1;
+    }
+
+    .wa-photo-thumb {
+        display: block;
+        max-width: 280px;
+        width: 100%;
+        max-height: 320px;
+        height: auto;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        vertical-align: middle;
+    }
+
+    .wa-photo-btn:focus-visible {
+        outline: 2px solid var(--chat-brand);
+        outline-offset: 2px;
+        border-radius: 8px;
+    }
+
+    .wa-location-map {
+        max-height: 140px;
+        object-fit: cover;
+    }
+
+    .wa-location-meta { border-top: 1px solid rgba(66, 177, 206, 0.12); }
+
+    .wa-location-link {
+        color: var(--chat-brand-d);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .wa-location-link:hover {
+        color: var(--chat-brand);
+        text-decoration: underline;
+    }
+
     .animate-message {
-        animation: slideIn 0.3s ease-out;
+        animation: waPop .18s ease-out;
     }
 
-    @keyframes slideIn {
-        from { 
-            opacity: 0; 
-            transform: translateY(10px); 
-        }
-        to { 
-            opacity: 1; 
-            transform: translateY(0); 
-        }
+    @keyframes waPop {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Adaptation pour les liens dans les messages */
-    .bubble-mine a { color: #ffffff; text-decoration: underline; }
-    .bubble-other a { color: #42B1CE; text-decoration: none; font-weight: bold; }
+    .wa-row::after { content: ''; display: block; clear: both; }
 </style>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">

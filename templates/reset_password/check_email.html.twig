@@ -23,14 +23,16 @@
                     
                     <p class="text-muted mb-4 lead fs-6">
                         Si un compte correspond à <br>
-                        <strong class="text-dark">{{ resetToken.user.email|default('votre adresse') }}</strong>, 
+                        <strong class="text-dark">{{ resetToken.user ? resetToken.user.email : 'votre adresse' }}</strong>,
                         un lien de réinitialisation vous a été envoyé.
                     </p>
 
-                    {# Info Expiration #}
+                    {# Durée alignée sur symfonycasts_reset_password.lifetime et l’e-mail #}
                     <div class="d-flex align-items-center justify-content-center alert border-0 rounded-3 mb-4 py-2" style="background-color: #fef9e7; color: #9a7d0a;">
-                        <i class="bi bi-hourglass-split me-2"></i>
-                        <span class="small fw-bold">Le lien expire dans 1 heure.</span>
+                        <i class="bi bi-hourglass-split me-2" aria-hidden="true"></i>
+                        <span class="small fw-bold">
+                            Le lien expire dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+                        </span>
                     </div>
 
                     <div class="p-3 bg-light rounded-3 mb-4">
@@ -50,7 +52,7 @@
             </div>
             
             <p class="mt-4 text-muted small">
-                Besoin d'aide ? <a href="#" class="text-decoration-none" style="color: #42B1CE;">Contactez le support</a>
+                Besoin d'aide ? <a href="{{ path('app_contact') }}" class="text-decoration-none" style="color: #42B1CE;">Contactez le support</a>
             </p>
         </div>
     </div>

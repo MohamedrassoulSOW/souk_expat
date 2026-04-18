@@ -31,8 +31,8 @@
                             {# Donner une seconde chance : Repasser en approuvé #}
                             <form method="post" action="{{ path('admin_annonce_approve', {id: annonce.id}) }}" style="display:inline;">
                                 <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ annonce.id) }}">
-                                <button class="btn btn-sm btn-success rounded-pill px-3">
-                                    <i class="bi bi-check-lg me-1"></i> Ré-approuver
+                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                    <i class="bi bi-check-lg me-1" aria-hidden="true"></i> Ré-approuver
                                 </button>
                             </form>
                         </td>

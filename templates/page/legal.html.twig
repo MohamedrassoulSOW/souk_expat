@@ -1,0 +1,72 @@
+{% extends 'page/static_base.html.twig' %}
+
+{% block title %}Mentions légales — Expat Souk{% endblock %}
+
+{% block page_badge %}Légal{% endblock %}
+{% block page_heading %}Mentions légales{% endblock %}
+{% block page_lead %}Informations réglementaires relatives à l’édition du site Expat Souk.{% endblock %}
+
+{% block static_body %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+        <div class="p-4 p-md-5 static-card-soft mb-4">
+            <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-building text-cyan-brand me-2"></i>Éditeur du site</h2>
+            <p class="text-secondary small mb-0">
+                Le site <strong class="text-dark">Expat Souk</strong> (expat-souk, « la Plateforme ») est édité dans le cadre d’un projet communautaire dédié aux expatriés au Maroc.<br>
+                Siège indicatif : <strong>Anfa Place, 20250 Casablanca, Maroc</strong>.<br>
+                Contact : via le <a href="{{ path('app_contact') }}" class="text-cyan-brand fw-semibold text-decoration-none">formulaire de contact</a> disponible sur le site.
+            </p>
+        </div>
+
+        <div class="p-4 p-md-5 static-card-soft mb-4">
+            <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-person-badge text-cyan-brand me-2"></i>Directeur de la publication</h2>
+            <p class="text-secondary small mb-0">
+                Le directeur de la publication est la personne morale ou physique responsable du projet Expat Souk, joignable à l’adresse de contact indiquée ci-dessus.
+            </p>
+        </div>
+
+        <div class="p-4 p-md-5 static-card-soft mb-4">
+            <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-hdd-network text-cyan-brand me-2"></i>Hébergement</h2>
+            <p class="text-secondary small mb-0">
+                Hébergement du site et des contenus conformément à l’infrastructure technique en place au moment de la consultation. Les données de sous-traitants (hébergeur, e-mail transactionnel) peuvent être tenues à jour sur simple demande auprès de l’éditeur.
+            </p>
+        </div>
+
+        <div class="p-4 p-md-5 static-card-soft mb-4">
+            <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-shield-lock text-cyan-brand me-2"></i>Données personnelles</h2>
+            <p class="text-secondary small mb-3">
+                Les informations collectées via les formulaires (inscription, contact, annonces) sont traitées pour la gestion du service et l’amélioration de l’expérience utilisateur. La connexion au site s’effectue via le protocole sécurisé HTTPS.
+            </p>
+            <p class="text-secondary small mb-0">
+                Conformément à la réglementation applicable, vous pouvez demander l’accès, la rectification ou la suppression de vos données en écrivant à l’adresse de contact indiquée sur la page <a href="{{ path('app_contact') }}" class="text-cyan-brand fw-semibold text-decoration-none">Contact</a>, en justifiant de votre identité.
+            </p>
+        </div>
+
+        <div class="p-4 p-md-5 static-card-soft mb-4">
+            <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-file-text text-cyan-brand me-2"></i>Conditions générales d’utilisation</h2>
+            <p class="text-secondary small mb-2">
+                L’utilisation du site implique l’acceptation sans réserve des présentes conditions. Les comptes personnels sont nominatifs. Les annonces publiées doivent être licites, sincères et respecter les droits des tiers.
+            </p>
+            <p class="text-secondary small mb-0">
+                Expat Souk peut retirer tout contenu ou suspendre un compte en cas de non-respect des règles, sans préjudice des mesures légales appropriées.
+            </p>
+        </div>
+
+        <div class="p-4 p-md-5 static-card-soft mb-4">
+            <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-journal-text text-cyan-brand me-2"></i>Propriété intellectuelle</h2>
+            <p class="text-secondary small mb-0">
+                L’ensemble des éléments du site (structure, textes, charte graphique, logo lorsqu’il est déposé) demeure la propriété de l’éditeur ou de ses partenaires, sauf mention contraire. Toute reproduction non autorisée est interdite.
+            </p>
+        </div>
+
+        <div class="p-4 p-md-5 static-card-soft">
+            <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-exclamation-triangle text-cyan-brand me-2"></i>Limitation de responsabilité</h2>
+            <p class="text-secondary small mb-0">
+                Expat Souk est une plateforme de mise en relation. Les transactions (prix, remise du bien, litiges) s’effectuent entre utilisateurs sous leur seule responsabilité. L’éditeur ne saurait être tenu responsable des échanges réalisés en dehors des bonnes pratiques ou des conditions d’utilisation.
+            </p>
+        </div>
+
+        <p class="text-center text-muted small mt-4 mb-0">Dernière mise à jour indicative : {{ "now"|date("d/m/Y") }}.</p>
+    </div>
+</div>
+{% endblock %}

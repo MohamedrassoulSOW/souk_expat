@@ -16,7 +16,7 @@ class AdminAnnonceController extends AbstractController
     #[Route('/pending', name: 'admin_annonces_pending')]
     public function pending(AnnonceRepository $annonceRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
         $annonces = $annonceRepository->findBy(
             ['status' => Annonce::STATUS_PENDING],
@@ -31,7 +31,7 @@ class AdminAnnonceController extends AbstractController
     #[Route('/approved', name: 'admin_annonces_approved')]
     public function approved(AnnonceRepository $annonceRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
         $annonces = $annonceRepository->findBy(['status' => Annonce::STATUS_APPROVED]);
 
@@ -43,7 +43,7 @@ class AdminAnnonceController extends AbstractController
     #[Route('/rejected', name: 'admin_annonces_rejected')]
     public function rejected(AnnonceRepository $annonceRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
         $annonces = $annonceRepository->findBy(['status' => Annonce::STATUS_REJECTED]);
 
@@ -55,7 +55,7 @@ class AdminAnnonceController extends AbstractController
     #[Route('/{id}/approve', name: 'admin_annonce_approve', methods: ['POST'])]
     public function approve(?Annonce $annonce, Request $request, EntityManagerInterface $em): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
         if (!$annonce) {
             throw $this->createNotFoundException('Annonce introuvable.');
@@ -68,6 +68,7 @@ class AdminAnnonceController extends AbstractController
         }
 
         $annonce->setStatus(Annonce::STATUS_APPROVED);
+        $annonce->setApprovedAt(new \DateTimeImmutable());
         $em->flush();
 
         $this->addFlash('success', 'Annonce validée avec succès');
@@ -77,7 +78,7 @@ class AdminAnnonceController extends AbstractController
     #[Route('/{id}/reject', name: 'admin_annonce_reject', methods: ['POST'])]
     public function reject(?Annonce $annonce, Request $request, EntityManagerInterface $em): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
         if (!$annonce) {
             throw $this->createNotFoundException('Annonce introuvable.');

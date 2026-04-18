@@ -25,6 +25,26 @@ class ThreadRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Liste complète des fils (admin), les plus récents en premier.
+     *
+     * @return list<Thread>
+     */
+    public function findAllForAdminOrderedByNewest(int $maxResults = 0): array
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->leftJoin('t.annonce', 'a')->addSelect('a')
+            ->leftJoin('t.buyer', 'b')->addSelect('b')
+            ->leftJoin('t.seller', 's')->addSelect('s')
+            ->orderBy('t.id', 'DESC');
+
+        if ($maxResults > 0) {
+            $qb->setMaxResults($maxResults);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     //    /**
     //     * @return Thread[] Returns an array of Thread objects
     //     */

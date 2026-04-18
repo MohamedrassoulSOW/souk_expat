@@ -46,7 +46,7 @@ body{
 
 /* Styles personnalisés pour moderniser de la page annonces */
     .transition-hover {
-        transition: transform 0.3s ease, shadow 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .transition-hover:hover {
         transform: translateY(-8px);
@@ -228,3 +228,540 @@ body{
         box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
         z-index: 5;
     }
+
+/* ============================================
+   MEDIA QUERIES GLOBALES - RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablettes et petits écrans (max-width: 991px) */
+@media (max-width: 991px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    /* Ajustements des cartes */
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    /* Images responsive */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    /* Espacements réduits */
+    .py-5 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+    
+    .mb-5 {
+        margin-bottom: 2.5rem !important;
+    }
+    
+    /* Boutons */
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* Tablettes (max-width: 768px) */
+@media (max-width: 768px) {
+    /* Typographie responsive */
+    h1, .h1 {
+        font-size: 2rem;
+    }
+    
+    h2, .h2 {
+        font-size: 1.75rem;
+    }
+    
+    h3, .h3 {
+        font-size: 1.5rem;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .display-5 {
+        font-size: 1.75rem;
+    }
+    
+    .display-6 {
+        font-size: 1.5rem;
+    }
+    
+    /* Grilles */
+    .row {
+        margin-left: -0.75rem;
+        margin-right: -0.75rem;
+    }
+    
+    .row > * {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    /* Cards */
+    .card-body {
+        padding: 1rem;
+    }
+    
+    /* Formulaires */
+    .form-control, .form-select {
+        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    /* Badges */
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.35em 0.65em;
+    }
+    
+    /* Carousel */
+    .carousel-item img {
+        height: 300px !important;
+    }
+    
+    /* Désactiver les effets hover sur mobile */
+    .modern-card:hover,
+    .transition-hover:hover,
+    .category-card:hover,
+    .annonce-card:hover,
+    .page-annonces .annonce-listing-card:hover {
+        transform: none;
+    }
+
+    .page-annonces .annonce-listing-card:hover .annonce-listing-card__img {
+        transform: none;
+    }
+}
+
+/* Mobiles (max-width: 576px) */
+@media (max-width: 576px) {
+    /* Typographie encore plus petite */
+    h1, .h1 {
+        font-size: 1.75rem;
+    }
+    
+    h2, .h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3, .h3 {
+        font-size: 1.25rem;
+    }
+    
+    .display-4 {
+        font-size: 1.75rem;
+    }
+    
+    .display-5 {
+        font-size: 1.5rem;
+    }
+    
+    .display-6 {
+        font-size: 1.25rem;
+    }
+    
+    /* Container padding réduit */
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    /* Espacements réduits */
+    .py-5 {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+    
+    .mb-5 {
+        margin-bottom: 2rem !important;
+    }
+    
+    .mt-5 {
+        margin-top: 2rem !important;
+    }
+    
+    /* Cards */
+    .card {
+        border-radius: 0.75rem !important;
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    /* Boutons */
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .btn-lg {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.9375rem;
+    }
+    
+    /* Formulaires */
+    .form-control, .form-select {
+        font-size: 0.9375rem;
+        padding: 0.5rem;
+    }
+    
+    /* Images dans les cards */
+    .card-img-top {
+        height: 180px !important;
+    }
+    
+    /* Carousel */
+    .carousel-item img {
+        height: 250px !important;
+    }
+    
+    /* Pagination */
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .page-link {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Text alignment */
+    .text-center-mobile {
+        text-align: center;
+    }
+    
+    /* Flex utilities */
+    .d-flex-mobile-column {
+        flex-direction: column;
+    }
+    
+    /* Marges et paddings */
+    .px-3 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+    
+    .mx-auto {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+}
+
+/* Très petits écrans (max-width: 375px) */
+@media (max-width: 375px) {
+    h1, .h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2, .h2 {
+        font-size: 1.25rem;
+    }
+    
+    .display-4 {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 0.45rem 0.875rem;
+        font-size: 0.8125rem;
+    }
+    
+    .card-img-top {
+        height: 150px !important;
+    }
+}
+
+/* Accessibilité tactile : cibles confortables sans casser le flux du texte */
+@media (hover: none) and (pointer: coarse) {
+    .navbar .nav-link,
+    .navbar .btn,
+    .navbar .dropdown-toggle,
+    .footer-modern .footer-links a,
+    .footer-modern .social-icon,
+    .pagination .page-link {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modern-card:hover,
+    .transition-hover:hover,
+    .category-card:hover,
+    .annonce-card:hover,
+    .page-annonces .annonce-listing-card:hover {
+        transform: none;
+    }
+}
+
+/* --- Page liste des annonces (/annonce) --- */
+.page-annonces {
+    --annonces-brand: #42b1ce;
+    --annonces-brand-dark: #369ab3;
+}
+
+.page-annonces .annonce-search-panel {
+    border: 1px solid rgba(66, 177, 206, 0.15);
+    background: linear-gradient(145deg, #fff 0%, #f8fcfd 100%);
+}
+
+/* Charte #42b1ce — icônes du bloc recherche */
+.page-annonces .annonce-search-panel .text-brand-annonces,
+.page-annonces .annonce-search-panel .annonce-search-input-icon {
+    color: #42b1ce;
+}
+
+.page-annonces .annonce-search-panel .annonce-search-input-icon .bi-search {
+    color: #42b1ce;
+}
+
+.page-annonces .annonce-search-panel .form-control:focus,
+.page-annonces .annonce-search-panel .form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(66, 177, 206, 0.15);
+    border-color: rgba(66, 177, 206, 0.35);
+}
+
+.page-annonces .btn-annonces-brand {
+    background-color: #42b1ce;
+    border: 1px solid #42b1ce;
+    color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.page-annonces .btn-annonces-brand:hover,
+.page-annonces .btn-annonces-brand:focus {
+    background-color: var(--annonces-brand-dark);
+    border-color: var(--annonces-brand-dark);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(66, 177, 206, 0.35);
+}
+
+.page-annonces .btn-annonces-brand .bi-search {
+    color: #fff;
+}
+
+.page-annonces .annonce-listing-card {
+    border-radius: 1rem;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+    background: #fff;
+}
+
+.page-annonces .annonce-listing-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1) !important;
+}
+
+.page-annonces .annonce-listing-card__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 1rem 1rem 0 0;
+    background: linear-gradient(135deg, #e8f4f8 0%, #f1f5f9 100%);
+}
+
+.page-annonces .annonce-listing-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-annonces .annonce-listing-card:hover .annonce-listing-card__img {
+    transform: scale(1.06);
+}
+
+.page-annonces .annonce-listing-card__chip-cat {
+    position: absolute;
+    top: 0.65rem;
+    left: 0.65rem;
+    z-index: 2;
+    max-width: calc(100% - 5rem);
+    padding: 0.35rem 0.65rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--annonces-brand);
+    border: 1px solid rgba(66, 177, 206, 0.22);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.page-annonces .annonce-listing-card__overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    padding: 1.75rem 0.9rem 0.65rem;
+    background: linear-gradient(180deg, transparent 0%, rgba(15, 23, 42, 0.78) 100%);
+}
+
+.page-annonces .annonce-listing-card__price {
+    display: block;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #fff;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+.page-annonces .annonce-listing-card__price small {
+    font-weight: 700;
+    font-size: 0.75em;
+    opacity: 0.92;
+}
+
+.page-annonces .annonce-listing-card__desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.45;
+    min-height: 2.9em;
+}
+
+.page-annonces .annonce-page-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    background: rgba(66, 177, 206, 0.1);
+    color: #334155;
+}
+
+.page-annonces .pagination-wrapper .pagination {
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.page-annonces .pagination-wrapper .page-link {
+    border: none;
+    color: var(--annonces-brand);
+    border-radius: 10px !important;
+    font-weight: 600;
+    padding: 0.45rem 0.85rem;
+    min-width: 2.5rem;
+    text-align: center;
+}
+
+.page-annonces .pagination-wrapper .page-item.active .page-link {
+    background-color: var(--annonces-brand);
+    color: #fff;
+}
+
+.page-annonces .pagination-wrapper .page-link:hover {
+    background-color: rgba(66, 177, 206, 0.12);
+    color: var(--annonces-brand-dark);
+}
+
+.page-annonces .annonce-empty-state {
+    border: 1px dashed rgba(66, 177, 206, 0.35);
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, #fff 0%, #f8fcfd 100%);
+}
+
+.page-annonces .text-brand-annonces {
+    color: #42b1ce;
+}
+
+.page-annonces .breadcrumb-item a.text-brand-annonces:hover {
+    color: var(--annonces-brand-dark) !important;
+}
+
+/* --- Toasts & animations globales (site-ui.js) --- */
+#app-toast-stack .app-toast {
+    min-width: min(100vw - 2rem, 22rem);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+@supports (backdrop-filter: blur(6px)) {
+    #app-toast-stack .app-toast {
+        backdrop-filter: blur(6px);
+    }
+}
+
+#app-toast-stack .toast.showing,
+#app-toast-stack .toast.show {
+    animation: appToastIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes appToastIn {
+    from {
+        opacity: 0;
+        transform: translate3d(1.25rem, 0.5rem, 0) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+[data-animate] {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+    transition:
+        opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-animate='fade-down'] {
+    transform: translate3d(0, -0.85rem, 0);
+}
+
+[data-animate].is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #app-toast-stack .toast.showing,
+    #app-toast-stack .toast.show {
+        animation: none;
+    }
+
+    [data-animate] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+}
+
+/* Impression */
+@media print {
+    .navbar,
+    .footer-modern,
+    .btn,
+    .pagination {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+    }
+    
+    .card {
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+    }
+}

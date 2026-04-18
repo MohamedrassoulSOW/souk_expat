@@ -2,7 +2,8 @@
 
 namespace App\Twig;
 
-use App\Repository\ThreadRepository;
+use App\Entity\User;
+use App\Repository\MessageRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -11,8 +12,9 @@ class MessageExtension extends AbstractExtension
 {
     public function __construct(
         private Security $security,
-        private ThreadRepository $threadRepository
-    ) {}
+        private MessageRepository $messageRepository,
+    ) {
+    }
 
     public function getFunctions(): array
     {
@@ -24,11 +26,10 @@ class MessageExtension extends AbstractExtension
     public function getUnreadCount(): int
     {
         $user = $this->security->getUser();
-        if (!$user) return 0;
+        if (!$user instanceof User) {
+            return 0;
+        }
 
-        // Ici, on compte simplement le nombre de discussions actives. 
-        // Si tu ajoutes un champ 'isRead' dans ton entité Message plus tard, 
-        // tu pourras affiner ce calcul.
-        return count($this->threadRepository->findByUser($user));
+        return $this->messageRepository->countUnreadMessages($user);
     }
 }

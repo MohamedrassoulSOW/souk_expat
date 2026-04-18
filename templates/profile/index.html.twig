@@ -57,15 +57,15 @@
 
                     <div class="row g-4 mt-2">
                         {# Détails #}
-                        <div class="col-md-7">
-                            <div class="bg-light-cyan rounded-4 p-4 h-100 border border-white shadow-sm">
+                        <div class="col-12 col-md-7">
+                            <div class="bg-light-cyan rounded-4 p-3 p-md-4 h-100 border border-white shadow-sm">
                                 <h6 class="fw-bold mb-4 text-dark text-uppercase small letter-spacing">Détails personnels</h6>
                                 <div class="row g-3">
-                                    <div class="col-6 border-end">
+                                    <div class="col-12 col-sm-6 border-end border-sm-end border-0">
                                         <label class="info-label">Prénom</label>
                                         <p class="fs-6 fw-bold text-dark mb-0">{{ user.firstName }}</p>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-12 col-sm-6">
                                         <label class="info-label">Nom</label>
                                         <p class="fs-6 fw-bold text-dark mb-0">{{ user.lastName }}</p>
                                     </div>
@@ -78,7 +78,7 @@
                         </div>
 
                         {# Actions #}
-                        <div class="col-md-5">
+                        <div class="col-12 col-md-5">
                             <div class="d-grid gap-2 h-100">
                                 <a href="{{ path('app_profile_edit') }}" class="btn btn-action-profile py-3 px-4">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -138,6 +138,25 @@
     .avatar-img-custom {
         width: 140px; height: 140px;
         object-fit: cover; border: 5px solid #fff;
+    }
+    
+    @media (max-width: 768px) {
+        .profile-header-custom {
+            height: 100px;
+        }
+        .avatar-container-custom { 
+            margin-top: -50px; 
+        }
+        .avatar-img-custom {
+            width: 100px; 
+            height: 100px;
+            border: 4px solid #fff;
+        }
+        .btn-cyan-round {
+            width: 32px;
+            height: 32px;
+            font-size: 0.875rem;
+        }
     }
     .btn-cyan-round {
         background-color: #42B1CE;

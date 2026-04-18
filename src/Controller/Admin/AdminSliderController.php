@@ -11,14 +11,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-
+#[IsGranted('ROLE_EDITOR')]
 #[Route('/admin/slider')]
 class AdminSliderController extends AbstractController
 {
     // src/Controller/HomeController.php
 
-    #[Route('/admin/slider', name: 'admin_slider_index', methods: ['GET'])]
+    #[Route('', name: 'admin_slider_index', methods: ['GET'])]
     public function index(SliderRepository $repo): Response
     {
         // C'est cette ligne qui définit "sliders" pour Twig

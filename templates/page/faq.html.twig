@@ -1,0 +1,39 @@
+{% extends 'page/static_base.html.twig' %}
+
+{% block title %}FAQ — Expat Souk{% endblock %}
+
+{% block page_badge %}FAQ{% endblock %}
+{% block page_heading %}Questions fréquentes{% endblock %}
+{% block page_lead %}Les réponses aux demandes les plus courantes sur le fonctionnement de la plateforme.{% endblock %}
+
+{% block static_body %}
+<div class="accordion accordion-flush shadow-sm rounded-4 overflow-hidden border" id="faqAccordion" style="border-color: rgba(66, 177, 206, 0.22) !important;">
+    {% set faqs = [
+        { 'q': 'Expat Souk est-il payant ?', 'a': 'La création de compte et la consultation des annonces sont gratuites. La publication d’annonces peut être soumise aux règles du site (limites, options) décrites lors du dépôt.' },
+        { 'q': 'Combien de temps une annonce reste-t-elle en ligne ?', 'a': 'Les annonces validées restent visibles jusqu’à ce que vous les retiriez ou jusqu’à suppression pour non-respect des conditions. Les délais précis peuvent être précisés dans votre espace « Mes annonces ».' },
+        { 'q': 'Pourquoi mon annonce est-elle « en attente » ?', 'a': 'Pour protéger la communauté, chaque annonce peut être vérifiée par l’équipe avant publication. Vous recevrez une notification lorsqu’elle sera approuvée ou si une modification est nécessaire.' },
+        { 'q': 'Comment contacter un vendeur ?', 'a': 'Sur la page de l’annonce, utilisez le bouton pour ouvrir une conversation. La messagerie vous permet d’échanger du texte, des photos et votre position si vous le souhaitez.' },
+        { 'q': 'Expat Souk gère-t-il les paiements ou la livraison ?', 'a': 'Non : nous mettons en relation acheteurs et vendeurs. Le paiement, la remise du bien et les formalités restent entre vous — pensez à toujours privilégier des échanges transparents.' },
+        { 'q': 'Comment signaler une annonce douteuse ?', 'a': 'Utilisez les canaux prévus sur la plateforme ou le formulaire de contact en précisant le lien ou l’identifiant de l’annonce. Notre équipe traitera votre signalement.' },
+        { 'q': 'Puis-je modifier ou supprimer mon annonce ?', 'a': 'Oui : connectez-vous, rendez-vous dans « Mes annonces », puis choisissez modifier ou supprimer selon vos besoins.' },
+        { 'q': 'Mes données personnelles sont-elles protégées ?', 'a': 'Le site est accessible en HTTPS. Pour les traitements détaillés (cookies, droits RGPD), consultez nos mentions légales et politiques lorsqu’elles sont publiées.' }
+    ] %}
+    {% for item in faqs %}
+        <div class="accordion-item border-0 border-bottom" style="border-color: rgba(0,0,0,.06) !important;">
+            <h2 class="accordion-header" id="faqHeading{{ loop.index }}">
+                <button class="accordion-button {{ loop.first ? '' : 'collapsed' }} fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="{{ loop.first ? 'true' : 'false' }}" aria-controls="faqCollapse{{ loop.index }}" style="background: {{ loop.first ? '#f8fcfd' : '#fff' }};">
+                    <i class="bi bi-patch-question-fill text-cyan-brand me-2"></i>{{ item.q }}
+                </button>
+            </h2>
+            <div id="faqCollapse{{ loop.index }}" class="accordion-collapse collapse {{ loop.first ? 'show' : '' }}" aria-labelledby="faqHeading{{ loop.index }}" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-secondary small">{{ item.a }}</div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="mt-5 p-4 rounded-4 text-center static-card-soft">
+    <p class="mb-2 fw-semibold text-dark">Vous ne trouvez pas votre réponse ?</p>
+    <a href="{{ path('app_contact') }}" class="btn text-white px-4" style="background: #42B1CE; border-color: #42B1CE;">Contactez le support</a>
+</div>
+{% endblock %}

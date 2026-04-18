@@ -13,9 +13,9 @@
         </a>
     </nav>
 
-    <div class="row g-5">
+    <div class="row g-4 g-lg-5">
         {# --- COLONNE GAUCHE : VISUELS --- #}
-        <div class="col-lg-7">
+        <div class="col-12 col-lg-7">
             {% if annonce.annonceImages|length > 0 %}
                 <div id="carouselAnnonce" class="carousel slide shadow-sm rounded-4 overflow-hidden" data-bs-ride="carousel">
                     <div class="carousel-inner">
@@ -23,30 +23,30 @@
                             <div class="carousel-item {% if loop.first %}active{% endif %}">
                                 <img src="{{ asset('uploads/annonces/' ~ image.imadeName) }}" 
                                      class="d-block w-100" 
-                                     style="aspect-ratio: 4/3; object-fit: cover;" 
+                                     style="aspect-ratio: 4/3; object-fit: cover; max-height: 500px;" 
                                      alt="{{ annonce.title }}">
                             </div>
                         {% endfor %}
                     </div>
                     {% if annonce.annonceImages|length > 1 %}
                         <button class="carousel-control-prev" type="button" data-bs-target="#carouselAnnonce" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon p-3 bg-dark rounded-circle" aria-hidden="true"></span>
+                            <span class="carousel-control-prev-icon p-2 p-md-3 bg-dark bg-opacity-75 rounded-circle" aria-hidden="true"></span>
                         </button>
                         <button class="carousel-control-next" type="button" data-bs-target="#carouselAnnonce" data-bs-slide="next">
-                            <span class="carousel-control-next-icon p-3 bg-dark rounded-circle" aria-hidden="true"></span>
+                            <span class="carousel-control-next-icon p-2 p-md-3 bg-dark bg-opacity-75 rounded-circle" aria-hidden="true"></span>
                         </button>
                     {% endif %}
                 </div>
             {% else %}
-                <div class="rounded-4 bg-light d-flex align-items-center justify-content-center" style="aspect-ratio: 4/3;">
+                <div class="rounded-4 bg-light d-flex align-items-center justify-content-center" style="aspect-ratio: 4/3; min-height: 300px;">
                     <i class="bi bi-image text-muted display-1"></i>
                 </div>
             {% endif %}
         </div>
 
         {# --- COLONNE DROITE : INFOS & CONTACT --- #}
-        <div class="col-lg-5">
-            <div class="sticky-top" style="top: 100px;">
+        <div class="col-12 col-lg-5">
+            <div class="sticky-top-annonce">
                 {# Catégorie & Ville #}
                 <div class="d-flex gap-2 mb-2">
                     <span class="badge rounded-pill px-3 py-2" style="background-color: rgba(66, 177, 206, 0.1); color: #42B1CE;">
@@ -57,10 +57,10 @@
                     </span>
                 </div>
 
-                <h1 class="fw-bold h2 mb-3">{{ annonce.title }}</h1>
+                <h1 class="fw-bold h2 h3 mb-3">{{ annonce.title }}</h1>
                 
-                <div class="display-6 fw-bold mb-4" style="color: #42B1CE;">
-                    {{ annonce.price|number_format(0, '.', ' ') }} <small class="fs-4">MAD</small>
+                <div class="display-6 fw-bold mb-4 price-display" style="color: #42B1CE;">
+                    {{ annonce.price|number_format(0, '.', ' ') }} <small class="fs-4 fs-5">MAD</small>
                 </div>
 
                 <hr class="my-4 opacity-25">
@@ -73,18 +73,18 @@
                 {# Actions de Contact #}
                 <div class="d-grid gap-3">
                     {% if app.user and app.user != annonce.user %}
-                        <a href="{{ path('app_chat_check', {id: annonce.id}) }}" class="btn btn-custom-cyan btn-lg rounded-pill fw-bold py-3 shadow-sm">
+                        <a href="{{ path('app_chat_check', {id: annonce.id}) }}" class="btn btn-custom-cyan btn-lg btn-md rounded-pill fw-bold py-3 py-2 shadow-sm">
                             <i class="bi bi-chat-dots-fill me-2"></i> Envoyer un message
                         </a>
                     {% elseif not app.user %}
-                        <a href="{{ path('app_login') }}" class="btn btn-custom-cyan btn-lg rounded-pill fw-bold py-3">
+                        <a href="{{ path('app_login') }}" class="btn btn-custom-cyan btn-lg btn-md rounded-pill fw-bold py-3 py-2">
                             Connectez-vous pour contacter
                         </a>
                     {% endif %}
 
                     {% if annonce.phone %}
-                        <a href="tel:{{ annonce.phone }}" class="btn btn-outline-dark btn-lg rounded-pill fw-bold py-3">
-                            <i class="bi bi-telephone me-2"></i> {{ annonce.phone }}
+                        <a href="tel:{{ annonce.phone }}" class="btn btn-outline-dark btn-lg btn-md rounded-pill fw-bold py-3 py-2">
+                            <i class="bi bi-telephone me-2"></i> <span class="d-none d-sm-inline">{{ annonce.phone }}</span><span class="d-sm-none">Appeler</span>
                         </a>
                     {% endif %}
                 </div>
@@ -104,7 +104,6 @@
     </div>
 </main>
 
-{{ include('layouts/footer.html.twig') }}
 
 <style>
     .btn-custom-cyan {
@@ -127,8 +126,32 @@
 
     h1 { color: #2d3436; }
     
+    .sticky-top-annonce {
+        position: sticky;
+        top: 100px;
+    }
+    
     @media (max-width: 991px) {
-        .sticky-top { position: static; }
+        .sticky-top-annonce { 
+            position: static; 
+        }
+        .price-display {
+            font-size: 2rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .price-display {
+            font-size: 1.75rem;
+        }
+        .price-display small {
+            font-size: 1rem !important;
+        }
+        .carousel-control-prev-icon, 
+        .carousel-control-next-icon {
+            width: 1rem;
+            height: 1rem;
+        }
     }
 </style>
 {% endblock %}

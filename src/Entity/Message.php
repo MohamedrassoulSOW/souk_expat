@@ -3,20 +3,38 @@
 namespace App\Entity;
 
 use App\Repository\MessageRepository;
-use Doctrine\DBAL\Types\Types; // Importé pour le type TEXT
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 class Message
 {
+    public const KIND_TEXT = 'text';
+    public const KIND_IMAGE = 'image';
+    public const KIND_LOCATION = 'location';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    // Changé en TEXT au lieu de STRING(255) pour ne pas limiter la longueur des messages
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $content = null;
+
+    #[ORM\Column(length: 20)]
+    private string $kind = self::KIND_TEXT;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imageFilename = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $latitude = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $longitude = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $locationLabel = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -29,12 +47,13 @@ class Message
     #[ORM\JoinColumn(nullable: false)]
     private ?Thread $thread = null;
 
-    /**
-     * CONSTRUCTEUR : Définit la date automatiquement à la création
-     */
+    #[ORM\Column]
+    private ?bool $isRead = false;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->isRead = false;
     }
 
     public function getId(): ?int
@@ -47,9 +66,64 @@ class Message
         return $this->content;
     }
 
-    public function setContent(string $content): static
+    public function setContent(?string $content): static
     {
         $this->content = $content;
+        return $this;
+    }
+
+    public function getKind(): string
+    {
+        return $this->kind;
+    }
+
+    public function setKind(string $kind): static
+    {
+        $this->kind = $kind;
+        return $this;
+    }
+
+    public function getImageFilename(): ?string
+    {
+        return $this->imageFilename;
+    }
+
+    public function setImageFilename(?string $imageFilename): static
+    {
+        $this->imageFilename = $imageFilename;
+        return $this;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): static
+    {
+        $this->latitude = $latitude;
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): static
+    {
+        $this->longitude = $longitude;
+        return $this;
+    }
+
+    public function getLocationLabel(): ?string
+    {
+        return $this->locationLabel;
+    }
+
+    public function setLocationLabel(?string $locationLabel): static
+    {
+        $this->locationLabel = $locationLabel;
         return $this;
     }
 
@@ -83,6 +157,17 @@ class Message
     public function setThread(?Thread $thread): static
     {
         $this->thread = $thread;
+        return $this;
+    }
+
+    public function isIsRead(): ?bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(bool $isRead): static
+    {
+        $this->isRead = $isRead;
         return $this;
     }
 }

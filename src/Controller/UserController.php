@@ -49,6 +49,52 @@ final class UserController extends AbstractController
         return $this->redirectToRoute('app_dashboard');
     }
 
+    /**
+     * Ajoute ou retire le rôle stocké ROLE_EDITOR (sans impacter le rôle admin).
+     */
+    #[Route('/admin/user/{id}/toggle-editor', name: 'admin_user_toggle_editor')]
+    public function toggleEditorRole(User $user, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        if ($this->getUser() === $user) {
+            $this->addFlash('danger', 'Modifiez le rôle éditeur depuis un autre compte super-admin, ou gérez-le en base.');
+
+            return $this->redirectToRoute('app_dashboard');
+        }
+
+        $noUser = static fn (string $r): bool => $r !== 'ROLE_USER';
+        $roles = array_values(array_filter($user->getRoles(), $noUser));
+        $hadEditor = \in_array(User::ROLE_EDITOR, $roles, true);
+        if ($hadEditor) {
+            $next = array_values(
+                array_filter(
+                    $roles,
+                    static fn (string $r) => $r !== User::ROLE_EDITOR
+                )
+            );
+        } else {
+            $next = $roles;
+            if (!\in_array(User::ROLE_EDITOR, $next, true)) {
+                $next[] = User::ROLE_EDITOR;
+            }
+        }
+
+        $hasAfter = \in_array(User::ROLE_EDITOR, $next, true);
+        $user->setRoles($next);
+        $entityManager->flush();
+
+        if ($hasAfter && !$hadEditor) {
+            $this->addFlash('success', 'Rôle éditeur donné (back-office, hors gestion des comptes).');
+        } elseif (!$hasAfter && $hadEditor) {
+            $this->addFlash('success', 'Rôle éditeur retiré.');
+        } else {
+            $this->addFlash('success', 'Rôles mis à jour.');
+        }
+
+        return $this->redirectToRoute('app_dashboard');
+    }
+
 
     #[Route('/admin/user/{id}/delete', name: 'admin_user_delete')]
     public function delete(User $user, EntityManagerInterface $em): Response

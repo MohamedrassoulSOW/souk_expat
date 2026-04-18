@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\DTO\AnnonceSearchFilters;
 use App\Entity\Annonce;
 use App\Entity\AnnonceImage;
 use App\Form\AnnonceType;
 use App\Repository\AnnonceRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\CityRepository;
+use App\Service\AnnonceDeletionService;
 use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -23,29 +26,39 @@ final class AnnonceController extends AbstractController
      * Liste globale des annonces (Public)
      */
     #[Route('/', name: 'app_annonce_index', methods: ['GET'])]
-    public function index(AnnonceRepository $annonceRepository, PaginatorInterface $paginator, Request $request): Response
-    {
-        // On crée la requête sans exécuter le findBy
-        $query = $annonceRepository->createQueryBuilder('a')
-            ->where('a.status = :status')
-            ->setParameter('status', Annonce::STATUS_APPROVED)
-            ->orderBy('a.createdAt', 'DESC')
-            ->getQuery();
+    public function index(
+        AnnonceRepository $annonceRepository,
+        CategoryRepository $categoryRepository,
+        CityRepository $cityRepository,
+        PaginatorInterface $paginator,
+        Request $request,
+    ): Response {
+        $filters = AnnonceSearchFilters::fromRequest($request);
+
+        $query = $annonceRepository->createApprovedSearchQueryBuilder(
+            $filters->q,
+            $filters->categoryId,
+            $filters->cityId,
+        )->getQuery();
 
         $annonces = $paginator->paginate(
             $query,
             $request->query->getInt('page', 1),
-            12 // 12 annonces par page
+            12,
         );
 
         return $this->render('annonce/index.html.twig', [
             'annonces' => $annonces,
+            'search_categories' => $categoryRepository->findAllOrderedByName(),
+            'cities' => $cityRepository->findAllOrderedByName(),
+            'search_filters' => $filters,
         ]);
     }
 
     #[Route('/admin/notify-all', name: 'admin_notify_all', methods: ['POST'])]
     public function notifyAllUsers(Request $request, NotificationService $notifService): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
         $title = $request->request->get('title');
         $message = $request->request->get('message');
 
@@ -62,11 +75,12 @@ final class AnnonceController extends AbstractController
      */
     #[Route('/category/{slug}', name: 'app_annonce_category', methods: ['GET'])]
     public function category(
-        string $slug, 
-        CategoryRepository $categoryRepository, 
+        string $slug,
+        CategoryRepository $categoryRepository,
+        CityRepository $cityRepository,
         AnnonceRepository $annonceRepository,
         PaginatorInterface $paginator,
-        Request $request
+        Request $request,
     ): Response {
         $category = $categoryRepository->findOneBy(['slug' => $slug]);
 
@@ -74,25 +88,26 @@ final class AnnonceController extends AbstractController
             throw $this->createNotFoundException("Catégorie introuvable");
         }
 
-        $query = $annonceRepository->createQueryBuilder('a')
-            // On utilise l'objet $category directement, Doctrine gère la conversion
-            ->where('a.category = :cat') 
-            ->andWhere('a.status = :status')
-            // On définit les paramètres un par un pour plus de sécurité
-            ->setParameter('cat', $category)
-            ->setParameter('status', Annonce::STATUS_APPROVED)
-            ->orderBy('a.createdAt', 'DESC')
-            ->getQuery();
+        $filters = AnnonceSearchFilters::fromRequest($request);
+
+        $query = $annonceRepository->createApprovedSearchQueryBuilder(
+            $filters->q,
+            $category->getId(),
+            $filters->cityId,
+        )->getQuery();
 
         $annonces = $paginator->paginate(
             $query,
             $request->query->getInt('page', 1),
-            2
+            12,
         );
 
         return $this->render('annonce/index.html.twig', [
             'annonces' => $annonces,
             'category' => $category,
+            'search_categories' => $categoryRepository->findAllOrderedByName(),
+            'cities' => $cityRepository->findAllOrderedByName(),
+            'search_filters' => $filters,
         ]);
     }
 
@@ -191,7 +206,7 @@ final class AnnonceController extends AbstractController
         }
 
         if ($annonce->getStatus() !== Annonce::STATUS_APPROVED) {
-            if (!$this->isGranted('ROLE_ADMIN') && $this->getUser() !== $annonce->getUser()) {
+            if (!$this->isGranted('ROLE_EDITOR') && $this->getUser() !== $annonce->getUser()) {
                 throw $this->createAccessDeniedException("Cette annonce est en cours de modération.");
             }
         }
@@ -214,7 +229,7 @@ final class AnnonceController extends AbstractController
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
-        if ($annonce->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+        if ($annonce->getUser() !== $this->getUser() && !$this->isGranted('ROLE_EDITOR')) {
             throw $this->createAccessDeniedException();
         }
 
@@ -256,19 +271,20 @@ final class AnnonceController extends AbstractController
 
     #[Route('/{id}/delete', name: 'app_annonce_delete', methods: ['POST'])]
     public function delete(
-        Request $request, 
-        Annonce $annonce, 
-        EntityManagerInterface $entityManager
+        Request $request,
+        Annonce $annonce,
+        EntityManagerInterface $entityManager,
+        AnnonceDeletionService $annonceDeletionService,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
         // Sécurité : Seul le propriétaire ou l'admin peut supprimer
-        if ($annonce->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+        if ($annonce->getUser() !== $this->getUser() && !$this->isGranted('ROLE_EDITOR')) {
             throw $this->createAccessDeniedException("Vous n'avez pas le droit de supprimer cette annonce.");
         }
 
         if ($this->isCsrfTokenValid('delete' . $annonce->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($annonce);
+            $annonceDeletionService->removeCompletely($entityManager, $annonce);
             $entityManager->flush();
 
             $this->addFlash('success', 'Annonce supprimée avec succès.');

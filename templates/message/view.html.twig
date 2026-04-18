@@ -4,171 +4,532 @@
 
 {% block body %}
 {{ include('layouts/navBar.html.twig') }}
-
-<div class="container chat-container mt-4">
-    <div class="card card-chat shadow-lg border-0">
-        {# 1. Header de la conversation #}
-        <div class="chat-header bg-white d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-                <a href="{{ path('app_messages_list') }}" class="btn btn-link text-muted p-0 me-3">
+<div class="container chat-container mt-4 px-2 px-md-3">
+    <div class="card card-chat shadow border-0 wa-chat-shell">
+        {# Header type WhatsApp #}
+        <div class="wa-chat-header d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center flex-grow-1 min-w-0">
+                <a href="{{ adminReadOnly|default(false) ? path('app_admin_chats_index') : path('app_messages_list') }}" class="btn btn-link text-secondary p-0 me-2 rounded-circle wa-back">
                     <i class="bi bi-arrow-left fs-4"></i>
                 </a>
 
-                <div class="position-relative me-3">
+                <div class="position-relative me-2 flex-shrink-0">
                     {% if thread.annonce.annonceImages|length > 0 %}
-                        <img src="{{ asset('uploads/annonces/' ~ thread.annonce.annonceImages[0].imadeName) }}" class="annonce-mini-img shadow-sm">
+                        <img src="{{ asset('uploads/annonces/' ~ thread.annonce.annonceImages[0].imadeName) }}" alt="" class="wa-avatar">
                     {% else %}
-                        <div class="annonce-mini-img bg-light d-flex align-items-center justify-content-center text-muted border">
+                        <div class="wa-avatar wa-avatar-placeholder d-flex align-items-center justify-content-center text-secondary">
                             <i class="bi bi-image"></i>
                         </div>
                     {% endif %}
-                    <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle p-1" style="width: 12px; height: 12px;"></span>
                 </div>
 
-                <div>
-                    <h6 class="mb-0 fw-bold text-dark">{{ thread.annonce.title }}</h6>
-                    <small class="text-muted">
-                        <span class="fw-bold" style="color: #42B1CE;">{{ (app.user == thread.buyer ? thread.seller : thread.buyer).userIdentifier|split('@')[0]|capitalize }}</span> • En ligne
+                <div class="min-w-0">
+                    <h6 class="mb-0 fw-semibold text-truncate text-dark" style="font-size: 1rem;">{{ thread.annonce.title }}</h6>
+                    <small class="text-secondary text-truncate d-block" style="font-size: 0.8rem;">
+                        {% if adminReadOnly|default(false) %}
+                            <span class="text-body-secondary">Acheteur : {{ thread.buyer.firstName }} · Vendeur : {{ thread.seller.firstName }}</span>
+                            <span class="ms-1 badge bg-secondary bg-opacity-25 text-dark" style="font-size:0.65rem;">Admin</span>
+                        {% else %}
+                            <span class="text-body-secondary fw-medium">{{ (app.user == thread.buyer ? thread.seller : thread.buyer).userIdentifier|split('@')[0]|capitalize }}</span>
+                            <span class="chat-status-dot">• en ligne</span>
+                        {% endif %}
                     </small>
                 </div>
             </div>
-            
-            <div class="d-none d-sm-block">
-                <span class="badge rounded-pill text-dark border bg-light px-3 py-2">
-                    {{ thread.annonce.price }} €
-                </span>
+
+            <div class="d-none d-sm-block flex-shrink-0">
+                <span class="wa-price-pill">{{ thread.annonce.price }} €</span>
             </div>
         </div>
-        
-        {# 2. Zone de messages (Scrollable) #}
-        <div id="message-container">
-            <div class="text-center my-4">
-                <span class="badge bg-white text-muted shadow-sm px-3 py-2 rounded-pill small">
-                    <i class="bi bi-lock-fill me-1"></i> Les échanges sont sécurisés par Expat Souk
+
+        <div id="message-container" class="wa-message-container">
+            <div class="text-center my-3">
+                <span class="wa-encryption-pill small">
+                    <i class="bi bi-lock-fill me-1"></i> Messages envoyés en toute sécurité sur Expat Souk (connexion HTTPS).
                 </span>
             </div>
-            
+
             {% for message in thread.messagesAsThread %}
                 {{ include('message/_message_item.html.twig') }}
             {% endfor %}
         </div>
 
-        {# 3. Barre de saisie #}
-        <div class="input-group-chat bg-white">
-            {{ form_start(form, {'attr': {'id': 'chat-form', 'class': 'mb-0 w-100'}}) }}
-                <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-light rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                        <i class="bi bi-paperclip text-muted fs-5"></i>
-                    </button>
-                    
-                    <div class="flex-grow-1">
+        {% if not adminReadOnly|default(false) %}
+        {# Aperçu photo (avant envoi) #}
+        <div id="chat-media-preview" class="d-none wa-media-preview">
+            <div class="wa-media-preview-inner">
+                <img id="chat-media-preview-img" src="" alt="" class="wa-media-preview-img">
+                <div class="d-flex align-items-center justify-content-between gap-2 mt-2">
+                    <span class="small text-secondary">Ajoutez une légende ci-dessous, puis appuyez sur envoyer</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="chat-media-preview-remove" title="Supprimer">Supprimer</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="chat-location-hint" class="d-none wa-location-ready px-3 py-2 small">
+            <i class="bi bi-geo-alt me-1 chat-brand-ic"></i>
+            Position prête à l’envoi.
+            <button type="button" id="chat-clear-location" class="btn btn-link btn-sm p-0 ms-2 align-baseline chat-link-brand">Annuler</button>
+        </div>
+        {% endif %}
+
+        {# Composer type WhatsApp #}
+        {% if adminReadOnly|default(false) %}
+        <div class="wa-composer border-top bg-body-tertiary py-3 px-3 text-center small text-secondary">
+            <i class="bi bi-shield-lock me-1" style="color: #0d9488;"></i> Vue <strong>administrateur</strong> — conversation en <strong>lecture seule</strong>. Les compteurs de messages des utilisateurs ne sont pas modifiés.
+        </div>
+        {% else %}
+        <div class="wa-composer">
+            {{ form_start(form, {'attr': {'id': 'chat-form', 'class': 'mb-0', 'enctype': 'multipart/form-data'}}) }}
+                {% if form.photo.vars.errors|length %}
+                    <div class="text-danger small px-3 pb-1">{{ form_errors(form.photo) }}</div>
+                {% endif %}
+
+                <div class="wa-composer-row">
+                    {# Menu pièces jointes (+) #}
+                    <div class="dropup wa-attach-wrap">
+                        <button type="button"
+                                class="btn wa-btn-circle wa-btn-plus text-secondary"
+                                id="chat-attach-toggle"
+                                data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside"
+                                aria-expanded="false"
+                                title="Joindre"
+                                aria-label="Joindre">
+                            <i class="bi bi-plus-lg fs-4"></i>
+                        </button>
+                        <ul class="dropdown-menu wa-attach-sheet shadow-lg border-0 py-2" aria-labelledby="chat-attach-toggle">
+                            <li>
+                                <button type="button" class="dropdown-item wa-attach-item py-2 d-flex align-items-center gap-3" id="chat-pick-gallery">
+                                    <span class="wa-attach-icon chat-attach-ic"><i class="bi bi-images"></i></span>
+                                    <span>Photos (galerie)</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item wa-attach-item py-2 d-flex align-items-center gap-3" id="chat-pick-camera">
+                                    <span class="wa-attach-icon chat-attach-ic chat-attach-ic-alt"><i class="bi bi-camera-fill"></i></span>
+                                    <span>Appareil photo</span>
+                                </button>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <button type="button" class="dropdown-item wa-attach-item py-2 d-flex align-items-center gap-3" id="chat-pick-location">
+                                    <span class="wa-attach-icon chat-attach-ic"><i class="bi bi-geo-alt"></i></span>
+                                    <span>Position</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="flex-grow-1 wa-input-shell">
                         {{ form_widget(form.content, {
                             'attr': {
-                                'class': 'form-control form-control-chat border-0 bg-light shadow-none', 
-                                'placeholder': 'Votre message...',
-                                'autocomplete': 'off'
+                                'class': 'form-control wa-msg-input shadow-none',
+                                'placeholder': 'Message',
+                                'autocomplete': 'off',
+                                'rows': 1
                             }
                         }) }}
                     </div>
 
-                    <button type="submit" class="btn btn-send-custom">
-                        <i class="bi bi-send-fill"></i>
+                    <button type="submit" class="btn wa-btn-circle wa-btn-send text-white border-0" title="Envoyer" aria-label="Envoyer">
+                        <i class="bi bi-send-fill fs-5"></i>
                     </button>
                 </div>
             {{ form_end(form, {'render_rest': true}) }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# Lightbox photo (style WhatsApp plein écran simplifié) #}
+<div class="modal fade wa-lightbox-modal" id="wa-photo-lightbox" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0 shadow-none">
+            <button type="button" class="btn-close btn-close-white wa-lightbox-close ms-auto mb-2" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            <div class="text-center rounded-3 overflow-hidden bg-black">
+                <img src="" alt="" id="wa-lightbox-img" class="img-fluid w-100">
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Structure du Chat */
-    .card-chat { 
-        height: 82vh; 
-        display: flex; 
-        flex-direction: column; 
-        overflow: hidden;
-        border-radius: 20px !important;
+    :root {
+        --chat-brand: #42B1CE;
+        --chat-brand-dark: #2a8da7;
+        --chat-brand-hover: #369ab3;
+        --chat-bg-shell: #f4fafc;
+        --chat-bg-thread: #e9f4f8;
     }
 
-    .chat-header { 
-        padding: 12px 20px; 
-        border-bottom: 1px solid #f0f0f0; 
-        z-index: 10;
-    }
-
-    .annonce-mini-img { 
-        width: 48px; 
-        height: 48px; 
-        border-radius: 12px; 
-        object-fit: cover; 
-    }
-
-    /* Container de messages avec fond texturé */
-    #message-container { 
-        flex-grow: 1; 
-        background-color: #f7f9fb;
-        background-image: url("https://www.transparenttextures.com/patterns/cubes.png"); /* Texture plus moderne */
-        padding: 20px; 
-        overflow-y: auto; 
-    }
-
-    /* Barre d'envoi */
-    .input-group-chat { 
-        padding: 15px 20px; 
-        border-top: 1px solid #f0f0f0; 
-    }
-
-    .form-control-chat { 
-        border-radius: 25px !important; 
-        padding: 12px 20px !important;
-        font-size: 0.95rem;
-    }
-
-    /* Bouton d'envoi thématisé #42B1CE */
-    .btn-send-custom { 
-        width: 48px; 
-        height: 48px; 
-        border-radius: 50% !important; 
-        background-color: #42B1CE !important;
-        border: none !important;
-        color: white !important;
+    .wa-chat-shell {
+        height: 82vh;
         display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 12px !important;
+        background: var(--chat-bg-shell);
+        border: 1px solid rgba(66, 177, 206, 0.14) !important;
+    }
+
+    .chat-status-dot {
+        color: var(--chat-brand-dark);
+        font-weight: 600;
+    }
+
+    .wa-chat-header {
+        padding: 10px 12px;
+        background: linear-gradient(180deg, #ffffff 0%, #f4fafc 100%);
+        border-bottom: 1px solid rgba(66, 177, 206, 0.18);
+    }
+
+    .wa-back:hover { background: rgba(0, 0, 0, .05); }
+
+    .wa-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #fff;
+    }
+
+    .wa-avatar-placeholder {
+        border: 1px solid #e9edef;
+        font-size: 1.25rem;
+    }
+
+    .wa-price-pill {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid rgba(66, 177, 206, 0.28);
+        font-weight: 600;
+        color: #1a3d45;
+    }
+
+    .wa-message-container {
+        flex-grow: 1;
+        padding: 8px 10px 12px;
+        overflow-y: auto;
+        background-color: var(--chat-bg-thread);
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2342B1CE' fill-opacity='0.04'%3E%3Cpath d='M30 0h30v30H30zM0 30h30v30H0z'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .wa-encryption-pill {
+        display: inline-block;
+        max-width: 96%;
+        padding: 8px 14px;
+        border-radius: 10px;
+        background: rgba(66, 177, 206, 0.12);
+        color: #256070;
+        border: 1px solid rgba(66, 177, 206, 0.2);
+        box-shadow: none;
+        line-height: 1.35;
+    }
+
+    .wa-media-preview {
+        background: var(--chat-bg-shell);
+        border-top: 1px solid rgba(66, 177, 206, 0.15);
+        padding: 10px 14px;
+    }
+
+    .wa-media-preview-inner { max-width: 360px; margin: 0 auto; }
+
+    .wa-media-preview-img {
+        width: 100%;
+        max-height: 220px;
+        object-fit: contain;
+        border-radius: 8px;
+        background: #000;
+    }
+
+    .wa-location-ready {
+        background: rgba(66, 177, 206, 0.08);
+        border-top: 1px solid rgba(66, 177, 206, 0.22);
+        color: #1e505e;
+    }
+
+    .chat-brand-ic { color: var(--chat-brand-dark); }
+
+    .wa-composer {
+        background: linear-gradient(180deg, #fafcfd 0%, var(--chat-bg-shell) 100%);
+        padding: 10px 12px 14px;
+        border-top: 1px solid rgba(66, 177, 206, 0.15);
+    }
+
+    .wa-composer-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    .wa-btn-circle {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 4px 10px rgba(66, 177, 206, 0.3);
-    }
-    
-    .btn-send-custom:hover { 
-        transform: scale(1.1) rotate(-5deg);
-        background-color: #369ab3 !important;
-        box-shadow: 0 6px 15px rgba(66, 177, 206, 0.4);
+        flex-shrink: 0;
     }
 
-    .btn-send-custom i { font-size: 1.2rem; margin-left: 3px; }
+    .wa-btn-plus {
+        background: #fff;
+        border: none;
+        box-shadow: 0 1px 1px rgba(11, 20, 26, .12);
+    }
 
-    /* Scrollbar */
-    #message-container::-webkit-scrollbar { width: 4px; }
-    #message-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
+    .wa-btn-send {
+        background: var(--chat-brand) !important;
+        box-shadow: 0 4px 14px rgba(66, 177, 206, 0.35);
+    }
+
+    .wa-btn-send:hover {
+        background: var(--chat-brand-hover) !important;
+        box-shadow: 0 6px 18px rgba(66, 177, 206, 0.42);
+    }
+
+    .wa-input-shell {
+        background: #fff;
+        border-radius: 24px;
+        border: 1px solid rgba(66, 177, 206, 0.18);
+        box-shadow: 0 1px 3px rgba(42, 141, 167, 0.06);
+    }
+
+    .wa-msg-input {
+        border: none !important;
+        border-radius: 24px !important;
+        padding: 10px 16px !important;
+        font-size: 15px;
+        resize: none;
+        max-height: 120px;
+        color: #1a2e33;
+    }
+
+    .wa-msg-input::placeholder { color: #7a9299; }
+
+    .wa-msg-input:focus {
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    .chat-attach-ic {
+        background: rgba(66, 177, 206, 0.15);
+        color: var(--chat-brand-dark);
+    }
+
+    .chat-attach-ic-alt {
+        background: rgba(66, 177, 206, 0.22);
+        color: #1e6575;
+    }
+
+    .chat-link-brand {
+        color: var(--chat-brand-dark);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .chat-link-brand:hover {
+        color: var(--chat-brand-hover);
+        text-decoration: underline;
+    }
+
+    .wa-attach-sheet {
+        min-width: 260px;
+        border-radius: 12px !important;
+    }
+
+    .wa-attach-item {
+        border-radius: 8px;
+        margin: 0 6px;
+        color: #111b21;
+    }
+
+    .wa-attach-item:active { background: #f5f6f6 !important; }
+
+    .wa-attach-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+    }
+
+    .wa-lightbox-close { filter: brightness(0) invert(1); opacity: .9; }
+
+    #message-container::-webkit-scrollbar { width: 6px; }
+    #message-container::-webkit-scrollbar-thumb { background: rgba(66, 177, 206, 0.35); border-radius: 10px; }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('message-container');
+        if (!container) return;
         container.scrollTop = container.scrollHeight;
+
+        const form = document.getElementById('chat-form');
+        const photoInput = form ? form.querySelector('.chat-photo-input') : null;
+        const pickGallery = document.getElementById('chat-pick-gallery');
+        const pickCamera = document.getElementById('chat-pick-camera');
+        const pickLocation = document.getElementById('chat-pick-location');
+        const latInput = form ? form.querySelector('.chat-lat-input') : null;
+        const lngInput = form ? form.querySelector('.chat-lng-input') : null;
+        const labelInput = form ? form.querySelector('.chat-location-label-input') : null;
+        const locationHint = document.getElementById('chat-location-hint');
+        const clearLocBtn = document.getElementById('chat-clear-location');
+        const mediaPreview = document.getElementById('chat-media-preview');
+        const mediaPreviewImg = document.getElementById('chat-media-preview-img');
+        const mediaPreviewRemove = document.getElementById('chat-media-preview-remove');
+        let mediaObjectUrl = null;
+
+        function hideLocationHint() {
+            if (locationHint) locationHint.classList.add('d-none');
+        }
+        function showLocationHint() {
+            if (locationHint) locationHint.classList.remove('d-none');
+        }
+        function clearLocationFields() {
+            if (latInput) latInput.value = '';
+            if (lngInput) lngInput.value = '';
+            if (labelInput) labelInput.value = '';
+            hideLocationHint();
+        }
+
+        function hideMediaPreview() {
+            if (mediaObjectUrl) {
+                URL.revokeObjectURL(mediaObjectUrl);
+                mediaObjectUrl = null;
+            }
+            if (mediaPreviewImg) mediaPreviewImg.src = '';
+            if (mediaPreview) mediaPreview.classList.add('d-none');
+        }
+
+        function showMediaPreviewFromFile(file) {
+            if (!file || !mediaPreview || !mediaPreviewImg) return;
+            if (mediaObjectUrl) URL.revokeObjectURL(mediaObjectUrl);
+            mediaObjectUrl = URL.createObjectURL(file);
+            mediaPreviewImg.src = mediaObjectUrl;
+            mediaPreview.classList.remove('d-none');
+            clearLocationFields();
+        }
+
+        if (clearLocBtn) {
+            clearLocBtn.addEventListener('click', function() { clearLocationFields(); });
+        }
+
+        const attachToggle = document.getElementById('chat-attach-toggle');
+        function closeAttachMenu() {
+            if (!attachToggle || typeof bootstrap === 'undefined' || !bootstrap.Dropdown) return;
+            bootstrap.Dropdown.getOrCreateInstance(attachToggle).hide();
+        }
+
+        function triggerPhotoPick(mode) {
+            if (!photoInput) return;
+            if (mode === 'camera') {
+                photoInput.setAttribute('capture', 'environment');
+            } else {
+                photoInput.removeAttribute('capture');
+            }
+            closeAttachMenu();
+            setTimeout(function() { photoInput.click(); }, 0);
+        }
+
+        if (pickGallery) {
+            pickGallery.addEventListener('click', function() { triggerPhotoPick('gallery'); });
+        }
+        if (pickCamera) {
+            pickCamera.addEventListener('click', function() { triggerPhotoPick('camera'); });
+        }
+
+        if (photoInput) {
+            photoInput.addEventListener('change', function() {
+                var f = this.files && this.files[0];
+                if (f && f.type && f.type.indexOf('image/') === 0) {
+                    showMediaPreviewFromFile(f);
+                } else if (f) {
+                    hideMediaPreview();
+                } else {
+                    hideMediaPreview();
+                }
+            });
+        }
+
+        if (mediaPreviewRemove && photoInput) {
+            mediaPreviewRemove.addEventListener('click', function() {
+                photoInput.value = '';
+                hideMediaPreview();
+            });
+        }
+
+        if (pickLocation && latInput && lngInput) {
+            pickLocation.addEventListener('click', function() {
+                closeAttachMenu();
+                if (!navigator.geolocation) {
+                    alert('La géolocalisation n’est pas disponible sur ce navigateur.');
+                    return;
+                }
+                pickLocation.disabled = true;
+                navigator.geolocation.getCurrentPosition(
+                    function(pos) {
+                        latInput.value = String(pos.coords.latitude);
+                        lngInput.value = String(pos.coords.longitude);
+                        if (photoInput) photoInput.value = '';
+                        hideMediaPreview();
+                        var name = window.prompt('Nom du lieu (facultatif)', labelInput ? (labelInput.value || '') : '');
+                        if (name !== null && labelInput) {
+                            labelInput.value = name;
+                        }
+                        showLocationHint();
+                        pickLocation.disabled = false;
+                    },
+                    function() {
+                        alert('Impossible d’obtenir votre position. Vérifiez les autorisations du navigateur.');
+                        pickLocation.disabled = false;
+                    },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                );
+            });
+        }
+
+        const lightboxEl = document.getElementById('wa-photo-lightbox');
+        const lightboxImg = document.getElementById('wa-lightbox-img');
+        let lightboxModal = null;
+        if (lightboxEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            lightboxModal = new bootstrap.Modal(lightboxEl);
+        }
+        container.addEventListener('click', function(ev) {
+            var thumb = ev.target.closest('.wa-photo-thumb');
+            if (!thumb) return;
+            var full = thumb.dataset.waFull || thumb.getAttribute('data-wa-full');
+            if (!full) return;
+            ev.preventDefault();
+            if (lightboxImg) lightboxImg.src = full;
+            if (lightboxModal) lightboxModal.show();
+        });
 
         const hubUrl = '{{ mercure_hub_url|default("")|escape("js") }}';
         if (hubUrl) {
-            const url = new URL(hubUrl);
+            var url = new URL(hubUrl);
             url.searchParams.append('topic', 'chat_thread_{{ thread.id }}');
-            const eventSource = new EventSource(url);
-            eventSource.onmessage = event => {
+            var eventSource = new EventSource(url);
+            eventSource.onmessage = function(event) {
                 container.insertAdjacentHTML('beforeend', event.data);
                 container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            };
+        }
+
+        var ta = form ? form.querySelector('.wa-msg-input') : null;
+        if (ta) {
+            function grow() {
+                ta.style.height = 'auto';
+                ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
             }
+            ta.addEventListener('input', grow);
+            grow();
         }
     });
 </script>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 {% endblock %}

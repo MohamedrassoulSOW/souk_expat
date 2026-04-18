@@ -20,13 +20,7 @@
                 </div>
 
                 <div class="card-body p-4 p-md-5">
-                    
-                    {# Gestion des erreurs flash #}
-                    {% for flash_error in app.flashes('reset_password_error') %}
-                        <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4 small" role="alert">
-                            <i class="bi bi-exclamation-circle me-2"></i> {{ flash_error }}
-                        </div>
-                    {% endfor %}
+                    {# Erreurs jeton / réinitialisation : flashes gérés globalement (toasts via base) #}
 
                     <p class="text-muted small mb-4 text-center">
                         Entrez l'adresse email associée à votre compte pour recevoir un lien de récupération.

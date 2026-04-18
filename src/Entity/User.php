@@ -16,6 +16,8 @@ use App\Entity\Annonce;
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public const string ROLE_EDITOR = 'ROLE_EDITOR';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

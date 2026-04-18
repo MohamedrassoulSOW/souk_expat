@@ -31,6 +31,7 @@ class Thread
      * @var Collection<int, Message>
      */
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'thread')]
+    #[ORM\OrderBy(['createdAt' => 'ASC', 'id' => 'ASC'])]
     private Collection $messagesAsThread;
 
     public function __construct()

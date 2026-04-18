@@ -1,0 +1,15 @@
+{# Sidebar desktop (md+) — le menu mobile est dans dashboard (offcanvas) #}
+
+<aside class="col-12 col-md-3 col-lg-2 bg-white border-end d-none d-md-flex flex-column dashboard-sidebar-desktop">
+
+    <div class="p-4 border-bottom text-center flex-shrink-0">
+        <a href="{{ path('app_home') }}" class="text-decoration-none">
+            <span class="fs-4 fw-bold" style="color: #42B1CE;">Expat Souk</span>
+            <p class="small text-muted mb-0 font-monospace" style="font-size: 0.7rem;">ADMINISTRATION</p>
+        </a>
+    </div>
+
+    <div class="flex-grow-1 overflow-y-auto p-3 custom-scrollbar min-h-0">
+        {{ include('admin/_sidebar_nav_content.html.twig') }}
+    </div>
+</aside>
