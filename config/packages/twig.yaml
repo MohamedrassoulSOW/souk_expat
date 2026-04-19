@@ -2,6 +2,8 @@ twig:
     file_name_pattern: '*.twig'
     globals:
         contact_email: '%app.contact_email%'
+        # Hub Mercure (temps réel chat) — même valeur que MERCURE_PUBLIC_URL côté navigateur
+        mercure_hub_url: '%env(MERCURE_PUBLIC_URL)%'
 
 when@test:
     twig:

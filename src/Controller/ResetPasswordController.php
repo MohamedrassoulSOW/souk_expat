@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Mail\SiteContact;
 use App\Form\ChangePasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,7 +29,6 @@ class ResetPasswordController extends AbstractController
     public function __construct(
         private ResetPasswordHelperInterface $resetPasswordHelper,
         private EntityManagerInterface $entityManager,
-        private readonly string $senderEmail,
     ) {
     }
 
@@ -113,12 +113,19 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('app_check_email');
         }
 
+        $from = new Address(SiteContact::EMAIL, 'Expat Souk');
+
         $email = (new TemplatedEmail())
-            ->from(new Address($this->senderEmail, 'Expat Souk')) 
+            ->from($from)
+            ->replyTo($from)
             ->to((string) $user->getEmail())
-            ->subject('Réinitialisation de votre mot de passe')
+            ->subject('Expat Souk — Réinitialisation de votre mot de passe')
             ->htmlTemplate('reset_password/email.html.twig')
-            ->context(['resetToken' => $resetToken])
+            ->textTemplate('reset_password/email.txt.twig')
+            ->context([
+                'resetToken' => $resetToken,
+                'siteContactEmail' => SiteContact::EMAIL,
+            ])
         ;
 
         $mailer->send($email);

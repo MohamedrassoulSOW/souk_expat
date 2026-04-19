@@ -22,8 +22,9 @@
                 <div class="card-body p-4 p-md-5">
                     {# Erreurs jeton / réinitialisation : flashes gérés globalement (toasts via base) #}
 
-                    <p class="text-muted small mb-4 text-center">
-                        Entrez l'adresse email associée à votre compte pour recevoir un lien de récupération.
+                    <p class="text-muted small mb-3 text-center">
+                        Saisissez l’adresse e-mail de votre compte. Nous vous enverrons un message depuis
+                        <strong class="text-dark">{{ contact_email }}</strong> avec un lien sécurisé pour choisir un nouveau mot de passe.
                     </p>
 
                     {{ form_start(requestForm) }}

@@ -10,7 +10,7 @@
         .wrapper { background-color: #f4f7f9; padding: 40px 20px; }
         
         /* Card */
-        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         
         /* Header */
         .header { background-color: #42B1CE; padding: 40px 30px; text-align: center; }
@@ -76,12 +76,14 @@
                     Ignorez simplement cet e-mail. Votre mot de passe actuel restera en sécurité et aucune modification ne sera effectuée.
                 </div>
                 
-                <p style="margin-top: 30px;">À très vite,<br><strong>L'équipe Expat Souk</strong></p>
+                <p style="margin-top: 28px;">Une question ? Répondez à cet e-mail ou écrivez-nous à <a href="mailto:{{ siteContactEmail }}" style="color:#42B1CE;font-weight:600;">{{ siteContactEmail }}</a>.</p>
+
+                <p style="margin-top: 24px;">À très vite,<br><strong>L’équipe Expat Souk</strong></p>
             </div>
             
             <div class="footer">
-                &copy; {{ "now"|date("Y") }} Expat Souk<br>
-                La plateforme préférée des expatriés.
+                &copy; {{ "now"|date("Y") }} Expat Souk — <a href="mailto:{{ siteContactEmail }}" style="color:#42B1CE;text-decoration:none;">{{ siteContactEmail }}</a><br>
+                <span style="color:#aaaaaa;">La plateforme des expatriés au Maroc.</span>
             </div>
         </div>
     </div>

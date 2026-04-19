@@ -21,10 +21,11 @@
                     
                     <h2 class="fw-bold h3 mb-3">Vérifiez vos emails</h2>
                     
-                    <p class="text-muted mb-4 lead fs-6">
+                    <p class="text-muted mb-3 lead fs-6">
                         Si un compte correspond à <br>
-                        <strong class="text-dark">{{ resetToken.user ? resetToken.user.email : 'votre adresse' }}</strong>,
-                        un lien de réinitialisation vous a été envoyé.
+                        <strong class="text-dark">{{ resetToken.user ? resetToken.user.email : 'cette adresse' }}</strong>,
+                        un lien de réinitialisation vient de vous être envoyé depuis
+                        <strong class="text-dark">{{ contact_email }}</strong>.
                     </p>
 
                     {# Durée alignée sur symfonycasts_reset_password.lifetime et l’e-mail #}
@@ -35,9 +36,12 @@
                         </span>
                     </div>
 
-                    <div class="p-3 bg-light rounded-3 mb-4">
+                    <div class="p-3 bg-light rounded-3 mb-4 text-start">
+                        <p class="small text-secondary mb-2">
+                            L’expéditeur du message est <strong>{{ contact_email }}</strong> (objet : « Expat Souk — Réinitialisation de votre mot de passe »).
+                        </p>
                         <p class="small text-secondary mb-0">
-                            Rien reçu ? Vérifiez vos <strong>courriers indésirables (spams)</strong> ou 
+                            Rien reçu ? Vérifiez vos <strong>courriers indésirables (spams)</strong> ou
                             <a href="{{ path('app_forgot_password_request') }}" class="fw-bold text-decoration-none" style="color: #42B1CE;">réessayez</a>.
                         </p>
                     </div>
@@ -52,7 +56,9 @@
             </div>
             
             <p class="mt-4 text-muted small">
-                Besoin d'aide ? <a href="{{ path('app_contact') }}" class="text-decoration-none" style="color: #42B1CE;">Contactez le support</a>
+                Besoin d’aide ? Écrivez-nous à
+                <a href="mailto:{{ contact_email }}" class="text-decoration-none fw-semibold" style="color: #42B1CE;">{{ contact_email }}</a>
+                ou <a href="{{ path('app_contact') }}" class="text-decoration-none" style="color: #42B1CE;">via le formulaire contact</a>.
             </p>
         </div>
     </div>
