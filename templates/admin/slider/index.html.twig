@@ -38,9 +38,12 @@
                     </td>
                     <td class="text-end">
                         <div class="d-flex flex-wrap justify-content-end gap-1" role="group" aria-label="Actions slide {{ slider.id }}">
-                            <a href="{{ path('admin_slider_toggle', {id: slider.id}) }}" class="btn btn-outline-secondary btn-sm" title="Activer ou désactiver la slide">
-                                <i class="bi bi-arrow-repeat" aria-hidden="true"></i><span class="d-none d-md-inline ms-1">Statut</span>
-                            </a>
+                            <form method="post" action="{{ path('admin_slider_toggle', {id: slider.id}) }}" class="d-inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('toggle_slider_' ~ slider.id) }}">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm" title="Activer ou désactiver la slide">
+                                    <i class="bi bi-arrow-repeat" aria-hidden="true"></i><span class="d-none d-md-inline ms-1">Statut</span>
+                                </button>
+                            </form>
                             <form method="post" action="{{ path('admin_slider_delete', {id: slider.id}) }}"
                                   onsubmit="return confirm('Supprimer cette image du slider ?');" class="d-inline">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ slider.id) }}">

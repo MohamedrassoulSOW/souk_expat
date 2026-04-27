@@ -1,0 +1,52 @@
+{# Actions admin utilisateur : POST + CSRF (obligatoire pour blocage, rôles, suppression). #}
+{# @var user \App\Entity\User #}
+<li>
+    <form method="post" action="{{ path('admin_user_toggle', {id: user.id}) }}" class="mb-0">
+        <input type="hidden" name="_token" value="{{ csrf_token('user_toggle_block_' ~ user.id) }}">
+        <button type="submit" class="dropdown-item rounded-2 w-100 text-start border-0 bg-transparent">
+            {% if user.isBlocked %}
+                <i class="bi bi-unlock me-2 text-success" aria-hidden="true"></i>Débloquer l'utilisateur
+            {% else %}
+                <i class="bi bi-slash-circle me-2 text-danger" aria-hidden="true"></i>Bloquer l'utilisateur
+            {% endif %}
+        </button>
+    </form>
+</li>
+<li><hr class="dropdown-divider opacity-50"></li>
+<li>
+    <form method="post" action="{{ path('admin_user_editor', {id: user.id}) }}" class="mb-0">
+        <input type="hidden" name="_token" value="{{ csrf_token('user_admin_role_' ~ user.id) }}">
+        <button type="submit" class="dropdown-item rounded-2 w-100 text-start border-0 bg-transparent">
+            {% if 'ROLE_ADMIN' in user.roles %}
+                <i class="bi bi-person-x me-2 text-danger" aria-hidden="true"></i>Retirer Admin
+            {% else %}
+                <i class="bi bi-person-check me-2 text-success" aria-hidden="true"></i>Nommer Admin
+            {% endif %}
+        </button>
+    </form>
+</li>
+<li><hr class="dropdown-divider opacity-50"></li>
+<li>
+    <form method="post" action="{{ path('admin_user_toggle_editor', {id: user.id}) }}" class="mb-0">
+        <input type="hidden" name="_token" value="{{ csrf_token('user_editor_role_' ~ user.id) }}">
+        <button type="submit" class="dropdown-item rounded-2 w-100 text-start border-0 bg-transparent">
+            {% if 'ROLE_EDITOR' in user.roles %}
+                <i class="bi bi-journal-minus me-2 text-warning" aria-hidden="true"></i>Retirer le rôle éditeur
+            {% else %}
+                <i class="bi bi-journal-check me-2" style="color: #0d9488;" aria-hidden="true"></i>Donner le rôle éditeur
+            {% endif %}
+        </button>
+    </form>
+</li>
+<li><hr class="dropdown-divider opacity-50"></li>
+<li>
+    <form method="post"
+          action="{{ path('admin_user_delete', {id: user.id}) }}"
+          class="mb-0"
+          onsubmit="return confirm('Confirmer la suppression de cet utilisateur ?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ user.id) }}">
+        <button type="submit" class="dropdown-item rounded-2 text-danger w-100 text-start border-0 bg-transparent">
+            <i class="bi bi-trash me-2" aria-hidden="true"></i>Supprimer
+        </button>
+    </form>
+</li>

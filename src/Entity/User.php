@@ -194,6 +194,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
+        $this->annonces = new ArrayCollection();
         $this->threadAsBuyer = new ArrayCollection();
         $this->threadAsSeller = new ArrayCollection();
         $this->messagesAsSender = new ArrayCollection();

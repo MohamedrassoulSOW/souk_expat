@@ -78,9 +78,14 @@ class AdminSliderController extends AbstractController
         return $this->redirectToRoute('admin_slider_index');
     }
 
-    #[Route('/toggle/{id}', name: 'admin_slider_toggle', methods: ['GET'])]
-    public function toggleStatus(Slider $slider, EntityManagerInterface $em): Response
+    #[Route('/toggle/{id}', name: 'admin_slider_toggle', methods: ['POST'])]
+    public function toggleStatus(Request $request, Slider $slider, EntityManagerInterface $em): Response
     {
+        if (!$this->isCsrfTokenValid('toggle_slider_' . $slider->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide ou expiré.');
+
+            return $this->redirectToRoute('admin_slider_index');
+        }
 
         // On inverse le statut actuel (si vrai devient faux, et inversement)
         $slider->setIsActive(!$slider->isActive());

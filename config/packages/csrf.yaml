@@ -5,7 +5,7 @@ framework:
             token_id: submit
 
     csrf_protection:
+        # « authenticate » / « logout » : CSRF classique (session) pour la page de connexion sans dépendre du JS.
+        # « submit » : reste stateless (formulaires Symfony) — le script csrf_protection_controller.js doit être chargé (app.js).
         stateless_token_ids:
             - submit
-            - authenticate
-            - logout

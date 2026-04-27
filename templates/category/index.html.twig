@@ -1,32 +1,28 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
 {% block title %}Gestion des Catégories | Expat Souk{% endblock %}
 
-{% block body %}
-<div class="container-fluid p-0">
-    <div class="row g-0">
-        <main class="col-12 col-md-9 col-lg-10 p-4 bg-light min-vh-100">
-            
+{% block admin_mobile_title %}Catégories{% endblock %}
+
+{% block admin_main %}
             {# Message de succès/erreur #}
             {# Header de la page #}
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-                <div class="d-flex flex-column">
+                <div class="d-flex flex-column min-w-0">
                     <a href="{{ path('app_dashboard') }}" class="text-decoration-none text-muted mb-1">
                         <i class="bi bi-house-door-fill me-1"></i> Tableau de bord
                     </a>
-                </div>
-                <div>
-                    <h3 class="fw-bold mb-1">📂 Catégories d'annonces</h3>
+                    <h3 class="fw-bold mb-1 text-truncate">📂 Catégories d'annonces</h3>
                     <p class="text-muted small mb-0">Organisez les types de produits et services sur la plateforme.</p>
                 </div>
-                <a href="{{ path('app_category_new') }}" class="btn btn-primary rounded-pill px-4 shadow-sm" style="background-color: #42B1CE; border: none;">
+                <a href="{{ path('app_category_new') }}" class="btn btn-primary rounded-pill px-4 shadow-sm flex-shrink-0" style="background-color: #42B1CE; border: none;">
                     <i class="bi bi-plus-circle me-2"></i>Nouvelle catégorie
                 </a>
             </div>
 
             {# Card principale #}
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white border-0 p-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <h5 class="fw-bold mb-0 text-dark">Liste des enregistrements</h5>
                     <div class="badge bg-soft-info text-info rounded-pill px-3">{{ categories|length }} catégories</div>
                 </div>
@@ -34,13 +30,14 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light text-muted small uppercase">
+                            <thead class="bg-light text-muted small text-uppercase">
                                 <tr>
                                     <th class="ps-4 py-3 border-0">ID</th>
-                                    <th class="py-3 border-0">IMAGE</th>
-                                    <th class="py-3 border-0">NOM</th>
-                                    <th class="py-3 border-0">SLUG (URL)</th>
-                                    <th class="py-3 border-0 text-end pe-4">GESTION</th>
+                                    <th class="py-3 border-0">Image</th>
+                                    <th class="py-3 border-0 d-none d-md-table-cell">Icône</th>
+                                    <th class="py-3 border-0">Nom</th>
+                                    <th class="py-3 border-0 d-none d-lg-table-cell">Slug (URL)</th>
+                                    <th class="py-3 border-0 text-end pe-4">Gestion</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -56,29 +53,40 @@
                                             <span class="text-muted small">—</span>
                                         {% endif %}
                                     </td>
+                                    <td class="py-3 d-none d-md-table-cell">
+                                        {% if category.icon %}
+                                            <i class="{{ category.icon }} fs-5 text-primary" aria-hidden="true"></i>
+                                        {% else %}
+                                            <span class="text-muted small">—</span>
+                                        {% endif %}
+                                    </td>
                                     <td class="py-3">
                                         <div class="fw-bold text-dark">{{ category.name }}</div>
                                     </td>
-                                    <td class="py-3">
-                                        <code class="small bg-white border px-2 py-1 rounded text-secondary">{{ category.slug }}</code>
+                                    <td class="py-3 d-none d-lg-table-cell">
+                                        <code class="small bg-white border px-2 py-1 rounded text-secondary text-break">{{ category.slug }}</code>
                                     </td>
                                     <td class="text-end pe-4 py-3">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <a href="{{ path('app_category_update', {'id': category.id}) }}" 
+                                        <div class="d-flex flex-wrap justify-content-end gap-2">
+                                            <a href="{{ path('app_category_update', {'id': category.id}) }}"
                                                class="btn btn-sm btn-light border rounded-pill px-3 shadow-sm hover-cyan">
                                                 <i class="bi bi-pencil-square text-primary me-1"></i> Éditer
                                             </a>
-                                            <a href="{{ path('app_category_delete', {'id': category.id}) }}" 
-                                               class="btn btn-sm btn-light border rounded-pill px-3 shadow-sm hover-red"
-                                               onclick="return confirm('Attention ! Supprimer cette catégorie pourrait affecter les annonces liées. Continuer ?');">
-                                                <i class="bi bi-trash3 text-danger me-1"></i> Supprimer
-                                            </a>
+                                            <form method="post"
+                                                  action="{{ path('app_category_delete', {'id': category.id}) }}"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Attention ! Supprimer cette catégorie pourrait affecter les annonces liées. Continuer ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_category_' ~ category.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-light border rounded-pill px-3 shadow-sm hover-red">
+                                                    <i class="bi bi-trash3 text-danger me-1"></i> Supprimer
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="5" class="text-center py-5">
+                                    <td colspan="6" class="text-center py-5">
                                         <div class="text-muted">
                                             <i class="bi bi-folder2-open fs-1 opacity-25 d-block mb-3"></i>
                                             Aucune catégorie n'est configurée pour le moment.
@@ -91,14 +99,10 @@
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
-</div>
 
 <style>
-    /* Intégration du style global */
     .bg-soft-info { background-color: #42B1CE15; }
-    
+
     .table thead th {
         font-weight: 700;
         font-size: 0.75rem;
@@ -124,7 +128,6 @@
         background-color: #f9fafb !important;
     }
 
-    /* Support mobile */
     @media (max-width: 768px) {
         .card-header { flex-direction: column; align-items: flex-start !important; gap: 10px; }
     }

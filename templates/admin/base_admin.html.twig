@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{# Même coque que le tableau de bord : menu latéral, offcanvas mobile, zone principale alignée. #}
+{% block body_attributes %} class="dashboard-admin-page"{% endblock %}
+
+{% block body %}
+<div class="offcanvas offcanvas-start" tabindex="-1" id="adminMenuOffcanvas" aria-labelledby="adminMenuOffcanvasLabel">
+    <div class="offcanvas-header border-bottom py-3">
+        <div>
+            <h5 class="offcanvas-title fw-bold mb-0" id="adminMenuOffcanvasLabel" style="color: #42B1CE;">Expat Souk</h5>
+            <p class="small text-muted mb-0 font-monospace" style="font-size: 0.7rem;">ADMINISTRATION</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer le menu"></button>
+    </div>
+    <div class="offcanvas-body p-0 d-flex flex-column">
+        <div class="flex-grow-1 overflow-y-auto p-3">
+            {{ include('admin/_sidebar_nav_content.html.twig') }}
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid p-0 dashboard-shell">
+    <header class="d-md-none sticky-top bg-white border-bottom shadow-sm py-2 px-3 d-flex align-items-center gap-2 dashboard-mobile-header">
+        <button class="btn btn-outline-primary rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 p-0"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#adminMenuOffcanvas"
+                aria-controls="adminMenuOffcanvas"
+                style="width: 44px; height: 44px;"
+                aria-label="Ouvrir le menu">
+            <i class="bi bi-list fs-3" aria-hidden="true"></i>
+        </button>
+        <span class="fw-bold text-truncate flex-grow-1" style="color: #42B1CE;">{% block admin_mobile_title %}Administration{% endblock %}</span>
+        <a href="{{ path('app_home') }}" class="btn btn-light border rounded-pill btn-sm flex-shrink-0" title="Accueil site">
+            <i class="bi bi-house-door" aria-hidden="true"></i>
+        </a>
+    </header>
+
+    <div class="row g-0 align-items-stretch dashboard-main-row">
+        {{ include('admin/_sidebar.html.twig') }}
+
+        <main class="col-12 col-md-9 col-lg-10 bg-light dashboard-main custom-scrollbar p-3 p-sm-4 min-vh-100">
+            {% block admin_main %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -1,3 +1,5 @@
+// Requis si des jetons CSRF sont « stateless » (voir config/packages/csrf.yaml) : double-submit + Turbo.
+import './controllers/csrf_protection_controller.js';
 import './stimulus_bootstrap.js';
 import './styles/app.css';
 import { initSiteUi } from './site-ui.js';

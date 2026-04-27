@@ -47,41 +47,7 @@
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
-                                    <li>
-                                        <a class="dropdown-item rounded-2" href="{{ path('admin_user_toggle', {id: u.id}) }}">
-                                            {% if u.isBlocked %}
-                                                <i class="bi bi-unlock me-2 text-success"></i>Débloquer
-                                            {% else %}
-                                                <i class="bi bi-slash-circle me-2 text-danger"></i>Bloquer
-                                            {% endif %}
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider opacity-50"></li>
-                                    <li>
-                                        <a class="dropdown-item rounded-2" href="{{ path('admin_user_editor', {id: u.id}) }}">
-                                            {% if 'ROLE_ADMIN' in u.roles %}
-                                                <i class="bi bi-person-x me-2"></i>Retirer admin
-                                            {% else %}
-                                                <i class="bi bi-person-check me-2"></i>Nommer admin
-                                            {% endif %}
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider opacity-50"></li>
-                                    <li>
-                                        <a class="dropdown-item rounded-2" href="{{ path('admin_user_toggle_editor', {id: u.id}) }}">
-                                            {% if 'ROLE_EDITOR' in u.roles %}
-                                                <i class="bi bi-journal-minus me-2 text-warning"></i> Retirer le rôle éditeur
-                                            {% else %}
-                                                <i class="bi bi-journal-check me-2" style="color: #0d9488;"></i> Donner le rôle éditeur
-                                            {% endif %}
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider opacity-50"></li>
-                                    <li>
-                                        <a class="dropdown-item text-danger rounded-2" href="{{ path('admin_user_delete', {id: u.id}) }}" onclick="return confirm('Supprimer cet utilisateur ?');">
-                                            <i class="bi bi-trash me-2"></i>Supprimer
-                                        </a>
-                                    </li>
+                                    {{ include('admin/_user_dropdown_actions.html.twig', { user: u }) }}
                                 </ul>
                             </div>
                         </td>

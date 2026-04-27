@@ -2,16 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
 
 final class UserController extends AbstractController
 {
-    #[Route('/admin/user', name: 'app_user')]
+    #[Route('/admin/user', name: 'app_user', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
         // Compter le nombre total d'utilisateurs
@@ -28,10 +29,16 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/user/{id}/editor', name: 'admin_user_editor')]
-    public function toggleRole(User $user, EntityManagerInterface $entityManager): Response
+    #[Route('/admin/user/{id}/editor', name: 'admin_user_editor', methods: ['POST'])]
+    public function toggleRole(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        if (!$this->isCsrfTokenValid('user_admin_role_' . $user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide ou expiré.');
+
+            return $this->redirectToRoute('app_dashboard');
+        }
 
         // Vérifie si l'utilisateur a déjà le rôle ADMIN
         if (in_array('ROLE_ADMIN', $user->getRoles())) {
@@ -52,10 +59,16 @@ final class UserController extends AbstractController
     /**
      * Ajoute ou retire le rôle stocké ROLE_EDITOR (sans impacter le rôle admin).
      */
-    #[Route('/admin/user/{id}/toggle-editor', name: 'admin_user_toggle_editor')]
-    public function toggleEditorRole(User $user, EntityManagerInterface $entityManager): Response
+    #[Route('/admin/user/{id}/toggle-editor', name: 'admin_user_toggle_editor', methods: ['POST'])]
+    public function toggleEditorRole(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        if (!$this->isCsrfTokenValid('user_editor_role_' . $user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide ou expiré.');
+
+            return $this->redirectToRoute('app_dashboard');
+        }
 
         if ($this->getUser() === $user) {
             $this->addFlash('danger', 'Modifiez le rôle éditeur depuis un autre compte super-admin, ou gérez-le en base.');
@@ -96,10 +109,16 @@ final class UserController extends AbstractController
     }
 
 
-    #[Route('/admin/user/{id}/delete', name: 'admin_user_delete')]
-    public function delete(User $user, EntityManagerInterface $em): Response
+    #[Route('/admin/user/{id}/delete', name: 'admin_user_delete', methods: ['POST'])]
+    public function delete(Request $request, User $user, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        if (!$this->isCsrfTokenValid('delete_user_' . $user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide ou expiré.');
+
+            return $this->redirectToRoute('app_dashboard');
+        }
 
         if ($this->getUser() === $user) {
             $this->addFlash('danger', 'Impossible de se supprimer soi-même.');
@@ -114,10 +133,16 @@ final class UserController extends AbstractController
         return $this->redirectToRoute('app_dashboard');
     }
 
-    #[Route('/admin/user/{id}/toggle', name: 'admin_user_toggle')]
-    public function toggle(User $user, EntityManagerInterface $em): Response
+    #[Route('/admin/user/{id}/toggle', name: 'admin_user_toggle', methods: ['POST'])]
+    public function toggle(Request $request, User $user, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        if (!$this->isCsrfTokenValid('user_toggle_block_' . $user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide ou expiré.');
+
+            return $this->redirectToRoute('app_dashboard');
+        }
 
         if ($this->getUser() === $user) {
             $this->addFlash('danger', 'Impossible de se bloquer soi-même.');

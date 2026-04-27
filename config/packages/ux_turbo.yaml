@@ -1,4 +1,4 @@
-# Enable stateless CSRF protection for forms and logins/logouts
+# En-têtes CSRF pour les envois de formulaires via Turbo (voir aussi config/packages/csrf.yaml).
 framework:
     csrf_protection:
         check_header: true

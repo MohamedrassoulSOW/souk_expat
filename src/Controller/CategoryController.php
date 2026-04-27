@@ -26,7 +26,7 @@ final class CategoryController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
         return $this->render('category/index.html.twig', [
-            'categories' => $categoryRepository->findAll(),
+            'categories' => $categoryRepository->findAllOrderedByName(),
         ]);
     }
 
@@ -114,12 +114,19 @@ final class CategoryController extends AbstractController
     /**
      * Supprimer une catégorie
      */
-    #[Route('/{id}/delete', name: 'app_category_delete', methods: ['POST', 'GET'])]
+    #[Route('/{id}/delete', name: 'app_category_delete', methods: ['POST'])]
     public function deleteCategory(
+        Request $request,
         EntityManagerInterface $entityManager,
-        Category $category
+        Category $category,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_EDITOR');
+
+        if (!$this->isCsrfTokenValid('delete_category_' . $category->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide ou expiré.');
+
+            return $this->redirectToRoute('app_category');
+        }
 
         $this->deleteCategoryImageFile($category->getImageName());
 

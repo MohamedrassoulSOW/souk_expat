@@ -123,8 +123,13 @@
         <section class="mb-5 home-categories-section">
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <h3 class="fw-bold text-dark mb-0">Que recherchez-vous ?</h3>
-                <span class="small text-muted d-none d-md-inline"><i class="bi bi-arrow-left-right me-1"></i>Flèches latérales, barre ou molette</span>
+                {% if popular_categories is not empty %}
+                    <span class="small text-muted d-none d-md-inline"><i class="bi bi-arrow-left-right me-1"></i>Flèches latérales, barre ou molette</span>
+                {% endif %}
             </div>
+            {% if popular_categories is empty %}
+                <p class="text-muted small mb-0">Les catégories seront affichées ici dès qu’elles seront créées dans l’administration.</p>
+            {% else %}
             <div class="d-flex align-items-stretch gap-1 gap-sm-2 home-categories-row">
                 <button type="button" class="btn home-cat-nav home-cat-prev d-none d-md-flex flex-shrink-0" aria-label="Catégories précédentes">
                     <i class="bi bi-chevron-left fs-4"></i>
@@ -139,7 +144,7 @@
                                class="home-categories-card-link text-decoration-none flex-shrink-0"
                                aria-label="{{ category.name }}">
                                 <div class="card h-100 border-0 shadow-sm category-card text-center p-3 rounded-4 home-category-tile">
-                                    <div class="category-icon mb-2 home-category-thumb-wrap d-flex align-items-center justify-content-center mx-auto">
+                                    <div class="category-icon mb-2 home-category-thumb-wrap d-flex align-items-center justify-content-center mx-auto overflow-hidden">
                                         {% if category.imageName %}
                                             <img src="{{ asset('uploads/categories/' ~ category.imageName) }}"
                                                  alt=""
@@ -148,11 +153,13 @@
                                                  height="64"
                                                  loading="lazy"
                                                  decoding="async">
+                                        {% elseif category.icon %}
+                                            <i class="{{ category.icon|e('html_attr') }} fs-2 home-category-fallback-icon" aria-hidden="true"></i>
                                         {% else %}
                                             <i class="bi bi-tag-fill fs-3 home-category-fallback-icon" aria-hidden="true"></i>
                                         {% endif %}
                                     </div>
-                                    <h6 class="mb-0 text-dark small fw-bold text-break">{{ category.name }}</h6>
+                                    <h6 class="mb-0 text-dark small fw-bold text-break lh-sm">{{ category.name }}</h6>
                                 </div>
                             </a>
                         {% endfor %}
@@ -162,6 +169,7 @@
                     <i class="bi bi-chevron-right fs-4"></i>
                 </button>
             </div>
+            {% endif %}
         </section>
 
         <hr class="my-5 opacity-25">
@@ -423,7 +431,7 @@
         .home-category-thumb {
             width: 64px;
             height: 64px;
-            object-fit: contain;
+            object-fit: cover;
             object-position: center;
         }
         .home-category-fallback-icon {
