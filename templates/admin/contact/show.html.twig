@@ -1,162 +1,101 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Message de {{ contact.name }} - Expat Souk{% endblock %}
+{% block title %}Message — {{ contact.name }} | SoukExpat{% endblock %}
+{% block admin_mobile_title %}Message{% endblock %}
 
-{% block body %}
-<div class="container-fluid bg-light min-vh-100 p-4">
-    <div class="container">
-        {# Fil d'Ariane stylisé #}
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb bg-white p-3 rounded-pill shadow-sm border-0">
-                <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" class="text-decoration-none text-muted">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{{ path('app_admin_contact_index') }}" class="text-decoration-none text-muted">Messages</a></li>
-                <li class="breadcrumb-item active fw-bold" style="color: #42B1CE;">Détail #{{ contact.id }}</li>
-            </ol>
-        </nav>
+{% block admin_main %}
+    {% set actions %}
+        <a href="{{ path('app_admin_contact_index') }}" class="btn btn-light border rounded-pill px-3 bg-white">
+            <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Retour
+        </a>
+    {% endset %}
 
-        <div class="row g-4">
-            {# --- COLONNE GAUCHE : LE MESSAGE --- #}
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                    {# En-tête du message #}
-                    <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <div class="avatar-md bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center fw-bold me-3 shadow-sm" style="width: 50px; height: 50px; background-color: #42B1CE15; color: #42B1CE;">
-                                <i class="bi bi-envelope-paper fs-4"></i>
-                            </div>
-                            <div>
-                                <h4 class="fw-bold mb-0 text-dark">{{ contact.subject }}</h4>
-                                <p class="text-muted small mb-0">Reçu le {{ contact.createdAt|date('d F Y à H:i') }}</p>
-                            </div>
-                        </div>
-                        {% if contact.isProcessed %}
-                            <span class="badge rounded-pill px-3 py-2 bg-success-subtle text-success border border-success-subtle">
-                                <i class="bi bi-check2-all me-1"></i> Traité
-                            </span>
-                        {% else %}
-                            <span class="badge rounded-pill px-3 py-2 bg-warning-subtle text-warning border border-warning-subtle">
-                                <i class="bi bi-clock me-1"></i> En attente
-                            </span>
-                        {% endif %}
-                    </div>
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Contacts',
+        title: contact.subject,
+        lead: 'Reçu le ' ~ contact.createdAt|date('d/m/Y à H:i'),
+        actions: actions
+    }) }}
 
-                    {# Corps du message #}
-                    <div class="card-body p-4 p-md-5 bg-white">
-                        <div class="message-content p-4 rounded-4" style="background-color: #f8f9fa; border-left: 4px solid #42B1CE;">
-                            <div class="fs-5 text-dark" style="white-space: pre-line; line-height: 1.7; font-family: 'Inter', sans-serif;">
-                                {{ contact.message }}
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4 d-flex align-items-center gap-2">
-                             <button class="btn btn-light rounded-pill px-4" onclick="window.print()">
-                                <i class="bi bi-printer me-2"></i>Imprimer
-                            </button>
-                            <button class="btn btn-light rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#replyModal{{ contact.id }}">
-                                <i class="bi bi-reply me-2"></i>Répondre
-                            </button>
-                        </div>
-                    </div>
+    <div class="row g-3 g-lg-4">
+        <div class="col-lg-8">
+            <div class="admin-panel p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <span class="text-muted small">Message #{{ contact.id }}</span>
+                    {% if contact.isProcessed %}
+                        <span class="badge rounded-pill bg-success-subtle text-success">Traité</span>
+                    {% else %}
+                        <span class="badge rounded-pill bg-warning-subtle text-dark">En attente</span>
+                    {% endif %}
                 </div>
-            </div>
-
-            {# --- COLONNE DROITE : INFOS & ACTIONS --- #}
-            <div class="col-lg-4">
-                {# Carte Expéditeur #}
-                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
-                    <h6 class="text-muted fw-bold text-uppercase small mb-4" style="letter-spacing: 1px;">Expéditeur</h6>
-                    <div class="d-flex align-items-center p-3 rounded-4 bg-light border border-light">
-                        <div class="avatar bg-white shadow-sm text-dark rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" 
-                             style="width: 55px; height: 55px; font-size: 1.3rem; color: #42B1CE !important; border: 2px solid #42B1CE20;">
-                            {{ contact.name|first|upper }}
-                        </div>
-                        <div class="overflow-hidden">
-                            <div class="fw-bold fs-5 text-dark text-truncate">{{ contact.name }}</div>
-                            <a href="mailto:{{ contact.email }}" class="text-decoration-none text-muted small text-truncate d-block">
-                                <i class="bi bi-envelope me-1"></i>{{ contact.email }}
-                            </a>
-                        </div>
-                    </div>
-                    <a href="mailto:{{ contact.email }}" class="btn btn-outline-info w-100 rounded-pill mt-3 border-info-subtle">
-                        Envoyer un email direct
-                    </a>
+                <div class="p-3 p-md-4 rounded-3 bg-light border-start border-4" style="border-color: var(--cyan-main) !important; white-space: pre-line; line-height: 1.7;">
+                    {{ contact.message }}
                 </div>
-
-                {# Actions Rapides #}
-                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
-                    <h6 class="text-muted fw-bold text-uppercase small mb-4" style="letter-spacing: 1px;">Gestion du ticket</h6>
-                    
-                    <form method="post" action="{{ path('app_admin_contact_toggle', {'id': contact.id}) }}">
-                        <button class="btn {{ contact.isProcessed ? 'btn-light text-muted' : 'btn-success' }} w-100 rounded-pill mb-3 py-2 fw-bold">
-                            <i class="bi bi-{{ contact.isProcessed ? 'arrow-counterclockwise' : 'check-lg' }} me-2"></i>
-                            {{ contact.isProcessed ? 'Réouvrir le message' : 'Marquer comme traité' }}
-                        </button>
-                    </form>
-
-                    <button type="button" class="btn btn-dark w-100 rounded-pill mb-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#replyModal{{ contact.id }}">
-                        <i class="bi bi-megaphone me-2"></i>Notifier l'utilisateur
+                <div class="mt-3 d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-light border rounded-pill px-3" onclick="window.print()">
+                        <i class="bi bi-printer me-1" aria-hidden="true"></i>Imprimer
                     </button>
-
-                    <div class="border-top pt-3 mt-2">
-                        <form method="post" action="{{ path('app_admin_contact_delete', {'id': contact.id}) }}" onsubmit="return confirm('Attention : suppression irréversible !');">
-                            <button class="btn btn-link text-danger w-100 text-decoration-none small p-0">
-                                <i class="bi bi-trash3 me-1"></i> Supprimer ce message
-                            </button>
-                        </form>
-                    </div>
+                    <button type="button" class="btn btn-admin-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#replyModal{{ contact.id }}">
+                        <i class="bi bi-reply me-1" aria-hidden="true"></i>Répondre
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-{# --- MODAL DE RÉPONSE (RE-STYLISE) --- #}
-<div class="modal fade" id="replyModal{{ contact.id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <form action="{{ path('admin_contact_reply', {'id': contact.id}) }}" method="POST" class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 p-4">
-                <h5 class="modal-title fw-bold">Répondre à {{ contact.name }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body px-4">
-                <div class="alert bg-light border-0 rounded-3 small text-muted mb-4">
-                    <i class="bi bi-info-circle me-2"></i>L'utilisateur recevra une notification sur son compte Expat Souk.
+        <div class="col-lg-4">
+            <div class="admin-panel p-4 mb-3">
+                <h2 class="h6 fw-bold text-uppercase text-muted mb-3" style="letter-spacing: .04em;">Expéditeur</h2>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white flex-shrink-0"
+                         style="width: 48px; height: 48px; background: var(--cyan-main);">
+                        {{ contact.name|first|upper }}
+                    </div>
+                    <div class="min-w-0">
+                        <div class="fw-bold text-truncate">{{ contact.name }}</div>
+                        <a href="mailto:{{ contact.email }}" class="small text-muted text-decoration-none text-truncate d-block">{{ contact.email }}</a>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-bold text-muted">VOTRE RÉPONSE</label>
-                    <textarea name="reply_message" class="form-control border-light-subtle rounded-3 p-3" rows="6" placeholder="Soyez clair et courtois..." required style="background-color: #fbfbfb;"></textarea>
-                </div>
+                <a href="mailto:{{ contact.email }}" class="btn btn-outline-secondary w-100 rounded-pill">
+                    E-mail direct
+                </a>
             </div>
-            <div class="modal-footer border-0 p-4">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
-                <button type="submit" class="btn text-white rounded-pill px-4 shadow-sm" style="background-color: #42B1CE;">
-                    Envoyer la réponse <i class="bi bi-send-fill ms-2"></i>
+
+            <div class="admin-panel p-4">
+                <h2 class="h6 fw-bold text-uppercase text-muted mb-3" style="letter-spacing: .04em;">Gestion</h2>
+                <form method="post" action="{{ path('app_admin_contact_toggle', {id: contact.id}) }}" class="mb-2">
+                    <button type="submit" class="btn {{ contact.isProcessed ? 'btn-light border' : 'btn-success' }} w-100 rounded-pill">
+                        {{ contact.isProcessed ? 'Réouvrir' : 'Marquer comme traité' }}
+                    </button>
+                </form>
+                <button type="button" class="btn btn-admin-primary w-100 rounded-pill mb-3" data-bs-toggle="modal" data-bs-target="#replyModal{{ contact.id }}">
+                    Notifier l’utilisateur
                 </button>
+                <form method="post" action="{{ path('app_admin_contact_delete', {id: contact.id}) }}" class="text-center" onsubmit="return confirm('Suppression irréversible ?');">
+                    <button type="submit" class="btn btn-outline-danger btn-icon-action" title="Supprimer" aria-label="Supprimer">
+                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                    </button>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
-</div>
 
-<style>
-    /* Intégration de la police Inter si possible */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-    
-    body { font-family: 'Inter', sans-serif; }
-    
-    .bg-info-subtle { background-color: #42B1CE15 !important; }
-    .text-info { color: #42B1CE !important; }
-    .btn-outline-info { border-color: #42B1CE50; color: #42B1CE; }
-    .btn-outline-info:hover { background-color: #42B1CE; color: white; border-color: #42B1CE; }
-
-    .card { transition: transform 0.2s ease; }
-    
-    /* Animation douce pour les badges */
-    .badge {
-        font-weight: 500;
-        letter-spacing: 0.3px;
-    }
-
-    .bg-success-subtle { background-color: #d1e7dd !important; color: #0f5132 !important; }
-    .bg-warning-subtle { background-color: #fff3cd !important; color: #664d03 !important; }
-</style>
+    <div class="modal fade" id="replyModal{{ contact.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form action="{{ path('app_admin_contact_reply', {id: contact.id}) }}" method="POST" class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Répondre à {{ contact.name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted mb-3">L’utilisateur recevra une notification sur son compte SoukExpat.</p>
+                    <label class="form-label small fw-bold">Votre réponse</label>
+                    <textarea name="reply_message" class="form-control rounded-3" rows="6" placeholder="Soyez clair et courtois…" required></textarea>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-admin-primary rounded-pill px-3">Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}

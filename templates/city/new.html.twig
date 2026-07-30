@@ -1,89 +1,30 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Nouvelle Ville | Expat Souk{% endblock %}
+{% block title %}Nouvelle ville | SoukExpat{% endblock %}
+{% block admin_mobile_title %}Nouvelle ville{% endblock %}
 
-{% block body %}
-<div class="container-fluid p-0">
-    <div class="row g-0">
+{% block admin_main %}
+    {% set actions %}
+        <a href="{{ path('app_city_index') }}" class="btn btn-light border rounded-pill px-3 bg-white">
+            <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Retour
+        </a>
+    {% endset %}
 
-        <main class="col-12 col-md-9 col-lg-10 p-4 bg-light min-vh-100">
-            
-            {# En-tête de page avec fil d'ariane #}
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-1">
-                            <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ path('app_city_index') }}" class="text-decoration-none">Villes</a></li>
-                            <li class="breadcrumb-item active">Nouvelle ville</li>
-                        </ol>
-                    </nav>
-                    <h3 class="fw-bold mb-0">Ajouter une zone géographique</h3>
-                </div>
-                <a href="{{ path('app_city_index') }}" class="btn btn-outline-secondary rounded-pill px-3 shadow-sm bg-white">
-                    <i class="bi bi-arrow-left me-2"></i>Retour à la liste
-                </a>
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Villes',
+        title: 'Ajouter une ville',
+        lead: 'Nouvelle zone géographique pour les filtres d’annonces.',
+        actions: actions
+    }) }}
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-6">
+            <div class="admin-panel p-4">
+                {{ include('city/_form.html.twig', { button_label: 'Enregistrer la ville' }) }}
             </div>
-
-            <div class="row justify-content-center">
-                <div class="col-12 col-xl-8">
-                    <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white border-bottom p-4">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-soft-info p-3 me-3">
-                                    <i class="bi bi-geo-alt fs-4" style="color: #42B1CE;"></i>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold mb-0">Formulaire de création</h5>
-                                    <p class="text-muted small mb-0">Remplissez les informations ci-dessous pour ajouter une nouvelle ville sur la plateforme.</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card-body p-4">
-                            {# Inclusion du formulaire Symfony #}
-                            {{ include('city/_form.html.twig') }}
-                        </div>
-                    </div>
-
-                    {# Petit conseil de modération en dessous du formulaire #}
-                    <div class="mt-4 p-3 bg-white border rounded-4 shadow-sm d-flex align-items-start">
-                        <i class="bi bi-info-circle-fill text-info me-3 fs-5"></i>
-                        <small class="text-muted">
-                            <strong>Conseil :</strong> Assurez-vous que l'orthographe de la ville est exacte. Les utilisateurs se basent sur ces noms pour filtrer leurs recherches d'annonces par localisation.
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </main>
+            <p class="small text-muted mt-3 mb-0">
+                Vérifiez l’orthographe : les utilisateurs filtrent leurs recherches sur ces noms.
+            </p>
+        </div>
     </div>
-</div>
-
-<style>
-    .bg-soft-info { background-color: #42B1CE15; }
-    .breadcrumb-item a { color: #42B1CE; }
-    
-    /* Style pour améliorer le rendu du formulaire par défaut de Symfony */
-    form input[type="text"] {
-        border-radius: 10px !important;
-        padding: 12px 15px !important;
-        border: 1px solid #dee2e6 !important;
-        margin-bottom: 1rem;
-    }
-    
-    form button {
-        border-radius: 50px !important;
-        padding: 10px 30px !important;
-        font-weight: bold !important;
-        background-color: #42B1CE !important;
-        border: none !important;
-        transition: all 0.3s ease;
-    }
-
-    form button:hover {
-        background-color: #369db7 !important;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(66, 177, 206, 0.3);
-    }
-</style>
 {% endblock %}

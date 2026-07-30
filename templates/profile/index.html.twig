@@ -5,19 +5,19 @@
 {% block body %}
 {{ include('layouts/navBar.html.twig') }}
 
-<div class="container py-5">
+<div class="container pt-4 pt-md-5 mt-2 pb-5">
     <div class="row justify-content-center">
         <div class="col-lg-9">
-            
-            {# Navigation supérieure #}
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="{{ path('app_home') }}" class="text-decoration-none text-muted small fw-bold hover-cyan">
-                    <i class="bi bi-chevron-left"></i> RETOUR ACCUEIL
-                </a>
-                <span class="badge bg-white shadow-sm rounded-pill px-3 py-2 border" style="color: #42B1CE;">
-                    <i class="bi bi-patch-check-fill me-1"></i> Compte Utilisateur
-                </span>
-            </div>
+            {{ include('layouts/_page_header.html.twig', {
+                eyebrow: 'Mon compte',
+                title_html: 'Mon <span class="text-brand">profil</span>',
+                lead: 'Gérez votre identité, votre photo et vos paramètres.',
+                breadcrumbs: [
+                    { label: 'Accueil', url: path('app_home') },
+                    { label: 'Profil' }
+                ],
+                actions: '<a href="' ~ path('app_profile_edit') ~ '" class="btn btn-custom-cyan btn-icon-action" title="Modifier" aria-label="Modifier"><i class="bi bi-pencil" aria-hidden="true"></i></a>'
+            }) }}
 
             {# Messages Flash Stylisés #}
             {% for label, messages in app.flashes %}
@@ -93,10 +93,10 @@
                                     </div>
                                 </a>
                                 {% if user.avatar %}
-                                    <form method="post" action="{{ path('app_profile_avatar_delete') }}" onsubmit="return confirm('Supprimer la photo ?');">
+                                    <form method="post" action="{{ path('app_profile_avatar_delete') }}" class="text-center mt-2" onsubmit="return confirm('Supprimer la photo ?');">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete_avatar') }}">
-                                        <button type="submit" class="btn btn-link text-danger w-100 text-decoration-none small mt-2">
-                                            <i class="bi bi-trash3 me-1"></i> Supprimer l'avatar
+                                        <button type="submit" class="btn btn-outline-danger btn-icon-action" title="Supprimer l'avatar" aria-label="Supprimer l'avatar">
+                                            <i class="bi bi-trash3" aria-hidden="true"></i>
                                         </button>
                                     </form>
                                 {% endif %}
@@ -111,7 +111,7 @@
                 <div class="col-6">
                     <div class="card border-0 shadow-sm rounded-4 p-4 stat-card-hover">
                         <div class="mb-2"><i class="bi bi-megaphone display-6" style="color: #42B1CE;"></i></div>
-                        <h4 class="fw-bold mb-0">{{ user.annonces|length }}</h4>
+                        <h4 class="fw-bold mb-0">{{ user.annonces|length|cap999 }}</h4>
                         <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Annonces</small>
                     </div>
                 </div>

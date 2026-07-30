@@ -1,0 +1,36 @@
+{# Chips de filtres actifs — vars: sf, search_categories, cities, reset_url #}
+{% set has_filters = sf.q or sf.categoryId or sf.cityId %}
+{% if has_filters %}
+    <div class="filter-chips d-flex flex-wrap align-items-center gap-2 mb-3" role="list" aria-label="Filtres actifs">
+        {% if sf.q %}
+            <span class="filter-chip" role="listitem">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                «&nbsp;{{ sf.q|u.truncate(28, '…') }}&nbsp;»
+            </span>
+        {% endif %}
+        {% if sf.categoryId %}
+            {% set cat_label = null %}
+            {% for cat in search_categories|default([]) %}
+                {% if cat.id == sf.categoryId %}{% set cat_label = cat.name %}{% endif %}
+            {% endfor %}
+            <span class="filter-chip" role="listitem">
+                <i class="bi bi-tag" aria-hidden="true"></i>
+                {{ cat_label|default('Catégorie') }}
+            </span>
+        {% endif %}
+        {% if sf.cityId %}
+            {% set city_label = null %}
+            {% for city in cities|default([]) %}
+                {% if city.id == sf.cityId %}{% set city_label = city.name %}{% endif %}
+            {% endfor %}
+            <span class="filter-chip" role="listitem">
+                <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                {{ city_label|default('Ville') }}
+            </span>
+        {% endif %}
+        <a href="{{ reset_url }}" class="filter-chip filter-chip--clear text-decoration-none">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+            Effacer
+        </a>
+    </div>
+{% endif %}

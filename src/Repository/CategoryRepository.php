@@ -33,6 +33,34 @@ class CategoryRepository extends ServiceEntityRepository
         return $this->findBy([], ['name' => 'ASC']);
     }
 
+    /**
+     * Catégories avec le nombre d'annonces approuvées (pour l’accueil).
+     *
+     * @return list<array{category: Category, total: int}>
+     */
+    public function findWithApprovedCounts(): array
+    {
+        $rows = $this->createQueryBuilder('c')
+            ->select('c AS category', 'COUNT(a.id) AS total')
+            ->leftJoin('c.annonces', 'a', 'WITH', 'a.status = :approved')
+            ->setParameter('approved', \App\Entity\Annonce::STATUS_APPROVED)
+            ->groupBy('c.id')
+            ->orderBy('total', 'DESC')
+            ->addOrderBy('c.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $out = [];
+        foreach ($rows as $row) {
+            $out[] = [
+                'category' => $row['category'],
+                'total' => (int) $row['total'],
+            ];
+        }
+
+        return $out;
+    }
+
     //    /**
     //     * @return Category[] Returns an array of Category objects
     //     */

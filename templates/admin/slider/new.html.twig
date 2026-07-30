@@ -1,35 +1,29 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Nouvelle Slide{% endblock %}
+{% block title %}Nouvelle slide | SoukExpat{% endblock %}
+{% block admin_mobile_title %}Nouvelle slide{% endblock %}
 
-{% block body %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h2 class="mb-4">Ajouter une image</h2>
-                    
-                    {{ form_start(form) }}
-                        <div class="mb-3">
-                            {{ form_row(form.title, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form_row(form.imageFile, {'attr': {'class': 'form-control'}}) }}
-                            <small class="text-muted">Format recommandé : 1920x800px</small>
-                        </div>
-                        <div class="mb-3">
-                            {{ form_row(form.isActive) }}
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ path('admin_slider_index') }}" class="btn btn-light">Annuler</a>
-                            <button class="btn btn-success">Enregistrer</button>
-                        </div>
-                    {{ form_end(form) }}
+{% block admin_main %}
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Slider',
+        title: 'Ajouter une image',
+        lead: 'Format recommandé : 1920×800 px.',
+        actions: '<a href="' ~ path('admin_slider_index') ~ '" class="btn btn-light border rounded-pill">Retour</a>'
+    }) }}
+
+    <div class="admin-panel" style="max-width: 560px;">
+        <div class="card-body p-4">
+            {{ form_start(form) }}
+                <div class="mb-3">{{ form_row(form.title, {'attr': {'class': 'form-control rounded-3'}}) }}</div>
+                <div class="mb-3">
+                    {{ form_row(form.imageFile, {'attr': {'class': 'form-control rounded-3'}}) }}
                 </div>
-            </div>
+                <div class="mb-4">{{ form_row(form.isActive) }}</div>
+                <div class="d-flex gap-2">
+                    <a href="{{ path('admin_slider_index') }}" class="btn btn-light border rounded-pill">Annuler</a>
+                    <button class="btn btn-admin-primary rounded-pill px-4">Enregistrer</button>
+                </div>
+            {{ form_end(form) }}
         </div>
     </div>
-</div>
 {% endblock %}

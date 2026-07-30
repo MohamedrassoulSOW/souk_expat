@@ -1,146 +1,115 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes Conversations - Expat Souk{% endblock %}
+{% block title %}Messages | SoukExpat{% endblock %}
 
 {% block body %}
 {{ include('layouts/navBar.html.twig') }}
 
-<div class="container py-5">
-    <div class="row g-4">
-        {# Sidebar Gauche : Liste des conversations #}
-        <div class="col-lg-5 col-md-6">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-bold m-0 text-dark">Messages</h3>
-                <span class="badge rounded-pill py-2 px-3" style="background-color: #42B1CE;">
-                    {{ threads|length }} discussion(s)
-                </span>
-            </div>
+<main class="msg-inbox">
+    <div class="container msg-inbox__container">
+        {{ include('layouts/_page_header.html.twig', {
+            eyebrow: 'Messagerie',
+            title_html: 'Mes <span class="text-brand">messages</span>',
+            lead: 'Échangez avec acheteurs et vendeurs autour de vos annonces.',
+            breadcrumbs: [
+                { label: 'Accueil', url: path('app_home') },
+                { label: 'Messages' }
+            ],
+            actions: '<span class="annonce-page-stat"><i class="bi bi-chat-dots" aria-hidden="true"></i><strong>' ~ threads|length|cap999 ~ '</strong> discussion' ~ (threads|length > 1 ? 's' : '') ~ '</span>'
+        }) }}
 
-            <div class="pe-lg-2 custom-scrollbar" style="max-height: 75vh; overflow-y: auto;">
-                {% for thread in threads %}
-                    {% set interlocuteur = (app.user == thread.buyer ? thread.seller : thread.buyer) %}
-                    
-                    <a href="{{ path('app_chat_view', {id: thread.id}) }}" 
-                       class="list-group-item list-group-item-action thread-card shadow-sm rounded-4 p-3 d-flex align-items-center bg-white border-0 mb-3">
-                        
-                        {# Avatar Stylisé #}
-                        <div class="position-relative">
-                            <div class="avatar-circle-custom">
-                                {{ interlocuteur.userIdentifier|slice(0, 1)|upper }}
-                            </div>
-                            <span class="position-absolute status-indicator rounded-circle"></span>
-                        </div>
+        <div class="msg-inbox__panel">
+            <div class="row g-0 msg-inbox__row">
+                <div class="col-12 col-md-5 col-lg-4 msg-inbox__list-col">
+                    <div class="msg-inbox__list" role="list">
+                        {% for thread in threads %}
+                            {% set interlocuteur = (app.user == thread.buyer ? thread.seller : thread.buyer) %}
+                            {% set last = thread.messagesAsThread|last %}
+                            {% set unread = 0 %}
+                            {% for m in thread.messagesAsThread %}
+                                {% if m.sender != app.user and not m.isIsRead %}
+                                    {% set unread = unread + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {% set preview %}
+                                {% if last %}
+                                    {% if last.kind == constant('App\\Entity\\Message::KIND_IMAGE') %}
+                                        📷 Photo
+                                    {% elseif last.kind == constant('App\\Entity\\Message::KIND_LOCATION') %}
+                                        📍 Position
+                                    {% else %}
+                                        {{ last.content|striptags|u.truncate(52, '…') }}
+                                    {% endif %}
+                                {% else %}
+                                    Nouvelle conversation
+                                {% endif %}
+                            {% endset %}
 
-                        {# Infos Conversation #}
-                        <div class="ms-3 flex-grow-1 overflow-hidden">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <h6 class="mb-0 fw-bold text-dark text-truncate" style="max-width: 160px;">
-                                    {{ thread.annonce.title }}
-                                </h6>
-                                <span class="badge bg-light text-muted fw-normal" style="font-size: 0.65rem;">
-                                    {{ thread.annonce.price }} €
-                                </span>
+                            <a href="{{ path('app_chat_view', { id: thread.id }) }}"
+                               class="msg-thread-card {{ unread > 0 ? 'is-unread' : '' }}"
+                               role="listitem">
+                                <div class="msg-thread-card__media">
+                                    {% if thread.annonce.annonceImages|length > 0 %}
+                                        <img src="{{ asset('uploads/annonces/' ~ thread.annonce.annonceImages[0].imadeName) }}"
+                                             alt=""
+                                             loading="lazy"
+                                             decoding="async">
+                                    {% else %}
+                                        <span class="msg-thread-card__placeholder"><i class="bi bi-image" aria-hidden="true"></i></span>
+                                    {% endif %}
+                                </div>
+                                <div class="msg-thread-card__body min-w-0">
+                                    <div class="d-flex align-items-start justify-content-between gap-2">
+                                        <h2 class="msg-thread-card__title">{{ thread.annonce.title|u.truncate(42, '…') }}</h2>
+                                        {% if last %}
+                                            <time class="msg-thread-card__time" datetime="{{ last.createdAt|date('c') }}">
+                                                {{ last.createdAt|date('d/m') }}
+                                            </time>
+                                        {% endif %}
+                                    </div>
+                                    <div class="msg-thread-card__meta">
+                                        {% if interlocuteur.avatar %}
+                                            <img class="msg-thread-card__avatar" src="{{ asset('uploads/avatars/' ~ interlocuteur.avatar) }}" alt="" width="20" height="20" loading="lazy">
+                                        {% else %}
+                                            <span class="msg-thread-card__avatar msg-thread-card__avatar--fallback">{{ interlocuteur.firstName|default('?')|slice(0, 1)|upper }}</span>
+                                        {% endif %}
+                                        <span class="text-truncate">{{ interlocuteur.firstName|default(interlocuteur.userIdentifier|split('@')[0]|capitalize) }}</span>
+                                        <span class="msg-thread-card__price">{{ thread.annonce.price|number_format(0, ',', ' ') }} MAD</span>
+                                    </div>
+                                    <p class="msg-thread-card__preview {{ unread > 0 ? 'fw-semibold' : '' }}">{{ preview|trim }}</p>
+                                </div>
+                                {% if unread > 0 %}
+                                    <span class="msg-thread-card__badge" aria-label="{{ unread }} non lu{{ unread > 1 ? 's' : '' }}">{{ unread > 9 ? '9+' : unread }}</span>
+                                {% else %}
+                                    <i class="bi bi-chevron-right msg-thread-card__chevron" aria-hidden="true"></i>
+                                {% endif %}
+                            </a>
+                        {% else %}
+                            <div class="msg-inbox__empty">
+                                <div class="msg-inbox__empty-icon" aria-hidden="true">
+                                    <i class="bi bi-chat-left-dots"></i>
+                                </div>
+                                <h2 class="h5 fw-bold mb-2">Aucun message</h2>
+                                <p class="text-muted small mb-3">Contactez un vendeur depuis une annonce pour démarrer une discussion.</p>
+                                <a href="{{ path('app_annonce_index') }}" class="btn btn-custom-cyan rounded-pill px-4 btn-sm fw-bold">
+                                    Voir les annonces
+                                </a>
                             </div>
-                            <div class="text-muted text-truncate small d-flex align-items-center">
-                                <i class="bi bi-person-circle me-1" style="color: #42B1CE;"></i>
-                                {{ interlocuteur.userIdentifier|split('@')[0]|capitalize }}
-                            </div>
-                        </div>
-                        
-                        <div class="ms-2 opacity-50">
-                            <i class="bi bi-chevron-right fs-5"></i>
-                        </div>
-                    </a>
-                {% else %}
-                    {# État vide (Liste) #}
-                    <div class="text-center p-5 bg-white rounded-4 shadow-sm border border-light">
-                        <div class="mb-3">
-                            <i class="bi bi-chat-left-dots" style="font-size: 3rem; color: #dee2e6;"></i>
-                        </div>
-                        <h5 class="fw-bold">Aucun message</h5>
-                        <p class="text-muted small">Vos futures discussions avec les vendeurs apparaîtront ici.</p>
-                        <a href="{{ path('app_annonce_index') }}" class="btn btn-cyan-sm rounded-pill px-4 btn-sm fw-bold">
-                            Découvrir les annonces
-                        </a>
+                        {% endfor %}
                     </div>
-                {% endfor %}
-            </div>
-        </div>
+                </div>
 
-        {# Zone Droite : Aperçu (Desktop uniquement) #}
-        <div class="col-lg-7 col-md-6 d-none d-md-block">
-            <div class="empty-state-container h-100 d-flex align-items-center justify-content-center rounded-4 border p-5 text-center bg-white bg-opacity-50">
-                <div class="max-width-400">
-                    <div class="icon-circle-bg mb-4 mx-auto">
-                        <i class="bi bi-chat-square-text-fill" style="color: #42B1CE; font-size: 2.5rem;"></i>
+                <div class="col-md-7 col-lg-8 d-none d-md-flex msg-inbox__aside">
+                    <div class="msg-inbox__aside-inner">
+                        <div class="msg-inbox__aside-icon" aria-hidden="true">
+                            <i class="bi bi-chat-square-text"></i>
+                        </div>
+                        <h2 class="h4 fw-bold mb-2">Sélectionnez une discussion</h2>
+                        <p class="text-muted mb-0">Choisissez une conversation pour afficher l’historique et continuer l’échange sur SoukExpat.</p>
                     </div>
-                    <h4 class="fw-bold text-dark">Sélectionnez une discussion</h4>
-                    <p class="text-muted">Cliquez sur une conversation à gauche pour consulter l'historique de vos échanges et finaliser votre transaction sur Expat Souk.</p>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<style>
-    body { background-color: #f8fafc; }
-
-    /* Avatar avec dégradé aux couleurs Expat Souk */
-    .avatar-circle-custom {
-        width: 52px; height: 52px;
-        background: linear-gradient(135deg, #42B1CE, #369ab3);
-        color: white; font-weight: bold; font-size: 1.1rem;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 15px; /* Look un peu plus moderne que le rond parfait */
-        box-shadow: 0 4px 10px rgba(66, 177, 206, 0.2);
-    }
-
-    /* Effets de carte */
-    .thread-card { 
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
-        border-left: 4px solid transparent !important;
-    }
-    .thread-card:hover { 
-        transform: translateX(8px);
-        background-color: #ffffff !important;
-        border-left: 4px solid #42B1CE !important;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
-    }
-
-    .status-indicator {
-        width: 14px; height: 14px;
-        border: 3px solid white;
-        bottom: -2px; right: -2px;
-        background: linear-gradient(135deg, #42B1CE, #2a8da7);
-    }
-
-    /* Zone vide droite */
-    .empty-state-container {
-        border: 2px dashed #e2e8f0 !important;
-    }
-    .icon-circle-bg {
-        width: 80px; height: 80px;
-        background-color: #f0f9fb;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-    }
-
-    /* Bouton custom */
-    .btn-cyan-sm {
-        background-color: #42B1CE;
-        color: white;
-        border: none;
-        transition: 0.3s;
-    }
-    .btn-cyan-sm:hover {
-        background-color: #369ab3;
-        color: white;
-        box-shadow: 0 4px 12px rgba(66, 177, 206, 0.3);
-    }
-
-    /* Scrollbar élégante */
-    .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-</style>
+</main>
 {% endblock %}

@@ -25,26 +25,29 @@ final class HomeController extends AbstractController
         Request $request,
     ): Response {
         $filters = AnnonceSearchFilters::fromRequest($request);
+        $categories = $categoryRepository->findAllOrderedByName();
+        $categoriesWithCounts = $categoryRepository->findWithApprovedCounts();
 
-        $query = $annonceRepository->createApprovedSearchQueryBuilder(
-            $filters->q,
-            $filters->categoryId,
-            $filters->cityId,
-        )->getQuery();
-
+        // Accueil : ordre chronologique (indexable) + peu d’items pour un 1er paint rapide
         $annoncesPaginees = $paginator->paginate(
-            $query,
+            $annonceRepository->createApprovedSearchQueryBuilder(
+                $filters->q,
+                $filters->categoryId,
+                $filters->cityId,
+                false,
+            ),
             $request->query->getInt('page', 1),
-            12,
+            8,
         );
+
+        $annonceRepository->prefetchImages(iterator_to_array($annoncesPaginees->getItems()));
 
         return $this->render('home/index.html.twig', [
             'annonces' => $annoncesPaginees,
-            'popular_categories' => $categoryRepository->findAllOrderedByName(),
-            'search_categories' => $categoryRepository->findAllOrderedByName(),
+            'popular_categories' => $categoriesWithCounts,
+            'search_categories' => $categories,
             'cities' => $cityRepository->findAllOrderedByName(),
-            'sliders' => $sliderRepository->findBy(['isActive' => true]),
-            'recent_annonces' => $annonceRepository->findRecentApproved(4),
+            'sliders' => $sliderRepository->findBy(['isActive' => true], ['id' => 'DESC'], 5),
             'search_filters' => $filters,
         ]);
     }

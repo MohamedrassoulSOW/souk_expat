@@ -1,181 +1,62 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Messages | Expat Souk{% endblock %}
+{% block title %}Contacts | SoukExpat{% endblock %}
+{% block admin_mobile_title %}Contacts{% endblock %}
 
-{% block body %}
-<div class="container-fluid p-4 bg-light min-vh-100">
-    
-    {# --- EN-TÊTE --- #}
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-        <div>
-            <h3 class="fw-bold mb-0 text-dark">
-                <i class="bi bi-chat-dots-fill me-2" style="color: #42B1CE;"></i>Centre de Messages
-            </h3>
-            <p class="text-muted mb-0">Gestion des demandes et de la relation utilisateur.</p>
-        </div>
-        <div class="d-flex gap-2">
-            <span class="badge rounded-pill px-3 py-2 bg-white text-dark border shadow-sm d-flex align-items-center">
-                <span class="bullet bg-primary me-2"></span>{{ contacts|length }} messages
-            </span>
-            <a href="{{ path('app_dashboard') }}" class="btn btn-white shadow-sm border rounded-pill px-4 bg-white">
-                <i class="bi bi-speedometer2 me-2"></i>Dashboard
-            </a>
-        </div>
-    </div>
+{% block admin_main %}
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Gestion',
+        title: 'Messages contact',
+        lead: 'Demandes reçues via le formulaire du site.',
+        actions: '<span class="admin-badge">' ~ (contacts|length|cap999) ~ ' message' ~ (contacts|length > 1 ? 's' : '') ~ '</span>'
+    }) }}
 
-    {# --- ALERTES --- #}
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success border-0 shadow-sm rounded-4 d-flex align-items-center mb-4">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            <div>{{ message }}</div>
-        </div>
-    {% endfor %}
-
-    {# --- TABLEAU DES MESSAGES --- #}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        <div class="card-header bg-white border-0 p-4 sticky-top">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0">Boîte de réception</h5>
-                <div class="input-group input-group-sm style-search" style="max-width: 250px;">
-                    <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control bg-light border-0" placeholder="Rechercher...">
-                </div>
-            </div>
-        </div>
-
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-muted small">
-                        <tr>
-                            <th class="ps-4 py-3 border-0" style="letter-spacing: 0.5px;">RÉCEPTION</th>
-                            <th class="py-3 border-0" style="letter-spacing: 0.5px;">EXPÉDITEUR</th>
-                            <th class="py-3 border-0" style="letter-spacing: 0.5px;">OBJET & APERÇU</th>
-                            <th class="py-3 border-0" style="letter-spacing: 0.5px;">STATUT</th>
-                            <th class="py-3 border-0 text-end pe-4" style="letter-spacing: 0.5px;">ACTIONS</th>
+    <div class="admin-panel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small">
+                    <tr>
+                        <th class="ps-3 py-3 border-0">Réception</th>
+                        <th class="py-3 border-0">Expéditeur</th>
+                        <th class="py-3 border-0 d-none d-md-table-cell">Objet</th>
+                        <th class="py-3 border-0">Statut</th>
+                        <th class="pe-3 py-3 border-0 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in contacts %}
+                        <tr class="{{ not contact.isProcessed ? 'table-warning' : '' }}">
+                            <td class="ps-3">
+                                <div class="fw-semibold small">{{ contact.createdAt|date('d/m/Y') }}</div>
+                                <div class="text-muted small">{{ contact.createdAt|date('H:i') }}</div>
+                            </td>
+                            <td>
+                                <div class="fw-bold small">{{ contact.name }}</div>
+                                <div class="text-muted small">{{ contact.email }}</div>
+                                <div class="text-truncate small d-md-none" style="max-width: 180px;">{{ contact.subject }}</div>
+                            </td>
+                            <td class="d-none d-md-table-cell" style="max-width: 280px;">
+                                <div class="fw-semibold small text-truncate">{{ contact.subject }}</div>
+                                <div class="text-muted small text-truncate">{{ contact.message }}</div>
+                            </td>
+                            <td>
+                                {% if contact.isProcessed %}
+                                    <span class="badge rounded-pill bg-success-subtle text-success">Traité</span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-warning-subtle text-dark">Nouveau</span>
+                                {% endif %}
+                            </td>
+                            <td class="pe-3 text-end">
+                                <a href="{{ path('app_admin_contact_show', {id: contact.id}) }}" class="btn btn-sm btn-admin-primary btn-icon-action" title="Ouvrir" aria-label="Ouvrir">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for contact in contacts %}
-                            <tr class="border-bottom border-light {{ not contact.isProcessed ? 'bg-info-light' : '' }}">
-                                <td class="ps-4">
-                                    <div class="text-dark fw-bold small mb-0">{{ contact.createdAt|date('d M Y') }}</div>
-                                    <div class="text-muted small">{{ contact.createdAt|date('H:i') }}</div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm me-3 rounded-circle d-flex align-items-center justify-content-center fw-bold" 
-                                             style="width: 38px; height: 38px; background-color: #42B1CE15; color: #42B1CE; border: 1px solid #42B1CE20;">
-                                            {{ contact.name|slice(0, 1)|upper }}
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-dark small mb-0">{{ contact.name }}</div>
-                                            <div class="text-muted small opacity-75">{{ contact.email }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td style="max-width: 300px;">
-                                    <div class="text-truncate fw-bold text-dark small mb-0">{{ contact.subject }}</div>
-                                    <div class="text-truncate text-muted small">{{ contact.message }}</div>
-                                </td>
-                                <td>
-                                    {% if contact.isProcessed %}
-                                        <span class="badge rounded-pill fw-normal px-3 py-1 bg-success-subtle text-success">
-                                            <i class="bi bi-check2 me-1"></i>Traité
-                                        </span>
-                                    {% else %}
-                                        <span class="badge rounded-pill fw-normal px-3 py-1 bg-warning-subtle text-warning">
-                                            <i class="bi bi-envelope-exclamation me-1"></i>Nouveau
-                                        </span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-end pe-4">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light border rounded-pill px-3 shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" aria-label="Actions message {{ contact.id }}">
-                                            <i class="bi bi-sliders2 me-1" aria-hidden="true"></i> Gérer
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2 rounded-3">
-                                            <li>
-                                                <a class="dropdown-item rounded-2" href="{{ path('app_admin_contact_show', {'id': contact.id}) }}">
-                                                    <i class="bi bi-eye me-2 text-info"></i>Consulter
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <form method="post" action="{{ path('app_admin_contact_toggle', {'id': contact.id}) }}">
-                                                    <button type="submit" class="dropdown-item rounded-2">
-                                                        {% if contact.isProcessed %}
-                                                            <i class="bi bi-arrow-counterclockwise me-2 text-warning"></i>Réouvrir
-                                                        {% else %}
-                                                            <i class="bi bi-check-circle me-2 text-success"></i>Clôturer
-                                                        {% endif %}
-                                                    </button>
-                                                </form>
-                                            </li>
-                                            <li><hr class="dropdown-divider opacity-50"></li>
-                                            <li>
-                                                <form method="post" action="{{ path('app_admin_contact_delete', {'id': contact.id}) }}" onsubmit="return confirm('Supprimer définitivement ?');">
-                                                    <button type="submit" class="dropdown-item rounded-2 text-danger">
-                                                        <i class="bi bi-trash3 me-2"></i>Supprimer
-                                                    </button>
-                                                </form>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="5" class="text-center py-5">
-                                    <div class="opacity-50">
-                                        <i class="bi bi-inbox fs-1"></i>
-                                        <p class="mt-2 fw-medium">Votre boîte de réception est vide.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                    {% else %}
+                        <tr><td colspan="5" class="text-center text-muted py-5">Boîte de réception vide.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
-
-<style>
-    /* Couleurs personnalisées */
-    .bg-info-light { background-color: #42B1CE08 !important; }
-    .bg-success-subtle { background-color: #d1e7dd !important; color: #0f5132 !important; }
-    .bg-warning-subtle { background-color: #fff3cd !important; color: #664d03 !important; }
-    
-    /* Bullet indicateur */
-    .bullet {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-    }
-
-    /* Style du tableau */
-    .table-hover tbody tr:hover {
-        background-color: #f8f9fa !important;
-        transition: background-color 0.2s ease;
-    }
-
-    /* Dropdown style */
-    .dropdown-item {
-        padding: 0.6rem 1rem;
-        font-size: 0.85rem;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-    .dropdown-item:hover {
-        background-color: #f8f9fa;
-        color: #42B1CE !important;
-    }
-
-    /* Search Input style */
-    .style-search input:focus {
-        box-shadow: none;
-        background-color: #eee !important;
-    }
-</style>
 {% endblock %}

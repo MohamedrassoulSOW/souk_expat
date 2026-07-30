@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SoukExpat{% endblock %}</title>
+    <style>
+        body { background: #f4f7f9; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+        .wrapper { padding: 32px 16px; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #4B79A1 0%, #1B2E4B 100%); padding: 28px 24px; text-align: center; }
+        .header h1 { color: #fff; margin: 0; font-size: 22px; font-weight: 800; }
+        .content { padding: 28px 24px; color: #334155; line-height: 1.6; font-size: 15px; }
+        .content h2 { color: #1B2E4B; margin: 0 0 12px; font-size: 18px; }
+        .button-wrapper { text-align: center; margin: 28px 0; }
+        .button { background: #4B79A1; color: #fff !important; padding: 14px 28px; text-decoration: none; border-radius: 999px; font-weight: 700; display: inline-block; }
+        .footer { padding: 18px 24px 28px; text-align: center; font-size: 12px; color: #94a3b8; }
+        .footer a { color: #4B79A1; text-decoration: none; font-weight: 600; }
+        .meta { background: #f8fafc; border-radius: 12px; padding: 14px 16px; margin: 16px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="container">
+        <div class="header">
+            <h1>SoukExpat</h1>
+        </div>
+        <div class="content">
+            {% block body %}{% endblock %}
+        </div>
+        <div class="footer">
+            {% block footer %}
+                Une question ? Écrivez-nous à
+                <a href="mailto:{{ siteContactEmail }}">{{ siteContactEmail }}</a><br>
+                &copy; {{ "now"|date("Y") }} SoukExpat
+            {% endblock %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

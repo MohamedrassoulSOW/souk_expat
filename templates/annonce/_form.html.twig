@@ -59,14 +59,12 @@
                             {{ form_errors(form.description) }}
                         </div>
 
-                        {# TÉLÉPHONE #}
                         <div class="col-12">
-                            <label class="form-label fw-bold small text-uppercase text-muted">Contact (téléphone)</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone text-muted"></i></span>
-                                {{ form_widget(form.phone, {'attr': {'class': 'form-control border-start-0 ps-0', 'value': app.user.phone|default('')}}) }}
+                            <div class="alert alert-light border rounded-4 small mb-0">
+                                <i class="bi bi-shield-check me-1 text-brand" aria-hidden="true"></i>
+                                Les acheteurs vous contactent via la <strong>messagerie SoukExpat</strong>.
+                                Aucun numéro de téléphone n’est demandé ni publié sur le site (prévu pour les apps mobiles).
                             </div>
-                            {{ form_errors(form.phone) }}
                         </div>
 
                         {# IMAGES - Zone de dépôt stylisée #}

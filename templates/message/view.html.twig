@@ -1,148 +1,165 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Chat - {{ thread.annonce.title }}{% endblock %}
+{% block title %}Chat — {{ thread.annonce.title }} | SoukExpat{% endblock %}
 
 {% block body %}
+{% set interlocuteur = adminReadOnly|default(false) ? null : (app.user == thread.buyer ? thread.seller : thread.buyer) %}
 {{ include('layouts/navBar.html.twig') }}
-<div class="container chat-container mt-4 px-2 px-md-3">
-    <div class="card card-chat shadow border-0 wa-chat-shell">
-        {# Header type WhatsApp #}
-        <div class="wa-chat-header d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center flex-grow-1 min-w-0">
-                <a href="{{ adminReadOnly|default(false) ? path('app_admin_chats_index') : path('app_messages_list') }}" class="btn btn-link text-secondary p-0 me-2 rounded-circle wa-back">
-                    <i class="bi bi-arrow-left fs-4"></i>
-                </a>
 
-                <div class="position-relative me-2 flex-shrink-0">
-                    {% if thread.annonce.annonceImages|length > 0 %}
-                        <img src="{{ asset('uploads/annonces/' ~ thread.annonce.annonceImages[0].imadeName) }}" alt="" class="wa-avatar">
-                    {% else %}
-                        <div class="wa-avatar wa-avatar-placeholder d-flex align-items-center justify-content-center text-secondary">
-                            <i class="bi bi-image"></i>
-                        </div>
-                    {% endif %}
-                </div>
+<main class="msg-chat">
+    <div class="container msg-chat__container">
+        <div class="card border-0 shadow-sm msg-chat__shell wa-chat-shell">
+            <header class="wa-chat-header">
+                <div class="d-flex align-items-center flex-grow-1 min-w-0 gap-2">
+                    <a href="{{ adminReadOnly|default(false) ? path('app_admin_chats_index') : path('app_messages_list') }}"
+                       class="btn wa-back"
+                       aria-label="Retour aux messages">
+                        <i class="bi bi-arrow-left fs-5" aria-hidden="true"></i>
+                    </a>
 
-                <div class="min-w-0">
-                    <h6 class="mb-0 fw-semibold text-truncate text-dark" style="font-size: 1rem;">{{ thread.annonce.title }}</h6>
-                    <small class="text-secondary text-truncate d-block" style="font-size: 0.8rem;">
-                        {% if adminReadOnly|default(false) %}
-                            <span class="text-body-secondary">Acheteur : {{ thread.buyer.firstName }} · Vendeur : {{ thread.seller.firstName }}</span>
-                            <span class="ms-1 badge bg-secondary bg-opacity-25 text-dark" style="font-size:0.65rem;">Admin</span>
+                    <a href="{{ path('app_annonce_show', { id: thread.annonce.id }) }}" class="wa-avatar-link flex-shrink-0" title="Voir l’annonce">
+                        {% if thread.annonce.annonceImages|length > 0 %}
+                            <img src="{{ asset('uploads/annonces/' ~ thread.annonce.annonceImages[0].imadeName) }}" alt="" class="wa-avatar">
                         {% else %}
-                            <span class="text-body-secondary fw-medium">{{ (app.user == thread.buyer ? thread.seller : thread.buyer).userIdentifier|split('@')[0]|capitalize }}</span>
-                            <span class="chat-status-dot">• en ligne</span>
+                            <div class="wa-avatar wa-avatar-placeholder">
+                                <i class="bi bi-image" aria-hidden="true"></i>
+                            </div>
                         {% endif %}
-                    </small>
+                    </a>
+
+                    <div class="min-w-0">
+                        <h1 class="wa-chat-title text-truncate">
+                            <a href="{{ path('app_annonce_show', { id: thread.annonce.id }) }}" class="text-decoration-none text-dark">
+                                {{ thread.annonce.title }}
+                            </a>
+                        </h1>
+                        <div class="wa-chat-subtitle text-truncate">
+                            {% if adminReadOnly|default(false) %}
+                                {{ thread.buyer.firstName }} ↔ {{ thread.seller.firstName }}
+                                <span class="badge rounded-pill bg-secondary bg-opacity-25 text-dark ms-1" style="font-size:0.65rem;">Admin</span>
+                            {% elseif interlocuteur %}
+                                <a href="{{ path('app_seller_show', { id: interlocuteur.id }) }}" class="wa-chat-person">
+                                    {% if interlocuteur.avatar %}
+                                        <img src="{{ asset('uploads/avatars/' ~ interlocuteur.avatar) }}" alt="" width="18" height="18" class="wa-chat-person-avatar">
+                                    {% endif %}
+                                    {{ interlocuteur.firstName|default('Membre') }}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="d-none d-sm-block flex-shrink-0">
-                <span class="wa-price-pill">{{ thread.annonce.price }} €</span>
-            </div>
-        </div>
-
-        <div id="message-container" class="wa-message-container">
-            <div class="text-center my-3">
-                <span class="wa-encryption-pill small">
-                    <i class="bi bi-lock-fill me-1"></i> Messages envoyés en toute sécurité sur Expat Souk (connexion HTTPS).
-                </span>
-            </div>
-
-            {% for message in thread.messagesAsThread %}
-                {{ include('message/_message_item.html.twig') }}
-            {% endfor %}
-        </div>
-
-        {% if not adminReadOnly|default(false) %}
-        {# Aperçu photo (avant envoi) #}
-        <div id="chat-media-preview" class="d-none wa-media-preview">
-            <div class="wa-media-preview-inner">
-                <img id="chat-media-preview-img" src="" alt="" class="wa-media-preview-img">
-                <div class="d-flex align-items-center justify-content-between gap-2 mt-2">
-                    <span class="small text-secondary">Ajoutez une légende ci-dessous, puis appuyez sur envoyer</span>
-                    <button type="button" class="btn btn-sm btn-outline-danger" id="chat-media-preview-remove" title="Supprimer">Supprimer</button>
+                <div class="d-none d-sm-flex align-items-center gap-2 flex-shrink-0">
+                    <span class="wa-price-pill">{{ thread.annonce.price|number_format(0, ',', ' ') }} MAD</span>
                 </div>
+            </header>
+
+            <div id="message-container" class="wa-message-container">
+                <div class="text-center my-3">
+                    <span class="wa-encryption-pill small">
+                        <i class="bi bi-shield-lock-fill me-1" aria-hidden="true"></i>
+                        Échanges sécurisés sur SoukExpat
+                    </span>
+                </div>
+
+                {% for message in thread.messagesAsThread %}
+                    {{ include('message/_message_item.html.twig') }}
+                {% else %}
+                    <div class="wa-empty-thread text-center text-muted small py-4">
+                        Aucun message pour l’instant. Dites bonjour pour démarrer.
+                    </div>
+                {% endfor %}
             </div>
-        </div>
 
-        <div id="chat-location-hint" class="d-none wa-location-ready px-3 py-2 small">
-            <i class="bi bi-geo-alt me-1 chat-brand-ic"></i>
-            Position prête à l’envoi.
-            <button type="button" id="chat-clear-location" class="btn btn-link btn-sm p-0 ms-2 align-baseline chat-link-brand">Annuler</button>
-        </div>
-        {% endif %}
-
-        {# Composer type WhatsApp #}
-        {% if adminReadOnly|default(false) %}
-        <div class="wa-composer border-top bg-body-tertiary py-3 px-3 text-center small text-secondary">
-            <i class="bi bi-shield-lock me-1" style="color: #0d9488;"></i> Vue <strong>administrateur</strong> — conversation en <strong>lecture seule</strong>. Les compteurs de messages des utilisateurs ne sont pas modifiés.
-        </div>
-        {% else %}
-        <div class="wa-composer">
-            {{ form_start(form, {'attr': {'id': 'chat-form', 'class': 'mb-0', 'enctype': 'multipart/form-data'}}) }}
-                {% if form.photo.vars.errors|length %}
-                    <div class="text-danger small px-3 pb-1">{{ form_errors(form.photo) }}</div>
-                {% endif %}
-
-                <div class="wa-composer-row">
-                    {# Menu pièces jointes (+) #}
-                    <div class="dropup wa-attach-wrap">
-                        <button type="button"
-                                class="btn wa-btn-circle wa-btn-plus text-secondary"
-                                id="chat-attach-toggle"
-                                data-bs-toggle="dropdown"
-                                data-bs-auto-close="outside"
-                                aria-expanded="false"
-                                title="Joindre"
-                                aria-label="Joindre">
-                            <i class="bi bi-plus-lg fs-4"></i>
+            {% if not adminReadOnly|default(false) %}
+            <div id="chat-media-preview" class="d-none wa-media-preview">
+                <div class="wa-media-preview-inner">
+                    <img id="chat-media-preview-img" src="" alt="" class="wa-media-preview-img">
+                    <div class="d-flex align-items-center justify-content-between gap-2 mt-2">
+                        <span class="small text-secondary">Ajoutez une légende, puis envoyez</span>
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-icon-action" id="chat-media-preview-remove" title="Supprimer" aria-label="Supprimer">
+                            <i class="bi bi-trash3" aria-hidden="true"></i>
                         </button>
-                        <ul class="dropdown-menu wa-attach-sheet shadow-lg border-0 py-2" aria-labelledby="chat-attach-toggle">
-                            <li>
-                                <button type="button" class="dropdown-item wa-attach-item py-2 d-flex align-items-center gap-3" id="chat-pick-gallery">
-                                    <span class="wa-attach-icon chat-attach-ic"><i class="bi bi-images"></i></span>
-                                    <span>Photos (galerie)</span>
-                                </button>
-                            </li>
-                            <li>
-                                <button type="button" class="dropdown-item wa-attach-item py-2 d-flex align-items-center gap-3" id="chat-pick-camera">
-                                    <span class="wa-attach-icon chat-attach-ic chat-attach-ic-alt"><i class="bi bi-camera-fill"></i></span>
-                                    <span>Appareil photo</span>
-                                </button>
-                            </li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li>
-                                <button type="button" class="dropdown-item wa-attach-item py-2 d-flex align-items-center gap-3" id="chat-pick-location">
-                                    <span class="wa-attach-icon chat-attach-ic"><i class="bi bi-geo-alt"></i></span>
-                                    <span>Position</span>
-                                </button>
-                            </li>
-                        </ul>
                     </div>
-
-                    <div class="flex-grow-1 wa-input-shell">
-                        {{ form_widget(form.content, {
-                            'attr': {
-                                'class': 'form-control wa-msg-input shadow-none',
-                                'placeholder': 'Message',
-                                'autocomplete': 'off',
-                                'rows': 1
-                            }
-                        }) }}
-                    </div>
-
-                    <button type="submit" class="btn wa-btn-circle wa-btn-send text-white border-0" title="Envoyer" aria-label="Envoyer">
-                        <i class="bi bi-send-fill fs-5"></i>
-                    </button>
                 </div>
-            {{ form_end(form, {'render_rest': true}) }}
-        </div>
-        {% endif %}
-    </div>
-</div>
+            </div>
 
-{# Lightbox photo (style WhatsApp plein écran simplifié) #}
+            <div id="chat-location-hint" class="d-none wa-location-ready px-3 py-2 small">
+                <i class="bi bi-geo-alt me-1 chat-brand-ic" aria-hidden="true"></i>
+                Position prête à l’envoi.
+                <button type="button" id="chat-clear-location" class="btn btn-link btn-sm p-0 ms-2 align-baseline chat-link-brand">Annuler</button>
+            </div>
+            {% endif %}
+
+            {% if adminReadOnly|default(false) %}
+            <div class="wa-composer border-top bg-body-tertiary py-3 px-3 text-center small text-secondary">
+                <i class="bi bi-shield-lock me-1" style="color: #0d9488;" aria-hidden="true"></i>
+                Vue administrateur — lecture seule.
+            </div>
+            {% else %}
+            <div class="wa-composer">
+                {{ form_start(form, {'attr': {'id': 'chat-form', 'class': 'mb-0', 'enctype': 'multipart/form-data'}}) }}
+                    {% if form.photo.vars.errors|length %}
+                        <div class="text-danger small px-3 pb-1">{{ form_errors(form.photo) }}</div>
+                    {% endif %}
+
+                    <div class="wa-composer-row">
+                        <div class="dropup wa-attach-wrap">
+                            <button type="button"
+                                    class="btn wa-btn-circle wa-btn-plus"
+                                    id="chat-attach-toggle"
+                                    data-bs-toggle="dropdown"
+                                    data-bs-auto-close="outside"
+                                    aria-expanded="false"
+                                    title="Joindre"
+                                    aria-label="Joindre">
+                                <i class="bi bi-plus-lg fs-4" aria-hidden="true"></i>
+                            </button>
+                            <ul class="dropdown-menu wa-attach-sheet shadow-lg border-0 py-2" aria-labelledby="chat-attach-toggle">
+                                <li>
+                                    <button type="button" class="dropdown-item wa-attach-item py-2 d-flex align-items-center gap-3" id="chat-pick-gallery">
+                                        <span class="wa-attach-icon chat-attach-ic"><i class="bi bi-images" aria-hidden="true"></i></span>
+                                        <span>Photos (galerie)</span>
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item wa-attach-item py-2 d-flex align-items-center gap-3" id="chat-pick-camera">
+                                        <span class="wa-attach-icon chat-attach-ic chat-attach-ic-alt"><i class="bi bi-camera-fill" aria-hidden="true"></i></span>
+                                        <span>Appareil photo</span>
+                                    </button>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <button type="button" class="dropdown-item wa-attach-item py-2 d-flex align-items-center gap-3" id="chat-pick-location">
+                                        <span class="wa-attach-icon chat-attach-ic"><i class="bi bi-geo-alt" aria-hidden="true"></i></span>
+                                        <span>Position</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="flex-grow-1 wa-input-shell">
+                            {{ form_widget(form.content, {
+                                'attr': {
+                                    'class': 'form-control wa-msg-input shadow-none',
+                                    'placeholder': 'Écrire un message…',
+                                    'autocomplete': 'off',
+                                    'rows': 1
+                                }
+                            }) }}
+                        </div>
+
+                        <button type="submit" class="btn wa-btn-circle wa-btn-send text-white border-0" title="Envoyer" aria-label="Envoyer">
+                            <i class="bi bi-send-fill fs-5" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                {{ form_end(form, {'render_rest': true}) }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+
 <div class="modal fade wa-lightbox-modal" id="wa-photo-lightbox" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content bg-transparent border-0 shadow-none">
@@ -153,216 +170,6 @@
         </div>
     </div>
 </div>
-
-<style>
-    :root {
-        --chat-brand: #42B1CE;
-        --chat-brand-dark: #2a8da7;
-        --chat-brand-hover: #369ab3;
-        --chat-bg-shell: #f4fafc;
-        --chat-bg-thread: #e9f4f8;
-    }
-
-    .wa-chat-shell {
-        height: 82vh;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        border-radius: 12px !important;
-        background: var(--chat-bg-shell);
-        border: 1px solid rgba(66, 177, 206, 0.14) !important;
-    }
-
-    .chat-status-dot {
-        color: var(--chat-brand-dark);
-        font-weight: 600;
-    }
-
-    .wa-chat-header {
-        padding: 10px 12px;
-        background: linear-gradient(180deg, #ffffff 0%, #f4fafc 100%);
-        border-bottom: 1px solid rgba(66, 177, 206, 0.18);
-    }
-
-    .wa-back:hover { background: rgba(0, 0, 0, .05); }
-
-    .wa-avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: #fff;
-    }
-
-    .wa-avatar-placeholder {
-        border: 1px solid #e9edef;
-        font-size: 1.25rem;
-    }
-
-    .wa-price-pill {
-        font-size: 0.85rem;
-        padding: 6px 12px;
-        border-radius: 999px;
-        background: #fff;
-        border: 1px solid rgba(66, 177, 206, 0.28);
-        font-weight: 600;
-        color: #1a3d45;
-    }
-
-    .wa-message-container {
-        flex-grow: 1;
-        padding: 8px 10px 12px;
-        overflow-y: auto;
-        background-color: var(--chat-bg-thread);
-        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2342B1CE' fill-opacity='0.04'%3E%3Cpath d='M30 0h30v30H30zM0 30h30v30H0z'/%3E%3C/g%3E%3C/svg%3E");
-    }
-
-    .wa-encryption-pill {
-        display: inline-block;
-        max-width: 96%;
-        padding: 8px 14px;
-        border-radius: 10px;
-        background: rgba(66, 177, 206, 0.12);
-        color: #256070;
-        border: 1px solid rgba(66, 177, 206, 0.2);
-        box-shadow: none;
-        line-height: 1.35;
-    }
-
-    .wa-media-preview {
-        background: var(--chat-bg-shell);
-        border-top: 1px solid rgba(66, 177, 206, 0.15);
-        padding: 10px 14px;
-    }
-
-    .wa-media-preview-inner { max-width: 360px; margin: 0 auto; }
-
-    .wa-media-preview-img {
-        width: 100%;
-        max-height: 220px;
-        object-fit: contain;
-        border-radius: 8px;
-        background: #000;
-    }
-
-    .wa-location-ready {
-        background: rgba(66, 177, 206, 0.08);
-        border-top: 1px solid rgba(66, 177, 206, 0.22);
-        color: #1e505e;
-    }
-
-    .chat-brand-ic { color: var(--chat-brand-dark); }
-
-    .wa-composer {
-        background: linear-gradient(180deg, #fafcfd 0%, var(--chat-bg-shell) 100%);
-        padding: 10px 12px 14px;
-        border-top: 1px solid rgba(66, 177, 206, 0.15);
-    }
-
-    .wa-composer-row {
-        display: flex;
-        align-items: flex-end;
-        gap: 8px;
-    }
-
-    .wa-btn-circle {
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .wa-btn-plus {
-        background: #fff;
-        border: none;
-        box-shadow: 0 1px 1px rgba(11, 20, 26, .12);
-    }
-
-    .wa-btn-send {
-        background: var(--chat-brand) !important;
-        box-shadow: 0 4px 14px rgba(66, 177, 206, 0.35);
-    }
-
-    .wa-btn-send:hover {
-        background: var(--chat-brand-hover) !important;
-        box-shadow: 0 6px 18px rgba(66, 177, 206, 0.42);
-    }
-
-    .wa-input-shell {
-        background: #fff;
-        border-radius: 24px;
-        border: 1px solid rgba(66, 177, 206, 0.18);
-        box-shadow: 0 1px 3px rgba(42, 141, 167, 0.06);
-    }
-
-    .wa-msg-input {
-        border: none !important;
-        border-radius: 24px !important;
-        padding: 10px 16px !important;
-        font-size: 15px;
-        resize: none;
-        max-height: 120px;
-        color: #1a2e33;
-    }
-
-    .wa-msg-input::placeholder { color: #7a9299; }
-
-    .wa-msg-input:focus {
-        box-shadow: none !important;
-        outline: none !important;
-    }
-
-    .chat-attach-ic {
-        background: rgba(66, 177, 206, 0.15);
-        color: var(--chat-brand-dark);
-    }
-
-    .chat-attach-ic-alt {
-        background: rgba(66, 177, 206, 0.22);
-        color: #1e6575;
-    }
-
-    .chat-link-brand {
-        color: var(--chat-brand-dark);
-        font-weight: 600;
-        text-decoration: none;
-    }
-    .chat-link-brand:hover {
-        color: var(--chat-brand-hover);
-        text-decoration: underline;
-    }
-
-    .wa-attach-sheet {
-        min-width: 260px;
-        border-radius: 12px !important;
-    }
-
-    .wa-attach-item {
-        border-radius: 8px;
-        margin: 0 6px;
-        color: #111b21;
-    }
-
-    .wa-attach-item:active { background: #f5f6f6 !important; }
-
-    .wa-attach-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.35rem;
-    }
-
-    .wa-lightbox-close { filter: brightness(0) invert(1); opacity: .9; }
-
-    #message-container::-webkit-scrollbar { width: 6px; }
-    #message-container::-webkit-scrollbar-thumb { background: rgba(66, 177, 206, 0.35); border-radius: 10px; }
-</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -437,20 +244,14 @@
             setTimeout(function() { photoInput.click(); }, 0);
         }
 
-        if (pickGallery) {
-            pickGallery.addEventListener('click', function() { triggerPhotoPick('gallery'); });
-        }
-        if (pickCamera) {
-            pickCamera.addEventListener('click', function() { triggerPhotoPick('camera'); });
-        }
+        if (pickGallery) pickGallery.addEventListener('click', function() { triggerPhotoPick('gallery'); });
+        if (pickCamera) pickCamera.addEventListener('click', function() { triggerPhotoPick('camera'); });
 
         if (photoInput) {
             photoInput.addEventListener('change', function() {
                 var f = this.files && this.files[0];
                 if (f && f.type && f.type.indexOf('image/') === 0) {
                     showMediaPreviewFromFile(f);
-                } else if (f) {
-                    hideMediaPreview();
                 } else {
                     hideMediaPreview();
                 }

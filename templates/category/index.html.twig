@@ -1,135 +1,83 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Gestion des Catégories | Expat Souk{% endblock %}
-
+{% block title %}Catégories | SoukExpat{% endblock %}
 {% block admin_mobile_title %}Catégories{% endblock %}
 
 {% block admin_main %}
-            {# Message de succès/erreur #}
-            {# Header de la page #}
-            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-                <div class="d-flex flex-column min-w-0">
-                    <a href="{{ path('app_dashboard') }}" class="text-decoration-none text-muted mb-1">
-                        <i class="bi bi-house-door-fill me-1"></i> Tableau de bord
-                    </a>
-                    <h3 class="fw-bold mb-1 text-truncate">📂 Catégories d'annonces</h3>
-                    <p class="text-muted small mb-0">Organisez les types de produits et services sur la plateforme.</p>
-                </div>
-                <a href="{{ path('app_category_new') }}" class="btn btn-primary rounded-pill px-4 shadow-sm flex-shrink-0" style="background-color: #42B1CE; border: none;">
-                    <i class="bi bi-plus-circle me-2"></i>Nouvelle catégorie
-                </a>
-            </div>
+    {% set actions %}
+        <a href="{{ path('app_category_new') }}" class="btn btn-admin-primary rounded-pill px-3">
+            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Nouvelle catégorie
+        </a>
+    {% endset %}
 
-            {# Card principale #}
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-header bg-white border-0 p-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
-                    <h5 class="fw-bold mb-0 text-dark">Liste des enregistrements</h5>
-                    <div class="badge bg-soft-info text-info rounded-pill px-3">{{ categories|length }} catégories</div>
-                </div>
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Référentiels',
+        title: 'Catégories',
+        lead: 'Types de produits et services affichés sur la plateforme.',
+        actions: actions
+    }) }}
 
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light text-muted small text-uppercase">
-                                <tr>
-                                    <th class="ps-4 py-3 border-0">ID</th>
-                                    <th class="py-3 border-0">Image</th>
-                                    <th class="py-3 border-0 d-none d-md-table-cell">Icône</th>
-                                    <th class="py-3 border-0">Nom</th>
-                                    <th class="py-3 border-0 d-none d-lg-table-cell">Slug (URL)</th>
-                                    <th class="py-3 border-0 text-end pe-4">Gestion</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for category in categories %}
-                                <tr class="border-bottom border-light">
-                                    <td class="ps-4 py-3">
-                                        <span class="text-muted font-monospace">#{{ category.id }}</span>
-                                    </td>
-                                    <td class="py-3">
-                                        {% if category.imageName %}
-                                            <img src="{{ asset('uploads/categories/' ~ category.imageName) }}" alt="" width="44" height="44" class="rounded-3 border bg-white" style="object-fit: cover;">
-                                        {% else %}
-                                            <span class="text-muted small">—</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="py-3 d-none d-md-table-cell">
-                                        {% if category.icon %}
-                                            <i class="{{ category.icon }} fs-5 text-primary" aria-hidden="true"></i>
-                                        {% else %}
-                                            <span class="text-muted small">—</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="py-3">
-                                        <div class="fw-bold text-dark">{{ category.name }}</div>
-                                    </td>
-                                    <td class="py-3 d-none d-lg-table-cell">
-                                        <code class="small bg-white border px-2 py-1 rounded text-secondary text-break">{{ category.slug }}</code>
-                                    </td>
-                                    <td class="text-end pe-4 py-3">
-                                        <div class="d-flex flex-wrap justify-content-end gap-2">
-                                            <a href="{{ path('app_category_update', {'id': category.id}) }}"
-                                               class="btn btn-sm btn-light border rounded-pill px-3 shadow-sm hover-cyan">
-                                                <i class="bi bi-pencil-square text-primary me-1"></i> Éditer
-                                            </a>
-                                            <form method="post"
-                                                  action="{{ path('app_category_delete', {'id': category.id}) }}"
-                                                  class="d-inline"
-                                                  onsubmit="return confirm('Attention ! Supprimer cette catégorie pourrait affecter les annonces liées. Continuer ?');">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_category_' ~ category.id) }}">
-                                                <button type="submit" class="btn btn-sm btn-light border rounded-pill px-3 shadow-sm hover-red">
-                                                    <i class="bi bi-trash3 text-danger me-1"></i> Supprimer
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
+    <div class="admin-panel">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-3 border-bottom">
+            <span class="fw-semibold small">Liste des enregistrements</span>
+            <span class="admin-badge">{{ categories|length|cap999 }} catégorie{{ categories|length > 1 ? 's' : '' }}</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small">
+                    <tr>
+                        <th class="ps-3 py-3 border-0">ID</th>
+                        <th class="py-3 border-0">Image</th>
+                        <th class="py-3 border-0 d-none d-md-table-cell">Icône</th>
+                        <th class="py-3 border-0">Nom</th>
+                        <th class="py-3 border-0 d-none d-lg-table-cell">Slug</th>
+                        <th class="pe-3 py-3 border-0 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                        <tr>
+                            <td class="ps-3"><span class="text-muted font-monospace small">#{{ category.id }}</span></td>
+                            <td>
+                                {% if category.imageName %}
+                                    <img src="{{ asset('uploads/categories/' ~ category.imageName) }}" alt="" width="44" height="44" class="rounded-3 border bg-white" style="object-fit: cover;">
                                 {% else %}
-                                <tr>
-                                    <td colspan="6" class="text-center py-5">
-                                        <div class="text-muted">
-                                            <i class="bi bi-folder2-open fs-1 opacity-25 d-block mb-3"></i>
-                                            Aucune catégorie n'est configurée pour le moment.
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-<style>
-    .bg-soft-info { background-color: #42B1CE15; }
-
-    .table thead th {
-        font-weight: 700;
-        font-size: 0.75rem;
-        letter-spacing: 0.8px;
-        color: #6c757d;
-    }
-
-    .hover-cyan:hover {
-        background-color: #42B1CE10 !important;
-        border-color: #42B1CE !important;
-    }
-
-    .hover-red:hover {
-        background-color: #dc354510 !important;
-        border-color: #dc3545 !important;
-    }
-
-    .table tbody tr {
-        transition: all 0.2s;
-    }
-
-    .table tbody tr:hover {
-        background-color: #f9fafb !important;
-    }
-
-    @media (max-width: 768px) {
-        .card-header { flex-direction: column; align-items: flex-start !important; gap: 10px; }
-    }
-</style>
+                                    <span class="text-muted small">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                {% if category.icon %}
+                                    <i class="{{ category.icon }} fs-5" style="color: var(--cyan-main);" aria-hidden="true"></i>
+                                {% else %}
+                                    <span class="text-muted small">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="fw-semibold">{{ category.name }}</td>
+                            <td class="d-none d-lg-table-cell">
+                                <code class="small bg-light border px-2 py-1 rounded">{{ category.slug }}</code>
+                            </td>
+                            <td class="pe-3 text-end">
+                                <div class="d-inline-flex flex-wrap justify-content-end gap-1">
+                                    <a href="{{ path('app_category_update', {id: category.id}) }}" class="btn btn-sm btn-light border btn-icon-action" title="Modifier" aria-label="Modifier">
+                                        <i class="bi bi-pencil" aria-hidden="true"></i>
+                                    </a>
+                                    <form method="post" action="{{ path('app_category_delete', {id: category.id}) }}" class="d-inline"
+                                          onsubmit="return confirm('Supprimer cette catégorie ? Les annonces liées peuvent être affectées.');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_category_' ~ category.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger btn-icon-action" title="Supprimer" aria-label="Supprimer">
+                                            <i class="bi bi-trash3" aria-hidden="true"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">Aucune catégorie configurée.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

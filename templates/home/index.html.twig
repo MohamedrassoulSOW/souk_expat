@@ -1,516 +1,269 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil | Expat Souk - Petites annonces entre expatriés{% endblock %}
+{% block title %}Accueil | SoukExpat — Le Marché Mondial des Expatriés{% endblock %}
 
 {% block body %}
     {{ include('layouts/navBar.html.twig') }}
     {% set sf = search_filters %}
-    {# --- SECTION SLIDER --- #}
-    {% if sliders is not empty %}
-        {# Hero : carousel pleine zone + recherche centrée au-dessus (z-index / hauteurs cohérents) #}
-        <section class="home-hero mb-4 mb-lg-5" data-animate="fade-up">
-            <div class="home-hero-frame position-relative mx-auto rounded-bottom-4 shadow-sm overflow-hidden">
-                {# Diaporama #}
-                <div id="homeCarousel" class="carousel slide home-hero-carousel h-100" data-bs-ride="carousel" data-bs-interval="5000">
-                    <div class="carousel-inner h-100">
-                        {% for slider in sliders %}
-                            <div class="carousel-item h-100 {{ loop.first ? 'active' : '' }}" data-bs-interval="5000">
-                                <img src="{{ asset('uploads/sliders/' ~ slider.imageName) }}" class="home-hero-slide-img d-block w-100" alt="{{ slider.title }}">
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <button class="carousel-control-prev home-hero-control" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Précédent</span>
-                    </button>
-                    <button class="carousel-control-next home-hero-control" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Suivant</span>
-                    </button>
-                </div>
+    {% set has_filters = sf.q or sf.categoryId or sf.cityId %}
 
-                {# Couche recherche + titres #}
-                <div class="home-hero-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center py-3 py-md-4">
-                    <div class="container px-3 px-lg-4 home-hero-overlay-inner">
-                        <div class="text-center text-white mb-3 mb-md-4">
-                            <h1 class="fw-bold display-6 display-md-4 home-hero-title">Trouvez tout, partout.</h1>
-                            <p class="mb-0 opacity-90 fs-6 home-hero-sub">La communauté des expatriés vous attend.</p>
-                        </div>
-
-                        <div class="card border-0 shadow-lg p-2 p-md-3 mx-auto home-search-card">
-                            <form action="{{ path('app_home') }}" method="get" class="row g-2 align-items-center">
-                                <div class="col-12 col-md-4">
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
-                                        <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Que cherchez-vous ?" value="{{ sf.q|default('') }}">
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-3 border-start border-md-start border-0">
-                                    <select name="category" class="form-select border-0 shadow-none">
-                                        <option value="">Toutes catégories</option>
-                                        {% for cat in search_categories %}
-                                            <option value="{{ cat.id }}" {{ sf.categoryId == cat.id ? 'selected' }}>{{ cat.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-12 col-md-3 border-start border-md-start border-0">
-                                    <select name="city" class="form-select border-0 shadow-none">
-                                        <option value="">Toutes les villes</option>
-                                        {% for city in cities %}
-                                            <option value="{{ city.id }}" {{ sf.cityId == city.id ? 'selected' }}>{{ city.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-12 col-md-2">
-                                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold text-white border-0" style="background-color: #42B1CE;">
-                                        Rechercher
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+    {# ——— HERO ——— #}
+    <section class="home-hero{% if sliders is empty %} home-hero--fallback{% endif %}" data-animate="fade-up">
+        {% if sliders is not empty %}
+            <div id="homeCarousel" class="carousel slide home-hero-carousel" data-bs-ride="carousel" data-bs-interval="5500">
+                <div class="carousel-indicators home-hero-indicators">
+                    {% for slider in sliders %}
+                        <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="{{ loop.index0 }}" class="{{ loop.first ? 'active' : '' }}" aria-label="Slide {{ loop.index }}" {% if loop.first %}aria-current="true"{% endif %}></button>
+                    {% endfor %}
                 </div>
+                <div class="carousel-inner">
+                    {% for slider in sliders %}
+                        <div class="carousel-item {{ loop.first ? 'active' : '' }}">
+                            <img src="{{ asset('uploads/sliders/' ~ slider.imageName) }}" class="home-hero-slide-img" alt="{{ slider.title }}">
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev home-hero-control" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Précédent</span>
+                </button>
+                <button class="carousel-control-next home-hero-control" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Suivant</span>
+                </button>
             </div>
-        </section>
-    {% else %}
-        {# Barre de recherche sans slider #}
-        <section class="search-section py-5 mb-5 bg-light">
-            <div class="container">
-                <div class="text-center mb-4">
-                    <h1 class="fw-bold display-4 display-6 display-md-4">Trouvez tout, partout.</h1>
-                    <p class="fs-5 d-none d-md-block">La communauté des expatriés vous attend.</p>
-                    <p class="small d-md-none">La communauté des expatriés vous attend.</p>
+        {% endif %}
+
+        <div class="home-hero-overlay">
+            <div class="container home-hero-overlay-inner">
+                <div class="home-hero-copy text-center text-white mx-auto">
+                    <img class="home-hero-brand-logo" src="{{ asset('logo-souk-expat.png') }}" alt="SoukExpat — Le Marché Mondial des Expatriés" width="220" height="120" decoding="async" fetchpriority="high">
+                    <h1 class="home-hero-title">Trouvez tout, partout.</h1>
+                    <p class="home-hero-sub">Achetez et vendez entre expatriés au Maroc</p>
                 </div>
 
-                <div class="card border-0 shadow-lg p-2 p-md-3 rounded-pill rounded-4 rounded-md-pill mx-auto" style="max-width: 900px;">
-                    <form action="{{ path('app_home') }}" method="get" class="row g-2 align-items-center">
-                        <div class="col-12 col-md-4">
-                            <div class="input-group">
-                                <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
-                                <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Que cherchez-vous ?" value="{{ sf.q|default('') }}">
-                            </div>
+                <form action="{{ path('app_home') }}" method="get" id="home-search-form" class="home-search" aria-label="Rechercher une annonce">
+                    <div class="home-search__row">
+                        <div class="home-search__field home-search__field--q">
+                            <label class="visually-hidden" for="home-q">Recherche</label>
+                            <i class="bi bi-search home-search__icon" aria-hidden="true"></i>
+                            <input id="home-q" type="search" name="q" class="home-search__input" placeholder="Que cherchez-vous ?" value="{{ sf.q|default('') }}" autocomplete="off">
                         </div>
-                        <div class="col-12 col-md-3 border-start border-md-start border-0">
-                            <select name="category" class="form-select border-0 shadow-none">
+                        <div class="home-search__field home-search__field--select d-none d-md-flex">
+                            <label class="visually-hidden" for="home-cat">Catégorie</label>
+                            <select id="home-cat" name="category" class="home-search__select">
                                 <option value="">Toutes catégories</option>
                                 {% for cat in search_categories %}
                                     <option value="{{ cat.id }}" {{ sf.categoryId == cat.id ? 'selected' }}>{{ cat.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-12 col-md-3 border-start border-md-start border-0">
-                            <select name="city" class="form-select border-0 shadow-none">
-                                <option value="">Toutes les villes</option>
+                        <div class="home-search__field home-search__field--select d-none d-md-flex">
+                            <label class="visually-hidden" for="home-city">Ville</label>
+                            <select id="home-city" name="city" class="home-search__select">
+                                <option value="">Toutes villes</option>
                                 {% for city in cities %}
                                     <option value="{{ city.id }}" {{ sf.cityId == city.id ? 'selected' }}>{{ city.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-12 col-md-2">
-                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold" style="background-color: #42B1CE; border: none;">
+                        <div class="home-search__actions">
+                            <button type="button" class="home-search__filters-btn d-md-none" data-bs-toggle="collapse" data-bs-target="#homeMobileFilters" aria-expanded="{{ has_filters ? 'true' : 'false' }}" aria-controls="homeMobileFilters" title="Filtres">
+                                <i class="bi bi-sliders" aria-hidden="true"></i>
+                            </button>
+                            <button type="submit" class="btn btn-custom-cyan home-search__submit rounded-pill fw-bold">
                                 Rechercher
                             </button>
                         </div>
-                    </form>
+                    </div>
+                    <div class="collapse {{ has_filters ? 'show' : '' }} d-md-none" id="homeMobileFilters">
+                        <div class="home-search__mobile-filters">
+                            <select id="home-cat-m" class="form-select form-select-sm rounded-3">
+                                <option value="">Catégorie</option>
+                                {% for cat in search_categories %}
+                                    <option value="{{ cat.id }}" {{ sf.categoryId == cat.id ? 'selected' }}>{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <select id="home-city-m" class="form-select form-select-sm rounded-3">
+                                <option value="">Ville</option>
+                                {% for city in cities %}
+                                    <option value="{{ city.id }}" {{ sf.cityId == city.id ? 'selected' }}>{{ city.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <main class="home-main">
+        {# ——— CATÉGORIES (une ligne, défilement horizontal) ——— #}
+        <section class="home-section home-section--categories" data-animate="fade-up">
+            <div class="container">
+                <div class="home-section__head">
+                    <div>
+                        <p class="home-section__eyebrow">Explorer</p>
+                        <h2 class="home-section__title">Parcourir par catégorie</h2>
+                    </div>
+                    <a href="{{ path('app_annonce_index') }}" class="home-section__link">
+                        Toutes les annonces <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </a>
                 </div>
             </div>
-        </section>
-    {% endif %}
 
-    <main class="container">
-        
-        {# --- SECTION CATÉGORIES POPULAIRES (défilement horizontal) --- #}
-        <section class="mb-5 home-categories-section">
-            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                <h3 class="fw-bold text-dark mb-0">Que recherchez-vous ?</h3>
-                {% if popular_categories is not empty %}
-                    <span class="small text-muted d-none d-md-inline"><i class="bi bi-arrow-left-right me-1"></i>Flèches latérales, barre ou molette</span>
-                {% endif %}
-            </div>
             {% if popular_categories is empty %}
-                <p class="text-muted small mb-0">Les catégories seront affichées ici dès qu’elles seront créées dans l’administration.</p>
+                <div class="container">
+                    <p class="text-muted small mb-0">Les catégories apparaîtront ici dès qu’elles seront créées.</p>
+                </div>
             {% else %}
-            <div class="d-flex align-items-stretch gap-1 gap-sm-2 home-categories-row">
-                <button type="button" class="btn home-cat-nav home-cat-prev d-none d-md-flex flex-shrink-0" aria-label="Catégories précédentes">
-                    <i class="bi bi-chevron-left fs-4"></i>
-                </button>
-                <div class="home-categories-rail flex-grow-1 min-w-0 mx-n2 mx-sm-0">
-                    <div class="home-categories-scroll d-flex flex-nowrap gap-3 pb-2 px-2 px-sm-0"
-                         id="home-categories-scroll"
-                         role="region"
-                         aria-label="Catégories — défilement horizontal">
-                        {% for category in popular_categories %}
-                            <a href="{{ path('app_annonce_category', {'slug': category.slug}) }}"
-                               class="home-categories-card-link text-decoration-none flex-shrink-0"
-                               aria-label="{{ category.name }}">
-                                <div class="card h-100 border-0 shadow-sm category-card text-center p-3 rounded-4 home-category-tile">
-                                    <div class="category-icon mb-2 home-category-thumb-wrap d-flex align-items-center justify-content-center mx-auto overflow-hidden">
-                                        {% if category.imageName %}
-                                            <img src="{{ asset('uploads/categories/' ~ category.imageName) }}"
-                                                 alt=""
-                                                 class="home-category-thumb rounded-3"
-                                                 width="64"
-                                                 height="64"
-                                                 loading="lazy"
-                                                 decoding="async">
-                                        {% elseif category.icon %}
-                                            <i class="{{ category.icon|e('html_attr') }} fs-2 home-category-fallback-icon" aria-hidden="true"></i>
-                                        {% else %}
-                                            <i class="bi bi-tag-fill fs-3 home-category-fallback-icon" aria-hidden="true"></i>
-                                        {% endif %}
-                                    </div>
-                                    <h6 class="mb-0 text-dark small fw-bold text-break lh-sm">{{ category.name }}</h6>
-                                </div>
+                <div class="home-cat-track" role="region" aria-label="Catégories — faites glisser horizontalement">
+                    <div class="home-cat-showcase">
+                        {% for item in popular_categories %}
+                            {% set category = item.category %}
+                            {% set total = item.total %}
+                            {% set icon = 'bi-tag-fill' %}
+                            {% set tone = loop.index0 % 3 %}
+                            {% if 'meuble' in category.slug or 'meuble' in category.name|lower %}
+                                {% set icon = 'bi-lamp' %}
+                            {% elseif 'electro' in category.slug or 'électro' in category.name|lower %}
+                                {% set icon = 'bi-plug' %}
+                            {% elseif 'vehicule' in category.slug or 'véhicule' in category.name|lower or 'auto' in category.slug %}
+                                {% set icon = 'bi-bicycle' %}
+                            {% elseif category.icon %}
+                                {% set icon = category.icon %}
+                            {% endif %}
+
+                            <a href="{{ path('app_annonce_category', { slug: category.slug }) }}"
+                               class="home-cat-card home-cat-card--tone-{{ tone }}"
+                               aria-label="{{ category.name }} — {{ total|cap999 }} annonce{{ total > 1 ? 's' : '' }}">
+                                <span class="home-cat-card__visual" aria-hidden="true">
+                                    {% if category.imageName %}
+                                        <img src="{{ asset('uploads/categories/' ~ category.imageName) }}" alt="" loading="lazy" decoding="async">
+                                    {% else %}
+                                        <i class="bi {{ icon }}"></i>
+                                    {% endif %}
+                                </span>
+                                <span class="home-cat-card__body">
+                                    <span class="home-cat-card__name">{{ category.name }}</span>
+                                    <span class="home-cat-card__meta">
+                                        {{ total|cap999 }} annonce{{ total > 1 ? 's' : '' }}
+                                    </span>
+                                </span>
+                                <span class="home-cat-card__go" aria-hidden="true">
+                                    <i class="bi bi-arrow-right"></i>
+                                </span>
                             </a>
                         {% endfor %}
                     </div>
                 </div>
-                <button type="button" class="btn home-cat-nav home-cat-next d-none d-md-flex flex-shrink-0" aria-label="Catégories suivantes">
-                    <i class="bi bi-chevron-right fs-4"></i>
-                </button>
-            </div>
             {% endif %}
         </section>
 
-        <hr class="my-5 opacity-25">
-
-        {# --- SECTION ANNONCES PRINCIPALES (PAGINÉES) --- #}
-        <section id="annonces-list">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">
-                <div>
-                    <h3 class="fw-bold mb-1">{% if sf.q or sf.categoryId or sf.cityId %}Résultats de recherche{% else %}Dernières annonces{% endif %}</h3>
-                    <p class="text-muted small d-none d-md-block">{% if sf.q or sf.categoryId or sf.cityId %}Filtres appliqués sur les annonces publiées.{% else %}Découvrez les opportunités récentes à travers le monde{% endif %}</p>
-                </div>
-                <span class="badge bg-light text-dark border rounded-pill px-3 py-2">
-                    {{ annonces.getTotalItemCount }} annonces
-                </span>
-            </div>
-
-            <div class="row g-4">
-            {% for annonce in annonces %}
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative annonce-card d-flex flex-column">
-                        
-                        {# Badge Prix #}
-                        <div class="position-absolute top-0 end-0 m-2" style="z-index: 2;">
-                            <span class="badge bg-white shadow-sm rounded-pill px-3 py-2" style="color: #42B1CE; font-weight: 700; border: 1px solid rgba(66, 177, 206, 0.2);">
-                                {{ annonce.price }} MAD
-                            </span>
-                        </div>
-
-                        <div class="position-relative">
-                                {# On utilise bien 'annonceImages' ici #}
-                                {% if annonce.annonceImages|length > 0 %}
-                                    {# ATTENTION : On doit aussi utiliser 'annonceImages' ici ! #}
-                                    <img src="{{ asset('uploads/annonces/' ~ annonce.annonceImages[0].imadeName) }}" 
-                                        class="card-img-top" 
-                                        alt="{{ annonce.title }}" 
-                                        style="height: 200px; object-fit: cover;">
-                                {% else %}
-                                    <img src="{{ asset('images/no-image.jpg') }}" 
-                                        class="card-img-top" 
-                                        alt="No Image" 
-                                        style="height: 200px; object-fit: cover;">
-                                {% endif %}
-                                
-                                <span class="position-absolute top-0 end-0 m-3 badge bg-white text-primary rounded-pill shadow-sm">
-                                    {{ annonce.price }} MAD
-                                </span>
-                        </div>
-
-                        <div class="card-body p-3 d-flex flex-column flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-light text-dark fw-bold py-1 px-2" style="font-size: 0.65rem; border: 1px solid #eee;">
-                                    <i class="bi bi-geo-alt-fill me-1 text-primary"></i>{{ annonce.city.name|upper }}
-                                </span>
-                                <small class="text-muted" style="font-size: 0.7rem;">
-                                    {{ annonce.createdAt|date('d/m/Y') }}
-                                </small>
-                            </div>
-                            
-                            <h5 class="card-title fw-bold h6 mb-2">
-                                <a href="{{ path('app_annonce_show', {'id': annonce.id}) }}" class="text-dark text-decoration-none stretched-link">
-                                    {{ annonce.title|u.truncate(40, '...') }}
-                                </a>
-                            </h5>
-                            
-                            <p class="card-text text-muted small mb-3 flex-grow-1">
-                                {{ annonce.description|u.truncate(65, '...') }}
-                            </p>
-                            
-                            {# Footer de la carte : Toujours en bas #}
-                            <div class="pt-3 border-top d-flex align-items-center justify-content-between mt-auto">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px; border: 1px solid #eee;">
-                                        <i class="bi bi-person text-primary small"></i>
-                                    </div>
-                                    <span class="small text-muted">Par <span class="fw-semibold text-dark">{{ annonce.user.firstName }} {{ annonce.user.lastName }}</span></span>
-                                </div>
-                                <i class="bi bi-chevron-right text-primary small"></i>
-                            </div>
-                        </div>
+        {# ——— ANNONCES ——— #}
+        <section id="annonces-list" class="home-listings" data-animate="fade-up">
+            <div class="container">
+                <div class="home-section__head">
+                    <div>
+                        <p class="home-section__eyebrow">{% if has_filters %}Recherche{% else %}Marketplace{% endif %}</p>
+                        <h2 class="home-section__title">
+                            {% if has_filters %}Résultats de recherche{% else %}Annonces à découvrir{% endif %}
+                        </h2>
+                        <p class="home-section__lead">
+                            {% if has_filters %}Annonces correspondant à vos filtres.{% else %}Les dernières opportunités de la communauté.{% endif %}
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="annonce-page-stat">
+                            <i class="bi bi-layout-grid text-brand" aria-hidden="true"></i>
+                            <strong>{{ annonces.getTotalItemCount|cap999 }}</strong>
+                            annonce{{ annonces.getTotalItemCount > 1 ? 's' : '' }}
+                        </span>
+                        <a href="{{ path('app_annonce_new') }}" class="btn btn-sm btn-custom-cyan rounded-pill px-3">
+                            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Vendre
+                        </a>
                     </div>
                 </div>
-            {% else %}
-                <div class="col-12 text-center py-5">
-                    <i class="bi bi-search fs-1 opacity-25 mb-3 d-block"></i>
-                    <h4 class="fw-bold">{% if sf.q or sf.categoryId or sf.cityId %}Aucun résultat{% else %}Aucune annonce ici…{% endif %}</h4>
-                    <p class="text-muted">{% if sf.q or sf.categoryId or sf.cityId %}Essayez d’autres mots-clés ou filtres.{% else %}Soyez le premier à publier une annonce !{% endif %}</p>
-                    {% if sf.q or sf.categoryId or sf.cityId %}
-                        <a href="{{ path('app_home') }}" class="btn btn-outline-secondary rounded-pill px-4 mt-2 me-2">Réinitialiser la recherche</a>
-                    {% endif %}
-                    <a href="{{ path('app_annonce_new') }}" class="btn btn-custom-cyan rounded-pill px-4 mt-2">Publier une annonce</a>
-                </div>
-            {% endfor %}
-        </div>
 
-            {# --- PAGINATION --- #}
-            <div class="d-flex justify-content-center mt-5 mb-5">
-                <div class="pagination-container p-2 bg-white rounded-pill shadow-sm">
-                    {{ knp_pagination_render(annonces) }}
+                {{ include('layouts/_filter_chips.html.twig', {
+                    sf: sf,
+                    search_categories: search_categories,
+                    cities: cities,
+                    reset_url: path('app_home')
+                }) }}
+
+                <div class="row g-3 g-md-4">
+                    {% for annonce in annonces %}
+                        <div class="col-6 col-md-4 col-xl-3">
+                            {{ include('annonce/_card.html.twig', {
+                                annonce: annonce,
+                                show_category: true,
+                                eager: loop.index <= 4
+                            }) }}
+                        </div>
+                    {% else %}
+                        <div class="col-12">
+                            <div class="annonce-empty-state text-center py-5 px-4">
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white shadow-sm mb-3" style="width: 4.5rem; height: 4.5rem;">
+                                    <i class="bi bi-search fs-2 text-brand opacity-75" aria-hidden="true"></i>
+                                </div>
+                                <h3 class="h5 fw-bold mb-2">{% if has_filters %}Aucun résultat{% else %}Aucune annonce pour le moment{% endif %}</h3>
+                                <p class="text-muted mx-auto mb-4" style="max-width: 26rem;">
+                                    {% if has_filters %}Essayez d’autres mots-clés ou effacez les filtres.{% else %}Soyez le premier à publier sur Expat Souk.{% endif %}
+                                </p>
+                                {% if has_filters %}
+                                    <a href="{{ path('app_home') }}" class="btn btn-outline-secondary rounded-pill px-4 me-2">Réinitialiser</a>
+                                {% endif %}
+                                <a href="{{ path('app_annonce_new') }}" class="btn btn-custom-cyan rounded-pill px-4">Publier une annonce</a>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
+
+                {% if annonces|length > 0 %}
+                    <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-3 mt-5">
+                        <nav aria-label="Pagination">
+                            <div class="pagination-wrapper">
+                                {{ knp_pagination_render(annonces) }}
+                            </div>
+                        </nav>
+                        <a href="{{ path('app_annonce_index') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                            Voir le catalogue complet
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </section>
 
+        {# ——— CTA ——— #}
+        {% if not has_filters %}
+            <section class="home-cta container" data-animate="fade-up">
+                <div class="home-cta__panel">
+                    <div class="home-cta__copy">
+                        <h2 class="home-cta__title">Vous avez quelque chose à vendre&nbsp;?</h2>
+                        <p class="home-cta__text mb-0">Publiez une annonce en quelques minutes et rejoignez la communauté SoukExpat.</p>
+                    </div>
+                    <a href="{{ path('app_annonce_new') }}" class="btn btn-light rounded-pill px-4 fw-bold text-brand">
+                        Déposer une annonce
+                    </a>
+                </div>
+            </section>
+        {% endif %}
     </main>
-
-    <style>
-        /* --- Hero + slider (sous navbar fixe, plein écran cohérent) --- */
-        .home-hero-frame {
-            background: #0c1a1d;
-        }
-        .home-hero {
-            --home-hero-h: clamp(300px, 50vh, 580px);
-        }
-        @media (max-width: 767.98px) {
-            .home-hero { --home-hero-h: clamp(280px, 42vh, 480px); }
-        }
-        .home-hero-frame {
-            height: var(--home-hero-h);
-        }
-        .home-hero-carousel,
-        .home-hero-carousel .carousel-inner,
-        .home-hero-carousel .carousel-item {
-            height: 100%;
-        }
-        /* Centrer le sujet dans le cadre ; annule .carousel-item img { height: … !important } de app.css sur mobile */
-        .home-hero-carousel .carousel-item .home-hero-slide-img {
-            display: block;
-            width: 100%;
-            height: 100% !important;
-            max-width: none;
-            object-fit: cover;
-            object-position: center center;
-        }
-        .home-hero-overlay {
-            z-index: 2;
-            pointer-events: none;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.2) 40%, rgba(0, 0, 0, 0.5) 100%);
-        }
-        .home-hero-overlay-inner {
-            pointer-events: auto;
-        }
-        .home-hero-title {
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.45);
-        }
-        .home-hero-sub {
-            text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
-        }
-        .home-hero-control {
-            z-index: 4;
-            width: 12%;
-            opacity: 0.9;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
-        }
-        .home-search-card {
-            max-width: 900px;
-            border-radius: 0.9rem;
-        }
-        @media (min-width: 768px) {
-            .home-search-card {
-                border-radius: 999px;
-            }
-        }
-        @media (max-width: 767.98px) {
-            .home-hero-frame {
-                border-radius: 0 0 0.75rem 0.75rem;
-            }
-            .home-hero-title { font-size: 1.5rem !important; }
-        }
-        /* Bandeau catégories — scroll horizontal */
-        .home-categories-section {
-            min-width: 0;
-        }
-        .home-categories-row {
-            min-width: 0;
-        }
-        .home-categories-rail {
-            overflow: hidden;
-            width: 100%;
-            max-width: 100%;
-            min-width: 0;
-        }
-        .home-cat-nav {
-            align-self: center;
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            border-radius: 50%;
-            border: 1px solid rgba(66, 177, 206, 0.35);
-            background: #fff;
-            color: #42B1CE;
-            box-shadow: 0 2px 10px rgba(66, 177, 206, 0.12);
-            transition: background .15s ease, transform .15s ease;
-        }
-        .home-cat-nav:hover {
-            background: #42B1CE;
-            color: #fff;
-            border-color: #42B1CE;
-            transform: scale(1.05);
-        }
-        .home-categories-scroll {
-            width: 100%;
-            max-width: 100%;
-            min-width: 0;
-            overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
-            scroll-snap-type: x mandatory;
-            scroll-padding-inline: 0.5rem;
-            scrollbar-width: auto;
-            scrollbar-color: #42B1CE rgba(0, 0, 0, 0.08);
-            cursor: grab;
-        }
-        .home-categories-scroll:active {
-            cursor: grabbing;
-        }
-        .home-categories-scroll::-webkit-scrollbar {
-            height: 10px;
-        }
-        .home-categories-scroll::-webkit-scrollbar-thumb {
-            background: rgba(66, 177, 206, 0.45);
-            border-radius: 10px;
-        }
-        .home-categories-scroll::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.04);
-            border-radius: 10px;
-        }
-        .home-categories-card-link {
-            scroll-snap-align: start;
-            width: 9.25rem;
-            min-width: 9.25rem;
-            max-width: 10rem;
-        }
-        @media (min-width: 576px) {
-            .home-categories-card-link {
-                width: 10rem;
-                min-width: 10rem;
-                max-width: 11rem;
-            }
-        }
-        /* PC (lg+) : au moins 6 cartes visibles sans scroll quand il y en a assez */
-        @media (min-width: 992px) {
-            .home-categories-scroll {
-                scrollbar-gutter: stable;
-            }
-            .home-categories-card-link {
-                --home-cat-gap: 1rem;
-                flex: 0 0 calc((100% - 5 * var(--home-cat-gap)) / 6);
-                width: calc((100% - 5 * var(--home-cat-gap)) / 6);
-                min-width: calc((100% - 5 * var(--home-cat-gap)) / 6);
-                max-width: calc((100% - 5 * var(--home-cat-gap)) / 6);
-            }
-        }
-        .home-category-tile {
-            min-height: 118px;
-        }
-        .home-category-thumb-wrap {
-            width: 64px;
-            height: 64px;
-        }
-        .home-category-thumb {
-            width: 64px;
-            height: 64px;
-            object-fit: cover;
-            object-position: center;
-        }
-        .home-category-fallback-icon {
-            color: #42B1CE;
-        }
-        .category-card {
-            transition: all 0.3s ease;
-        }
-        .category-card:hover {
-            transform: translateY(-5px);
-            background-color: #f8fdff;
-            border: 1px solid #42B1CE !important;
-        }
-        .annonce-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .annonce-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
-        }
-        
-        /* Customisation Pagination pour Bootstrap 5 */
-        .pagination {
-            margin-bottom: 0;
-            gap: 5px;
-        }
-        .page-item.active .page-link {
-            background-color: #42B1CE;
-            border-color: #42B1CE;
-            border-radius: 50%;
-        }
-        .page-link {
-            border: none;
-            color: #42B1CE;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        @media (max-width: 576px) {
-            .page-link {
-                width: 35px;
-                height: 35px;
-                font-size: 0.875rem;
-            }
-        }
-        
-        /* Responsive utilities */
-        @media (max-width: 768px) {
-            .display-6 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
 
     <script>
         (function () {
-            var el = document.getElementById('home-categories-scroll');
-            if (!el) return;
-            var step = function () {
-                var card = el.querySelector('.home-categories-card-link');
-                if (!card) return 280;
-                return Math.round(card.getBoundingClientRect().width + 16);
-            };
-            document.querySelector('.home-cat-prev')?.addEventListener('click', function () {
-                el.scrollBy({ left: -step(), behavior: 'smooth' });
+            var heroForm = document.getElementById('home-search-form');
+            if (!heroForm) return;
+            heroForm.addEventListener('submit', function () {
+                if (!window.matchMedia('(max-width: 767.98px)').matches) return;
+                var catM = document.getElementById('home-cat-m');
+                var cityM = document.getElementById('home-city-m');
+                var catD = document.getElementById('home-cat');
+                var cityD = document.getElementById('home-city');
+                if (catM && catD) catD.value = catM.value;
+                if (cityM && cityD) cityD.value = cityM.value;
             });
-            document.querySelector('.home-cat-next')?.addEventListener('click', function () {
-                el.scrollBy({ left: step(), behavior: 'smooth' });
-            });
-            el.addEventListener('wheel', function (e) {
-                if (el.scrollWidth <= el.clientWidth) return;
-                if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-                e.preventDefault();
-                el.scrollLeft += e.deltaY;
-            }, { passive: false });
         })();
     </script>
 

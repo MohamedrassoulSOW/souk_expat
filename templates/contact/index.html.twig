@@ -5,19 +5,17 @@
 {% block body %}
 {{ include('layouts/navBar.html.twig') }}
 
-{# En-tête pleine largeur (charte #42B1CE, comme FAQ / À propos) #}
-<header class="contact-page-hero text-white">
-    <div class="container py-5 pb-lg-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-9 col-xl-8 text-center">
-                <span class="contact-hero-badge text-uppercase small fw-semibold">Contact</span>
-                <h1 class="display-5 fw-bold mt-3 mb-3">Une question ? Écrivez-nous</h1>
-                <p class="lead mb-0 opacity-90 px-md-3">
-                    Notre équipe répond en général sous <strong class="text-white">24 à 48 h ouvrées</strong>.
-                    Vous pouvez aussi consulter la <a href="{{ path('app_faq') }}" class="text-white fw-semibold text-decoration-underline">FAQ</a>
-                    avant d’envoyer votre message.
-                </p>
-            </div>
+{# En-tête pleine largeur #}
+<header class="page-hero">
+    <div class="container">
+        <div class="page-hero__inner">
+            <span class="page-hero__badge">Contact</span>
+            <h1 class="page-hero__title">Une question ? Écrivez-nous</h1>
+            <p class="page-hero__lead">
+                Notre équipe répond en général sous <strong>24 à 48 h ouvrées</strong>.
+                Vous pouvez aussi consulter la <a href="{{ path('app_faq') }}">FAQ</a>
+                avant d’envoyer votre message.
+            </p>
         </div>
     </div>
 </header>
@@ -136,22 +134,6 @@
 </section>
 
 <style>
-    .contact-page-hero {
-        background: linear-gradient(135deg, #42B1CE 0%, #2a8da7 100%);
-        border-bottom-left-radius: 28px;
-        border-bottom-right-radius: 28px;
-        box-shadow: 0 14px 40px rgba(66, 177, 206, 0.25);
-        margin-bottom: 0;
-    }
-    .contact-hero-badge {
-        display: inline-block;
-        letter-spacing: 2px;
-        padding: 8px 18px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.18);
-        border: 1px solid rgba(255, 255, 255, 0.28);
-        font-size: 0.72rem;
-    }
     .contact-page-body {
         background: linear-gradient(180deg, #f4fafc 0%, #f8f9fa 40%, #fff 100%);
         padding-bottom: 3rem;

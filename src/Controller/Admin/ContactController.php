@@ -6,6 +6,7 @@ use App\Entity\Contact;
 use App\Repository\ContactRepository;
 use App\Repository\UserRepository;
 use App\Service\NotificationService;
+use App\Service\PlatformMailer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,6 @@ final class ContactController extends AbstractController
     public function index(ContactRepository $contactRepository): Response
     {
         return $this->render('admin/contact/index.html.twig', [
-            // On récupère les messages du plus récent au plus ancien
             'contacts' => $contactRepository->findBy([], ['createdAt' => 'DESC']),
         ]);
     }
@@ -37,7 +37,6 @@ final class ContactController extends AbstractController
     #[Route('/{id}/toggle', name: 'app_admin_contact_toggle', methods: ['POST'])]
     public function toggleProcessed(Contact $contact, EntityManagerInterface $entityManager): Response
     {
-        // On inverse le statut actuel
         $contact->setIsProcessed(!$contact->isProcessed());
         $entityManager->flush();
 
@@ -57,35 +56,48 @@ final class ContactController extends AbstractController
         return $this->redirectToRoute('app_admin_contact_index');
     }
 
-        // Dans votre Controller de réponse
-public function reply(Contact $contact, Request $request, UserRepository $userRepo, NotificationService $notifService, EntityManagerInterface $em): Response 
-{
-    // On récupère le contenu du textarea (le nom doit être identique au 'name' dans Twig)
-    $replyContent = $request->request->get('reply_message');
+    #[Route('/{id}/reply', name: 'app_admin_contact_reply', methods: ['POST'])]
+    public function reply(
+        Contact $contact,
+        Request $request,
+        UserRepository $userRepo,
+        NotificationService $notifService,
+        PlatformMailer $platformMailer,
+        EntityManagerInterface $em,
+    ): Response {
+        $replyContent = trim((string) $request->request->get('reply_message', ''));
 
-    // On cherche l'utilisateur par l'email du contact
-    $user = $userRepo->findOneBy(['email' => $contact->getEmail()]);
+        if ($replyContent === '') {
+            $this->addFlash('error', 'Le message de réponse est vide.');
 
-    if ($user && !empty($replyContent)) {
-        // C'est ici qu'on fait la "traduction" :
-        // Le 'subject' du contact devient le 'title' de la notification
-        $titleForNotif = "Réponse à votre message : " . $contact->getSubject();
+            return $this->redirectToRoute('app_admin_contact_show', ['id' => $contact->getId()]);
+        }
 
-        $notifService->notifyUser(
-            $user, 
-            $titleForNotif, // Remplira le champ 'title' en base
-            $replyContent    // Remplira le champ 'message' en base
+        $sent = $platformMailer->sendContactReply(
+            (string) $contact->getEmail(),
+            (string) $contact->getName(),
+            (string) $contact->getSubject(),
+            $replyContent,
         );
+
+        $user = $userRepo->findOneBy(['email' => $contact->getEmail()]);
+        if ($user) {
+            $notifService->notifyUser(
+                $user,
+                'Réponse à votre message : ' . $contact->getSubject(),
+                $replyContent,
+            );
+        }
 
         $contact->setIsProcessed(true);
         $em->flush();
 
-        $this->addFlash('success', 'La notification a été envoyée à ' . $user->getFirstName());
-    } else {
-        $this->addFlash('error', 'Impossible d\'envoyer : utilisateur non trouvé ou message vide.');
+        if ($sent) {
+            $this->addFlash('success', 'Réponse envoyée par e-mail depuis contact@soukexpat.com.');
+        } else {
+            $this->addFlash('warning', 'Réponse enregistrée, mais l’e-mail n’a pas pu être envoyé. Vérifiez MAILER_DSN.');
+        }
+
+        return $this->redirectToRoute('app_admin_contact_show', ['id' => $contact->getId()]);
     }
-
-    return $this->redirectToRoute('app_admin_contact_show', ['id' => $contact->getId()]);
-}
-
 }

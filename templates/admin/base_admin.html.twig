@@ -1,47 +1,97 @@
 {% extends 'base.html.twig' %}
 
-{# Même coque que le tableau de bord : menu latéral, offcanvas mobile, zone principale alignée. #}
 {% block body_attributes %} class="dashboard-admin-page"{% endblock %}
 
 {% block body %}
-<div class="offcanvas offcanvas-start" tabindex="-1" id="adminMenuOffcanvas" aria-labelledby="adminMenuOffcanvasLabel">
-    <div class="offcanvas-header border-bottom py-3">
-        <div>
-            <h5 class="offcanvas-title fw-bold mb-0" id="adminMenuOffcanvasLabel" style="color: #42B1CE;">Expat Souk</h5>
-            <p class="small text-muted mb-0 font-monospace" style="font-size: 0.7rem;">ADMINISTRATION</p>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer le menu"></button>
-    </div>
-    <div class="offcanvas-body p-0 d-flex flex-column">
-        <div class="flex-grow-1 overflow-y-auto p-3">
-            {{ include('admin/_sidebar_nav_content.html.twig') }}
-        </div>
-    </div>
-</div>
-
 <div class="container-fluid p-0 dashboard-shell">
-    <header class="d-md-none sticky-top bg-white border-bottom shadow-sm py-2 px-3 d-flex align-items-center gap-2 dashboard-mobile-header">
-        <button class="btn btn-outline-primary rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 p-0"
-                type="button"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#adminMenuOffcanvas"
-                aria-controls="adminMenuOffcanvas"
-                style="width: 44px; height: 44px;"
-                aria-label="Ouvrir le menu">
-            <i class="bi bi-list fs-3" aria-hidden="true"></i>
-        </button>
-        <span class="fw-bold text-truncate flex-grow-1" style="color: #42B1CE;">{% block admin_mobile_title %}Administration{% endblock %}</span>
-        <a href="{{ path('app_home') }}" class="btn btn-light border rounded-pill btn-sm flex-shrink-0" title="Accueil site">
-            <i class="bi bi-house-door" aria-hidden="true"></i>
-        </a>
+    {# ——— En-tête + menu déroulant (mobile uniquement) ——— #}
+    <header class="d-md-none sticky-top dashboard-mobile-header">
+        <div class="bg-white border-bottom shadow-sm px-3 py-2">
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ path('app_dashboard') }}" class="flex-shrink-0 text-decoration-none" title="Tableau de bord">
+                    <img src="{{ asset('logo-souk-expat-nav.png') }}" alt="SoukExpat" width="110" height="34" class="admin-mobile-logo" decoding="async">
+                </a>
+                <div class="min-w-0 flex-grow-1">
+                    <div class="admin-mobile-kicker">Administration</div>
+                    <div class="fw-bold text-truncate admin-mobile-title">{% block admin_mobile_title %}Menu{% endblock %}</div>
+                </div>
+                <button class="btn admin-menu-toggle flex-shrink-0"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#adminMobileDropdown"
+                        aria-expanded="false"
+                        aria-controls="adminMobileDropdown"
+                        id="adminMenuToggleBtn">
+                    <i class="bi bi-list admin-menu-toggle__icon-open" aria-hidden="true"></i>
+                    <i class="bi bi-x-lg admin-menu-toggle__icon-close d-none" aria-hidden="true"></i>
+                    <span class="admin-menu-toggle__label">Menu</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="collapse admin-mobile-dropdown" id="adminMobileDropdown">
+            <div class="admin-mobile-dropdown__panel">
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                    <span class="small fw-bold text-uppercase text-muted" style="letter-spacing: .06em;">Navigation</span>
+                    <button type="button" class="btn btn-sm btn-light border rounded-pill px-3"
+                            data-bs-toggle="collapse" data-bs-target="#adminMobileDropdown"
+                            aria-label="Fermer le menu">
+                        Fermer
+                    </button>
+                </div>
+                {{ include('admin/_sidebar_nav_content.html.twig', { nav_mobile: true }) }}
+            </div>
+        </div>
     </header>
 
     <div class="row g-0 align-items-stretch dashboard-main-row">
         {{ include('admin/_sidebar.html.twig') }}
 
-        <main class="col-12 col-md-9 col-lg-10 bg-light dashboard-main custom-scrollbar p-3 p-sm-4 min-vh-100">
+        <main class="col-12 col-md-9 col-lg-10 dashboard-main custom-scrollbar p-3 p-sm-4">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label == 'error' ? 'danger' : label }} border-0 shadow-sm rounded-3 alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
             {% block admin_main %}{% endblock %}
         </main>
     </div>
 </div>
+
+<script>
+(function () {
+    var menu = document.getElementById('adminMobileDropdown');
+    var btn = document.getElementById('adminMenuToggleBtn');
+    if (!menu || !btn) return;
+
+    var iconOpen = btn.querySelector('.admin-menu-toggle__icon-open');
+    var iconClose = btn.querySelector('.admin-menu-toggle__icon-close');
+    var label = btn.querySelector('.admin-menu-toggle__label');
+
+    function setOpen(open) {
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.classList.toggle('is-open', open);
+        if (iconOpen) iconOpen.classList.toggle('d-none', open);
+        if (iconClose) iconClose.classList.toggle('d-none', !open);
+        if (label) label.textContent = open ? 'Fermer' : 'Menu';
+        document.body.classList.toggle('admin-mobile-menu-open', open);
+    }
+
+    menu.addEventListener('show.bs.collapse', function () { setOpen(true); });
+    menu.addEventListener('hide.bs.collapse', function () { setOpen(false); });
+
+    menu.querySelectorAll('[data-admin-nav-link]').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.bootstrap && bootstrap.Collapse) {
+                var instance = bootstrap.Collapse.getInstance(menu);
+                if (instance) instance.hide();
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}

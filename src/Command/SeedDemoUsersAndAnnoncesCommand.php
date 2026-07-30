@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\Annonce;
+use App\Entity\AnnonceImage;
 use App\Entity\Category;
 use App\Entity\City;
 use App\Entity\User;
@@ -18,17 +19,22 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(
     name: 'app:demo:seed-users-and-annonces',
-    description: 'Crée 5 comptes utilisateurs, 1 administrateur et au moins 30 annonces validées (données de démo).',
+    description: 'Crée 10 comptes utilisateurs et au moins 10 annonces validées par compte (avec images téléchargées).',
 )]
 final class SeedDemoUsersAndAnnoncesCommand extends Command
 {
     private const string DEMO_PASSWORD = 'DemoSouk2026!';
 
-    private const int MIN_ANNONCES = 30;
+    private const int USER_COUNT = 10;
+
+    private const int ANNONCES_PER_USER = 10;
 
     /** @var list<string> */
     private const array USER_EMAILS = [
@@ -37,9 +43,99 @@ final class SeedDemoUsersAndAnnoncesCommand extends Command
         'utilisateur3@souk-demo.local',
         'utilisateur4@souk-demo.local',
         'utilisateur5@souk-demo.local',
+        'utilisateur6@souk-demo.local',
+        'utilisateur7@souk-demo.local',
+        'utilisateur8@souk-demo.local',
+        'utilisateur9@souk-demo.local',
+        'utilisateur10@souk-demo.local',
     ];
 
     private const string ADMIN_EMAIL = 'admin@souk-demo.local';
+
+    /**
+     * Images Unsplash libres (hotlink CDN) — une URL par type de produit.
+     *
+     * @var list<array{title: string, description: string, image: string}>
+     */
+    private const array PRODUCT_TEMPLATES = [
+        [
+            'title' => 'Canapé 2 places',
+            'description' => 'Canapé compact, bon état général. Idéal petit salon.',
+            'image' => 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Vélo ville',
+            'description' => 'Vélo avec panier et éclairage. Révision récente.',
+            'image' => 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Micro-ondes',
+            'description' => 'Fonctionne parfaitement, quelques traces d\'usage.',
+            'image' => 'https://images.unsplash.com/photo-1585659722983-3a675dabf23d?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Bureau en bois',
+            'description' => 'Plateau 120x60 cm, pieds réglables.',
+            'image' => 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Chaise de bureau',
+            'description' => 'Assise confortable, roulettes OK.',
+            'image' => 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Lampe sur pied',
+            'description' => 'Abat-jour inclus, ampoule LED.',
+            'image' => 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Table basse',
+            'description' => 'Style scandinave, plateau verre.',
+            'image' => 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Étagère 5 niveaux',
+            'description' => 'Montage simple, stable.',
+            'image' => 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Machine à laver',
+            'description' => '7 kg, programmes variés.',
+            'image' => 'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Télé 43 pouces',
+            'description' => 'Smart TV, télécommande d\'origine.',
+            'image' => 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Réfrigérateur',
+            'description' => 'Classe A+, compartiment freezer.',
+            'image' => 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Aspirateur',
+            'description' => 'Sac inclus, filtre HEPA.',
+            'image' => 'https://images.unsplash.com/photo-1558317374-067fb5f30001?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Matelas 140x190',
+            'description' => 'Fermeté moyenne, housse lavable.',
+            'image' => 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Guitare acoustique',
+            'description' => 'Cordes neuves, housse fournie.',
+            'image' => 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=800&h=600&fit=crop&q=80',
+        ],
+        [
+            'title' => 'Trottinette électrique',
+            'description' => 'Autonomie environ 20 km.',
+            'image' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop&q=80',
+        ],
+    ];
+
+    private readonly HttpClientInterface $httpClient;
 
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -47,8 +143,18 @@ final class SeedDemoUsersAndAnnoncesCommand extends Command
         private readonly CityRepository $cityRepository,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly EntityManagerInterface $entityManager,
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir,
+        ?HttpClientInterface $httpClient = null,
     ) {
         parent::__construct();
+        $this->httpClient = $httpClient ?? HttpClient::create([
+            'timeout' => 30,
+            'headers' => [
+                'User-Agent' => 'SoukExpatDemoSeeder/1.0',
+                'Accept' => 'image/*,*/*',
+            ],
+        ]);
     }
 
     protected function configure(): void
@@ -82,6 +188,13 @@ final class SeedDemoUsersAndAnnoncesCommand extends Command
             $this->removeExistingDemoUsers($demoEmails);
         }
 
+        $uploadDir = $this->projectDir . '/public/uploads/annonces';
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+            $io->error('Impossible de créer le dossier uploads/annonces.');
+
+            return Command::FAILURE;
+        }
+
         $categories = $this->ensureCategories($io);
         $cities = $this->ensureCities($io);
 
@@ -91,61 +204,111 @@ final class SeedDemoUsersAndAnnoncesCommand extends Command
         }
         $this->entityManager->flush();
 
-        $owners = array_values($users);
-        $nOwners = \count($owners);
+        $regularUsers = array_slice($users, 0, self::USER_COUNT);
         $nCategories = \count($categories);
         $nCities = \count($cities);
-
-        $templates = [
-            ['Canapé 2 places', 'Canapé compact, bon état général. Idéal petit salon.'],
-            ['Vélo ville', 'Vélo avec panier et éclairage. Révision récente.'],
-            ['Micro-ondes', 'Fonctionne parfaitement, quelques traces d\'usage.'],
-            ['Bureau en bois', 'Plateau 120x60 cm, pieds réglables.'],
-            ['Chaise de bureau', 'Assise confortable, roulettes OK.'],
-            ['Lampe sur pied', 'Abat-jour inclus, ampoule LED.'],
-            ['Table basse', 'Style scandinave, plateau verre.'],
-            ['Étagère 5 niveaux', 'Montage simple, stable.'],
-            ['Machine à laver', '7 kg, programmes variés.'],
-            ['Télé 43 pouces', 'Smart TV, télécommande d\'origine.'],
-        ];
+        $nTemplates = \count(self::PRODUCT_TEMPLATES);
 
         $now = new \DateTimeImmutable();
-        for ($i = 1; $i <= self::MIN_ANNONCES; ++$i) {
-            $owner = $owners[($i - 1) % $nOwners];
-            $category = $categories[($i - 1) % $nCategories];
-            $city = $cities[($i - 1) % $nCities];
-            $tpl = $templates[($i - 1) % \count($templates)];
+        $annonceIndex = 0;
+        $imagesDownloaded = 0;
+        $imagesFailed = 0;
 
-            $title = sprintf('%s — annonce démo #%d', $tpl[0], $i);
-            $description = $tpl[1] . ' Annonce générée pour tests sur Souk Expat.';
+        $io->progressStart(self::USER_COUNT * self::ANNONCES_PER_USER);
 
-            $annonce = new Annonce();
-            $annonce->setTitle($title);
-            $annonce->setDescription($description);
-            $annonce->setPrice(10.0 + ($i * 7.5));
-            $annonce->setPhone(sprintf('06%08d', 10000000 + $i));
-            $annonce->setUser($owner);
-            $annonce->setCategory($category);
-            $annonce->setCity($city);
-            $annonce->setStatus(Annonce::STATUS_APPROVED);
-            $annonce->setApprovedAt($now->modify(sprintf('-%d days', ($i - 1) % 20)));
+        foreach ($regularUsers as $ownerIndex => $owner) {
+            for ($j = 1; $j <= self::ANNONCES_PER_USER; ++$j) {
+                ++$annonceIndex;
+                $tpl = self::PRODUCT_TEMPLATES[($annonceIndex - 1) % $nTemplates];
+                $category = $categories[($annonceIndex - 1) % $nCategories];
+                $city = $cities[($annonceIndex - 1) % $nCities];
 
-            $this->entityManager->persist($annonce);
+                $title = sprintf('%s — démo u%d #%d', $tpl['title'], $ownerIndex + 1, $j);
+                $description = $tpl['description'] . ' Annonce générée pour tests sur Souk Expat.';
+
+                $annonce = new Annonce();
+                $annonce->setTitle($title);
+                $annonce->setDescription($description);
+                $annonce->setPrice(10.0 + ($annonceIndex * 7.5));
+                $annonce->setPhone('');
+                $annonce->setUser($owner);
+                $annonce->setCategory($category);
+                $annonce->setCity($city);
+                $annonce->setStatus(Annonce::STATUS_APPROVED);
+                $annonce->setApprovedAt($now->modify(sprintf('-%d days', ($annonceIndex - 1) % 20)));
+
+                $this->entityManager->persist($annonce);
+
+                $filename = $this->downloadProductImage($tpl['image'], $uploadDir, $annonceIndex);
+                if ($filename !== null) {
+                    $annonceImage = new AnnonceImage();
+                    $annonceImage->setImadeName($filename);
+                    $annonceImage->setAnnonce($annonce);
+                    $this->entityManager->persist($annonceImage);
+                    ++$imagesDownloaded;
+                } else {
+                    ++$imagesFailed;
+                }
+
+                $io->progressAdvance();
+            }
+
+            $this->entityManager->flush();
         }
 
-        $this->entityManager->flush();
+        $io->progressFinish();
 
         $io->success(sprintf(
-            'Comptes créés : 5 utilisateurs + 1 admin. Mot de passe commun : %s',
+            'Comptes créés : %d utilisateurs + 1 admin. Mot de passe commun : %s',
+            self::USER_COUNT,
             self::DEMO_PASSWORD,
         ));
         $io->listing([
             'Admin : ' . self::ADMIN_EMAIL,
             ...array_map(static fn (string $e): string => 'Utilisateur : ' . $e, self::USER_EMAILS),
         ]);
-        $io->note(sprintf('%d annonces validées ont été créées.', self::MIN_ANNONCES));
+        $io->note(sprintf(
+            '%d annonces validées créées (%d par utilisateur). Images téléchargées : %d%s',
+            self::USER_COUNT * self::ANNONCES_PER_USER,
+            self::ANNONCES_PER_USER,
+            $imagesDownloaded,
+            $imagesFailed > 0 ? sprintf(' (%d échecs)', $imagesFailed) : '',
+        ));
 
         return Command::SUCCESS;
+    }
+
+    private function downloadProductImage(string $url, string $uploadDir, int $index): ?string
+    {
+        try {
+            $response = $this->httpClient->request('GET', $url);
+            if ($response->getStatusCode() !== 200) {
+                return null;
+            }
+
+            $content = $response->getContent();
+            if ($content === '') {
+                return null;
+            }
+
+            $contentType = $response->getHeaders(false)['content-type'][0] ?? 'image/jpeg';
+            $ext = match (true) {
+                str_contains($contentType, 'png') => 'png',
+                str_contains($contentType, 'webp') => 'webp',
+                str_contains($contentType, 'gif') => 'gif',
+                default => 'jpg',
+            };
+
+            $filename = sprintf('demo_%d_%s.%s', $index, bin2hex(random_bytes(4)), $ext);
+            $path = $uploadDir . '/' . $filename;
+            if (file_put_contents($path, $content) === false) {
+                return null;
+            }
+
+            return $filename;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**
@@ -153,12 +316,24 @@ final class SeedDemoUsersAndAnnoncesCommand extends Command
      */
     private function removeExistingDemoUsers(array $emails): void
     {
+        $uploadDir = $this->projectDir . '/public/uploads/annonces/';
+
         foreach ($emails as $email) {
             $user = $this->userRepository->findOneBy(['email' => $email]);
             if ($user === null) {
                 continue;
             }
             foreach ($user->getAnnonces() as $annonce) {
+                foreach ($annonce->getAnnonceImages() as $image) {
+                    $name = $image->getImadeName();
+                    if ($name !== null && $name !== '') {
+                        $path = $uploadDir . $name;
+                        if (is_file($path)) {
+                            @unlink($path);
+                        }
+                    }
+                    $this->entityManager->remove($image);
+                }
                 $this->entityManager->remove($annonce);
             }
             $this->entityManager->remove($user);
@@ -224,8 +399,8 @@ final class SeedDemoUsersAndAnnoncesCommand extends Command
      */
     private function createDemoUsers(): array
     {
-        $firstNames = ['Amine', 'Sara', 'Youssef', 'Lina', 'Omar', 'Admin'];
-        $lastNames = ['Alami', 'Benali', 'Idrissi', 'Cherkaoui', 'Fassi', 'Souk'];
+        $firstNames = ['Amine', 'Sara', 'Youssef', 'Lina', 'Omar', 'Nadia', 'Karim', 'Ines', 'Hicham', 'Salma'];
+        $lastNames = ['Alami', 'Benali', 'Idrissi', 'Cherkaoui', 'Fassi', 'Tazi', 'Bennani', 'Amrani', 'Kadiri', 'Lahsini'];
 
         $users = [];
         foreach (self::USER_EMAILS as $idx => $email) {
@@ -240,8 +415,8 @@ final class SeedDemoUsersAndAnnoncesCommand extends Command
 
         $admin = new User();
         $admin->setEmail(self::ADMIN_EMAIL);
-        $admin->setFirstName($firstNames[5]);
-        $admin->setLastName($lastNames[5]);
+        $admin->setFirstName('Admin');
+        $admin->setLastName('Souk');
         $admin->setRoles(['ROLE_ADMIN']);
         $admin->setPassword($this->passwordHasher->hashPassword($admin, self::DEMO_PASSWORD));
         $users[] = $admin;

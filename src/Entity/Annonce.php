@@ -19,9 +19,6 @@ class Annonce
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
 
-    /** Durée pendant laquelle une annonce validée reste visible avant suppression automatique. */
-    public const APPROVED_VISIBLE_DAYS = 30;
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -42,8 +39,12 @@ class Annonce
     #[ORM\Column(length: 50)]
     private string $status;
 
-    #[ORM\Column(length: 30)]
-    private string $phone;
+    /**
+     * Conservé en base pour compatibilité ; non collecté ni affiché sur le site web
+     * (contact via messagerie — téléphone réservé aux futures apps mobiles).
+     */
+    #[ORM\Column(length: 30, options: ['default' => ''])]
+    private string $phone = '';
 
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
@@ -51,7 +52,7 @@ class Annonce
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    /** Date à laquelle l’admin a accepté l’annonce ; sert au calcul des 30 jours en ligne. */
+    /** Date à laquelle l’admin a accepté l’annonce. */
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $approvedAt = null;
 
@@ -81,6 +82,7 @@ class Annonce
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->status = self::STATUS_DRAFT;
+        $this->phone = '';
         $this->annonceImages = new ArrayCollection();
         $this->threadsAsAnnonce = new ArrayCollection();
     }
@@ -109,8 +111,17 @@ class Annonce
     public function getStatus(): string { return $this->status; }
     public function setStatus(string $status): self { $this->status = $status; return $this; }
 
-    public function getPhone(): string { return $this->phone; }
-    public function setPhone(string $phone): self { $this->phone = $phone; return $this; }
+    public function getPhone(): string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): self
+    {
+        $this->phone = trim($phone);
+
+        return $this;
+    }
 
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
     public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }

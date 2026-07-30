@@ -1,0 +1,16 @@
+{% extends 'emails/_layout.html.twig' %}
+
+{% block title %}Nouveau message contact{% endblock %}
+
+{% block body %}
+    <h2>Nouveau message via le formulaire contact</h2>
+    <p>Un visiteur a écrit à SoukExpat. Vous pouvez répondre directement à cet e-mail (Reply-To = expéditeur).</p>
+    <div class="meta">
+        <strong>Nom :</strong> {{ contact.name }}<br>
+        <strong>E-mail :</strong> <a href="mailto:{{ contact.email }}">{{ contact.email }}</a><br>
+        <strong>Sujet :</strong> {{ contact.subject }}<br>
+        <strong>Date :</strong> {{ contact.createdAt|date('d/m/Y H:i') }}
+    </div>
+    <p><strong>Message :</strong></p>
+    <p>{{ contact.message|nl2br }}</p>
+{% endblock %}

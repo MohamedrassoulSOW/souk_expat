@@ -1,11 +1,8 @@
 <nav class="navbar navbar-expand-lg fixed-top modern-nav">
     <div class="container">
         {# 1. LOGO & BRAND #}
-        <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-decoration-none" href="{{ path('app_home') }}" title="Expat Souk — Accueil">
-            <span class="brand-logo-circle" aria-hidden="true">
-                <img src="{{ asset('logo-souk-expat.png') }}" alt="" width="44" height="44" decoding="async" fetchpriority="high">
-            </span>
-            <span class="brand-text">Expat<span class="text-cyan-nav">Souk</span></span>
+        <a class="navbar-brand brand-logo-link d-flex align-items-center text-decoration-none" href="{{ path('app_home') }}" title="SoukExpat — Accueil">
+            <img class="brand-logo-img" src="{{ asset('logo-souk-expat-nav.png') }}" alt="SoukExpat — Le Marché Mondial des Expatriés" width="170" height="52" decoding="async" fetchpriority="high">
         </a>
 
         {# BOUTON MOBILE #}
@@ -21,7 +18,7 @@
                     <a class="nav-link {{ route == 'app_home' ? 'active' : '' }}" href="{{ path('app_home') }}">Accueil</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ route == 'app_annonce_index' ? 'active' : '' }}" href="{{ path('app_annonce_index') }}">Annonces</a>
+                    <a class="nav-link {{ route == 'app_annonce_index' or route == 'app_annonce_category' ? 'active' : '' }}" href="{{ path('app_annonce_index') }}">Annonces</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ route == 'app_about' ? 'active' : '' }}" href="{{ path('app_about') }}">À propos</a>
@@ -36,11 +33,12 @@
                 {% if app.user %}
                     
                     {# --- DROPDOWN NOTIFICATIONS --- #}
+                    {% set unreadNotifsCount = unread_notifications_count() %}
+                    {% set latestNotifs = latest_notifications(8) %}
                     <div class="dropdown">
                         <a href="#" class="nav-icon-link position-relative d-flex align-items-center justify-content-center" 
                            id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-bell fs-5"></i>
-                            {% set unreadNotifsCount = app.user.notifications|filter(n => not n.isRead)|length %}
                             {% if unreadNotifsCount > 0 %}
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.6rem; transform: translate(-45%, 15%) !important;">
                                     {{ unreadNotifsCount }}
@@ -50,7 +48,7 @@
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-3 p-2 rounded-4 animate slideIn" style="width: 320px;">
                             <li class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="mb-0 fw-bold">Notifications</h6>
-                                {% if app.user.notifications|length > 0 %}
+                                {% if latestNotifs|length > 0 %}
                                     <a href="{{ path('app_notification_delete_all') }}" class="text-danger small text-decoration-none" title="Tout supprimer">
                                         <i class="bi bi-trash3"></i>
                                     </a>
@@ -58,14 +56,13 @@
                             </li>
                             
                             <div class="notif-scroll" style="max-height: 350px; overflow-y: auto;">
-                                {% for notification in app.user.notifications|reverse %}
+                                {% for notification in latestNotifs %}
                                     <li class="px-2">
                                         <a href="{{ path('app_notification_read', {id: notification.id}) }}" 
                                            class="dropdown-item rounded-3 py-3 mb-1 {{ not notification.isRead ? 'bg-light border-start border-info border-3' : 'opacity-75' }}" 
                                            style="white-space: normal;">
                                             <div class="d-flex gap-2">
                                                 <div class="flex-grow-1">
-                                                    {# Utilisation de .message car c'est le standard Symfony courant #}
                                                     <div class="small text-dark mb-1 fw-medium">
                                                         {{ notification.message|default('Nouvelle notification') }}
                                                     </div>
@@ -104,7 +101,7 @@
                         <i class="bi bi-chat-dots fs-5"></i>
                         {% set msgCount = unread_messages_count() %}
                         {% if msgCount > 0 %}
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill shadow-sm" style="font-size: 0.6rem; background-color: #42B1CE !important; transform: translate(-45%, 15%) !important;">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill shadow-sm" style="font-size: 0.6rem; background-color: var(--cyan-main) !important; transform: translate(-45%, 15%) !important;">
                                 {{ msgCount }}
                             </span>
                         {% endif %}
@@ -150,10 +147,10 @@
 
 <style>
     :root {
-        --cyan-main: #42B1CE;
-        --cyan-hover: #369ab3;
+        --cyan-main: #4B79A1;
+        --cyan-hover: #1B2E4B;
         /* Hauteur réservée sous la navbar fixe (logo + padding — évite chevauchement du slider / héros) */
-        --main-nav-height: 5rem;
+        --main-nav-height: 5.25rem;
     }
     body {
         padding-top: var(--main-nav-height);
@@ -186,37 +183,53 @@
     .modern-nav .actions-container {
         flex-shrink: 0;
     }
-    .brand-logo-circle {
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        overflow: hidden;
-        flex-shrink: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: #fff;
-        border: 2px solid rgba(66, 177, 206, 0.32);
-        box-shadow: 0 2px 12px rgba(66, 177, 206, 0.18);
+    .brand-logo-link {
+        line-height: 0;
+        padding: 0.1rem 0;
     }
-    .brand-logo-circle img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
+    .brand-logo-img {
         display: block;
+        height: 52px;
+        width: auto;
+        max-width: min(170px, 42vw);
+        object-fit: contain;
+        object-position: left center;
     }
-    .brand-text { font-size: 1.4rem; letter-spacing: -0.5px; color: #2d3436; white-space: nowrap; }
     @media (max-width: 991.98px) {
-        .brand-logo-circle {
-            width: 42px;
-            height: 42px;
+        .brand-logo-img {
+            height: 44px;
+            max-width: min(148px, 48vw);
         }
-        .brand-text { font-size: 1.15rem; letter-spacing: -0.3px; }
     }
     .text-cyan-nav { color: var(--cyan-main); }
-    .nav-links-container .nav-link { color: #636e72; font-weight: 500; margin: 0 10px; transition: 0.2s; }
-    .nav-links-container .nav-link:hover, .nav-links-container .nav-link.active { color: var(--cyan-main); }
+    .nav-links-container .nav-link {
+        color: #636e72;
+        font-weight: 600;
+        margin: 0 8px;
+        padding: 0.45rem 0.35rem;
+        transition: color 0.2s ease;
+        position: relative;
+    }
+    .nav-links-container .nav-link::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        width: 0;
+        height: 2px;
+        background: var(--cyan-main);
+        border-radius: 2px;
+        transform: translateX(-50%);
+        transition: width 0.2s ease;
+    }
+    .nav-links-container .nav-link:hover,
+    .nav-links-container .nav-link.active {
+        color: var(--cyan-main);
+    }
+    .nav-links-container .nav-link:hover::after,
+    .nav-links-container .nav-link.active::after {
+        width: 70%;
+    }
     .nav-icon-link { color: #636e72; width: 42px; height: 42px; text-decoration: none; border-radius: 50%; transition: 0.2s; }
     .nav-icon-link:hover { color: var(--cyan-main); background: #f8f9fa; }
     .btn-custom-cyan { background-color: var(--cyan-main); color: white !important; border: none; transition: 0.3s; }

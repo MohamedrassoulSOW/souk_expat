@@ -1,66 +1,67 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Gestion du Slider{% endblock %}
+{% block title %}Slider accueil | SoukExpat{% endblock %}
+{% block admin_mobile_title %}Slider{% endblock %}
 
-{% block body %}
-{{ include('layouts/navBar.html.twig') }}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="{{ path('app_dashboard') }}" class="btn btn-outline-secondary"><i class="bi bi-speedometer2 me-1" aria-hidden="true"></i>Retour dashboard</a>
-        <h1>📸 Gestion du Slider Accueil</h1>
-        <a href="{{ path('admin_slider_new') }}" class="btn btn-outline-primary"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Ajouter une slide</a>
+{% block admin_main %}
+    {% set actions %}
+        <a href="{{ path('admin_slider_new') }}" class="btn btn-admin-primary rounded-pill px-3">
+            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Ajouter une slide
+        </a>
+    {% endset %}
+
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Contenu',
+        title: 'Slider d’accueil',
+        lead: 'Images du carrousel sur la page d’accueil.',
+        actions: actions
+    }) }}
+
+    <div class="admin-panel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small">
+                    <tr>
+                        <th class="ps-3 py-3 border-0">Aperçu</th>
+                        <th class="py-3 border-0">Titre</th>
+                        <th class="py-3 border-0">Statut</th>
+                        <th class="pe-3 py-3 border-0 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for slider in sliders %}
+                        <tr>
+                            <td class="ps-3">
+                                <img src="{{ asset('uploads/sliders/' ~ slider.imageName) }}"
+                                     alt="" class="rounded-3" width="120" height="60" style="object-fit: cover;" loading="lazy">
+                            </td>
+                            <td class="fw-semibold">{{ slider.title|default('Sans titre') }}</td>
+                            <td>
+                                {% if slider.isActive %}
+                                    <span class="badge bg-success rounded-pill">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary rounded-pill">Inactif</span>
+                                {% endif %}
+                            </td>
+                            <td class="pe-3 text-end">
+                                <div class="d-flex flex-wrap justify-content-end gap-1">
+                                    <form method="post" action="{{ path('admin_slider_toggle', {id: slider.id}) }}" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('toggle_slider_' ~ slider.id) }}">
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm btn-icon-action" title="Activer / désactiver" aria-label="Activer ou désactiver"><i class="bi bi-arrow-repeat" aria-hidden="true"></i></button>
+                                    </form>
+                                    <form method="post" action="{{ path('admin_slider_delete', {id: slider.id}) }}"
+                                          onsubmit="return confirm('Supprimer cette image du slider ?');" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ slider.id) }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm btn-icon-action" title="Supprimer" aria-label="Supprimer"><i class="bi bi-trash3" aria-hidden="true"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="4" class="text-center text-muted py-5">Aucune image dans le slider.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <div class="card shadow-sm">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light">
-                <tr>
-                    <th>Aperçu</th>
-                    <th>Titre</th>
-                    <th>Statut</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for slider in sliders %}
-                <tr>
-                    <td>
-                        <img src="{{ asset('uploads/sliders/' ~ slider.imageName) }}" 
-                            alt="" class="rounded" style="width: 120px; height: 60px; object-fit: cover;">
-                    </td>
-                    <td>{{ slider.title|default('Sans titre') }}</td>
-                    <td>
-                        {% if slider.isActive %}
-                            <span class="badge bg-success">Actif</span>
-                        {% else %}
-                            <span class="badge bg-secondary">Inactif</span>
-                        {% endif %}
-                    </td>
-                    <td class="text-end">
-                        <div class="d-flex flex-wrap justify-content-end gap-1" role="group" aria-label="Actions slide {{ slider.id }}">
-                            <form method="post" action="{{ path('admin_slider_toggle', {id: slider.id}) }}" class="d-inline">
-                                <input type="hidden" name="_token" value="{{ csrf_token('toggle_slider_' ~ slider.id) }}">
-                                <button type="submit" class="btn btn-outline-secondary btn-sm" title="Activer ou désactiver la slide">
-                                    <i class="bi bi-arrow-repeat" aria-hidden="true"></i><span class="d-none d-md-inline ms-1">Statut</span>
-                                </button>
-                            </form>
-                            <form method="post" action="{{ path('admin_slider_delete', {id: slider.id}) }}"
-                                  onsubmit="return confirm('Supprimer cette image du slider ?');" class="d-inline">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ slider.id) }}">
-                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer la slide">
-                                    <i class="bi bi-trash3" aria-hidden="true"></i><span class="d-none d-md-inline ms-1">Supprimer</span>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="4" class="text-center py-4 text-muted">Aucune image dans le slider.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
 {% endblock %}

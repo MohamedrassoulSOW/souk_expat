@@ -1,0 +1,17 @@
+{# En-tête pages admin — vars: title, lead?, actions? (HTML), eyebrow? #}
+<div class="admin-page-header">
+    <div class="admin-page-header__copy min-w-0">
+        {% if eyebrow is defined and eyebrow %}
+            <p class="admin-page-header__eyebrow mb-1">{{ eyebrow }}</p>
+        {% endif %}
+        <h1 class="admin-page-header__title">{{ title }}</h1>
+        {% if lead is defined and lead %}
+            <p class="admin-page-header__lead mb-0">{{ lead }}</p>
+        {% endif %}
+    </div>
+    {% if actions is defined and actions %}
+        <div class="admin-page-header__actions">
+            {{ actions|raw }}
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,34 @@
+{% extends 'emails/_layout.html.twig' %}
+
+{% block title %}{% if approved %}Annonce approuvée{% else %}Annonce non validée{% endif %}{% endblock %}
+
+{% block body %}
+    <h2>Bonjour {{ user.firstName|default('') }},</h2>
+
+    {% if approved %}
+        <p>Bonne nouvelle : votre annonce a été <strong>approuvée</strong> et est maintenant visible sur SoukExpat.</p>
+    {% else %}
+        <p>Votre annonce n’a <strong>pas été validée</strong> par notre équipe de modération.</p>
+        <p>Vous pouvez la modifier puis la soumettre à nouveau, ou nous contacter si besoin.</p>
+    {% endif %}
+
+    <div class="meta">
+        <strong>Annonce :</strong> {{ annonce.title }}<br>
+        {% if annonce.price is defined %}
+            <strong>Prix :</strong> {{ annonce.price|number_format(0, ',', ' ') }} MAD<br>
+        {% endif %}
+        {% if annonce.city %}
+            <strong>Ville :</strong> {{ annonce.city.name }}
+        {% endif %}
+    </div>
+
+    {% if approved %}
+        <div class="button-wrapper">
+            <a class="button" href="{{ url('app_annonce_show', { id: annonce.id }) }}">Voir mon annonce</a>
+        </div>
+    {% else %}
+        <div class="button-wrapper">
+            <a class="button" href="{{ url('app_mes_annonces') }}">Mes annonces</a>
+        </div>
+    {% endif %}
+{% endblock %}

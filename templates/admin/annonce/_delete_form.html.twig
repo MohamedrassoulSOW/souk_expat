@@ -1,0 +1,10 @@
+{# Bouton suppression admin — var: annonce #}
+<form method="post"
+      action="{{ path('admin_annonce_delete', { id: annonce.id }) }}"
+      class="d-inline"
+      onsubmit="return confirm('Supprimer définitivement cette annonce ? Cette action est irréversible.');">
+    <input type="hidden" name="_token" value="{{ csrf_token('admin_delete' ~ annonce.id) }}">
+    <button type="submit" class="btn btn-sm btn-outline-danger btn-icon-action" title="Supprimer" aria-label="Supprimer">
+        <i class="bi bi-trash3" aria-hidden="true"></i>
+    </button>
+</form>

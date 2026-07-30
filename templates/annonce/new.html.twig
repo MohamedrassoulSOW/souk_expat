@@ -1,15 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Annonce{% endblock %}
+{% block title %}Déposer une annonce | Expat Souk{% endblock %}
 
 {% block body %}
+{{ include('layouts/navBar.html.twig') }}
 
-    <div class="container mt-4 text-end">
-        <a href="{{ path('app_annonce_index') }}" class="btn btn-outline-secondary btn-sm mb-3">
-            ← Retour aux annonces
+<main class="container pt-4 pt-md-5 mt-2 pb-5">
+    {% set actions %}
+        <a href="{{ path('app_mes_annonces') }}" class="btn btn-outline-secondary rounded-pill px-3">
+            <i class="bi bi-stack me-1" aria-hidden="true"></i> Mes annonces
         </a>
-    </div>
+    {% endset %}
+    {{ include('layouts/_page_header.html.twig', {
+        eyebrow: 'Publier',
+        title_html: 'Déposer une <span class="text-brand">annonce</span>',
+        lead: 'Remplissez les informations ci-dessous. Votre annonce sera visible après validation.',
+        breadcrumbs: [
+            { label: 'Accueil', url: path('app_home') },
+            { label: 'Annonces', url: path('app_annonce_index') },
+            { label: 'Nouvelle annonce' }
+        ],
+        actions: actions
+    }) }}
 
     {{ include('annonce/_form.html.twig') }}
+</main>
 
+{{ include('layouts/footer.html.twig') }}
 {% endblock %}

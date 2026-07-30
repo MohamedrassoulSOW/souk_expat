@@ -66,21 +66,18 @@
             <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
                 <h5 class="fw-bold mb-4">Gestion de l'offre</h5>
                 
-                <div class="d-grid gap-3">
-                    <a href="{{ path('app_annonce_edit', {id: annonce.id}) }}" class="btn btn-custom-cyan rounded-pill py-2 fw-bold shadow-sm">
-                        <i class="bi bi-pencil-square me-2"></i> Modifier
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a href="{{ path('app_annonce_edit', {id: annonce.id}) }}" class="btn btn-custom-cyan btn-icon-action" title="Modifier" aria-label="Modifier">
+                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
                     </a>
-                    
-                    <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" class="btn btn-outline-dark rounded-pill py-2 fw-bold">
-                        <i class="bi bi-eye me-2"></i> Aperçu public
+                    <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" class="btn btn-outline-dark btn-icon-action" title="Aperçu public" aria-label="Aperçu public">
+                        <i class="bi bi-eye" aria-hidden="true"></i>
                     </a>
-
-                    <div class="my-2 border-top"></div>
-
-                    <form method="post" action="{{ path('app_annonce_delete', {id: annonce.id}) }}" onsubmit="return confirm('Supprimer définitivement cette annonce ?');">
+                    <form method="post" action="{{ path('app_annonce_delete', {id: annonce.id}) }}" class="d-inline"
+                          onsubmit="return confirm('Supprimer définitivement cette annonce ?');">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ annonce.id) }}">
-                        <button class="btn btn-link text-danger w-100 text-decoration-none small fw-bold">
-                            <i class="bi bi-trash3 me-2"></i> Supprimer l'annonce
+                        <button type="submit" class="btn btn-outline-danger btn-icon-action" title="Supprimer" aria-label="Supprimer">
+                            <i class="bi bi-trash3" aria-hidden="true"></i>
                         </button>
                     </form>
                 </div>

@@ -16,11 +16,80 @@
     {{ include('layouts/navBar.html.twig') }}
 
     <main class="page-annonces">
-        <div class="container pt-5 mt-4 pb-5">
-            {# --- Recherche --- #}
-            <section class="card border-0 shadow-sm rounded-4 mb-4 annonce-search-panel overflow-hidden" data-animate="fade-up">
-                <div class="card-body p-3 p-md-4">
-                    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-3">
+        <div class="container page-annonces__container">
+            {% set actions %}
+                <a href="{{ path('app_annonce_new') }}" class="btn btn-custom-cyan rounded-pill px-3 px-md-4 shadow-sm">
+                    <i class="bi bi-plus-circle me-1 me-md-2" aria-hidden="true"></i>
+                    <span class="d-md-none">Publier</span>
+                    <span class="d-none d-md-inline">Déposer une annonce</span>
+                </a>
+            {% endset %}
+
+            {% if category is defined %}
+                {{ include('layouts/_page_header.html.twig', {
+                    eyebrow: 'Catégorie',
+                    title: category.name,
+                    lead: 'Annonces publiées dans cette catégorie · ' ~ (annonces.getTotalItemCount|cap999) ~ ' résultat' ~ (annonces.getTotalItemCount > 1 ? 's' : ''),
+                    breadcrumbs: [
+                        { label: 'Accueil', url: path('app_home') },
+                        { label: 'Annonces', url: path('app_annonce_index') },
+                        { label: category.name }
+                    ],
+                    actions: actions
+                }) }}
+            {% else %}
+                {{ include('layouts/_page_header.html.twig', {
+                    eyebrow: has_filters ? 'Recherche' : 'Catalogue',
+                    title_html: has_filters
+                        ? 'Résultats <span class="text-brand">de recherche</span>'
+                        : 'Toutes les <span class="text-brand">annonces</span>',
+                    lead: 'Parcourez les annonces validées · ' ~ (annonces.getTotalItemCount|cap999) ~ ' annonce' ~ (annonces.getTotalItemCount > 1 ? 's' : ''),
+                    breadcrumbs: [
+                        { label: 'Accueil', url: path('app_home') },
+                        { label: 'Annonces' }
+                    ],
+                    actions: actions
+                }) }}
+            {% endif %}
+
+            {# Barre résultats + filtres (sticky mobile) #}
+            <div class="page-annonces__toolbar" data-animate="fade-up">
+                <div class="page-annonces__toolbar-meta">
+                    <span class="annonce-page-stat">
+                        <i class="bi bi-layout-grid" aria-hidden="true"></i>
+                        <strong>{{ annonces.getTotalItemCount|cap999 }}</strong>
+                        <span class="d-none d-sm-inline">annonce{{ annonces.getTotalItemCount > 1 ? 's' : '' }}</span>
+                    </span>
+                    {% if has_filters %}
+                        <a href="{{ reset_url }}" class="page-annonces__reset d-md-none">
+                            <i class="bi bi-x-lg" aria-hidden="true"></i>Effacer
+                        </a>
+                    {% endif %}
+                </div>
+                <button class="page-annonces__filter-toggle d-md-none"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#annonceFiltersCollapse"
+                        aria-expanded="{{ has_filters ? 'true' : 'false' }}"
+                        aria-controls="annonceFiltersCollapse">
+                    <i class="bi bi-sliders" aria-hidden="true"></i>
+                    Filtres
+                    {% if has_filters %}
+                        <span class="page-annonces__filter-dot" aria-hidden="true"></span>
+                    {% endif %}
+                </button>
+            </div>
+
+            {{ include('layouts/_filter_chips.html.twig', {
+                sf: sf,
+                search_categories: search_categories,
+                cities: cities,
+                reset_url: reset_url
+            }) }}
+
+            <section class="annonce-search-panel mb-3 mb-md-4" data-animate="fade-up">
+                <div class="annonce-search-panel__inner">
+                    <div class="d-none d-md-flex align-items-center justify-content-between gap-2 mb-3">
                         <div>
                             <h2 class="h6 mb-1 fw-bold text-dark d-flex align-items-center gap-2">
                                 <i class="bi bi-sliders text-brand-annonces" aria-hidden="true"></i>
@@ -28,173 +97,70 @@
                             </h2>
                             <p class="small text-muted mb-0">
                                 {% if category is defined %}
-                                    Annonces « {{ category.name }} » — filtrez par mots-clés ou par ville.
+                                    Filtrez par mots-clés ou par ville.
                                 {% else %}
-                                    Combinez mots-clés, catégorie et ville pour trouver une annonce.
+                                    Combinez mots-clés, catégorie et ville.
                                 {% endif %}
                             </p>
                         </div>
                         {% if has_filters %}
-                            <a href="{{ reset_url }}" class="btn btn-sm btn-outline-secondary rounded-pill align-self-stretch align-self-md-center">
-                                <i class="bi bi-x-lg me-1" aria-hidden="true"></i>Réinitialiser les filtres
+                            <a href="{{ reset_url }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                <i class="bi bi-x-lg me-1" aria-hidden="true"></i>Réinitialiser
                             </a>
                         {% endif %}
                     </div>
 
-                    <form method="get" action="{% if category is defined %}{{ path('app_annonce_category', { slug: category.slug }) }}{% else %}{{ path('app_annonce_index') }}{% endif %}" class="row g-3 align-items-end">
-                        <div class="col-12 {{ category is defined ? 'col-md-5' : 'col-md-4' }}">
-                            <label class="form-label small text-muted mb-1" for="annonce-q">Mots-clés</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0 annonce-search-input-icon"><i class="bi bi-search" aria-hidden="true"></i></span>
-                                <input id="annonce-q" type="search" name="q" class="form-control border-start-0 bg-white" placeholder="Titre, description…" value="{{ sf.q|default('') }}" autocomplete="off">
+                    <div id="annonceFiltersCollapse" class="collapse d-md-block {{ has_filters ? 'show' : '' }}">
+                        <form method="get" action="{% if category is defined %}{{ path('app_annonce_category', { slug: category.slug }) }}{% else %}{{ path('app_annonce_index') }}{% endif %}" class="row g-2 g-md-3 align-items-end">
+                            <div class="col-12 {{ category is defined ? 'col-md-5' : 'col-md-4' }}">
+                                <label class="form-label small text-muted mb-1" for="annonce-q">Mots-clés</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0 annonce-search-input-icon"><i class="bi bi-search" aria-hidden="true"></i></span>
+                                    <input id="annonce-q" type="search" name="q" class="form-control border-start-0 bg-white" placeholder="Titre, description…" value="{{ sf.q|default('') }}" autocomplete="off">
+                                </div>
                             </div>
-                        </div>
-                        {% if category is not defined %}
-                            <div class="col-12 col-md-3">
-                                <label class="form-label small text-muted mb-1" for="annonce-cat">Catégorie</label>
-                                <select id="annonce-cat" name="category" class="form-select bg-white border">
-                                    <option value="">Toutes les catégories</option>
-                                    {% for cat in search_categories %}
-                                        <option value="{{ cat.id }}" {{ sf.categoryId == cat.id ? 'selected' }}>{{ cat.name }}</option>
+                            {% if category is not defined %}
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <label class="form-label small text-muted mb-1" for="annonce-cat">Catégorie</label>
+                                    <select id="annonce-cat" name="category" class="form-select bg-white border">
+                                        <option value="">Toutes les catégories</option>
+                                        {% for cat in search_categories %}
+                                            <option value="{{ cat.id }}" {{ sf.categoryId == cat.id ? 'selected' }}>{{ cat.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <div class="col-12 {{ category is defined ? 'col-sm-6 col-md-4' : 'col-sm-6 col-md-3' }}">
+                                <label class="form-label small text-muted mb-1" for="annonce-city">Ville</label>
+                                <select id="annonce-city" name="city" class="form-select bg-white border">
+                                    <option value="">Toutes les villes</option>
+                                    {% for city in cities %}
+                                        <option value="{{ city.id }}" {{ sf.cityId == city.id ? 'selected' }}>{{ city.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
-                        {% endif %}
-                        <div class="col-12 {{ category is defined ? 'col-md-4' : 'col-md-3' }}">
-                            <label class="form-label small text-muted mb-1" for="annonce-city">Ville</label>
-                            <select id="annonce-city" name="city" class="form-select bg-white border">
-                                <option value="">Toutes les villes</option>
-                                {% for city in cities %}
-                                    <option value="{{ city.id }}" {{ sf.cityId == city.id ? 'selected' }}>{{ city.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-12 {{ category is defined ? 'col-md-3' : 'col-md-2' }}">
-                            <button type="submit" class="btn btn-annonces-brand w-100 rounded-pill py-2 fw-bold shadow-sm">
-                                <i class="bi bi-search me-1" aria-hidden="true"></i>Rechercher
-                            </button>
-                        </div>
-                    </form>
+                            <div class="col-12 {{ category is defined ? 'col-md-3' : 'col-md-2' }}">
+                                <button type="submit" class="btn btn-annonces-brand w-100 rounded-pill py-2 fw-bold shadow-sm">
+                                    <i class="bi bi-search me-1" aria-hidden="true"></i>Rechercher
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </section>
 
-            {# --- En-tête --- #}
-            <header class="row align-items-start align-items-md-center gy-3 mb-4 pb-4 border-bottom" data-animate="fade-up">
-                <div class="col-12 col-lg-8 text-center text-md-start">
-                    {% if category is defined %}
-                        <nav aria-label="Fil d'Ariane" class="d-none d-md-block">
-                            <ol class="breadcrumb mb-2 small">
-                                <li class="breadcrumb-item"><a href="{{ path('app_home') }}" class="text-decoration-none text-brand-annonces">Accueil</a></li>
-                                <li class="breadcrumb-item"><a href="{{ path('app_annonce_index') }}" class="text-decoration-none text-brand-annonces">Annonces</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
-                            </ol>
-                        </nav>
-                        <div class="d-flex align-items-center gap-3 flex-wrap justify-content-center justify-content-md-start mb-2">
-                            {% if category.imageName %}
-                                <img src="{{ asset('uploads/categories/' ~ category.imageName) }}"
-                                     alt=""
-                                     width="56"
-                                     height="56"
-                                     class="rounded-3 border bg-white flex-shrink-0 shadow-sm"
-                                     style="object-fit: contain;"
-                                     loading="lazy">
-                            {% endif %}
-                            <h1 class="fw-bold h2 mb-0">{{ category.name }}</h1>
-                        </div>
-                        <p class="text-muted small mb-2">Annonces publiées dans cette catégorie.</p>
-                    {% else %}
-                        <h1 class="fw-bold h2 mb-2">
-                            {% if has_filters %}
-                                <span class="text-dark">Résultats</span> <span class="text-brand-annonces">de recherche</span>
-                            {% else %}
-                                Toutes les <span class="text-brand-annonces">annonces</span>
-                            {% endif %}
-                        </h1>
-                        <p class="text-muted small mb-0">Parcourez les annonces validées par notre équipe.</p>
-                    {% endif %}
-
-                    <div class="mt-3">
-                        <span class="annonce-page-stat">
-                            <i class="bi bi-layout-grid text-brand-annonces" aria-hidden="true"></i>
-                            <strong>{{ annonces.getTotalItemCount }}</strong>
-                            annonce{{ annonces.getTotalItemCount > 1 ? 's' : '' }} au total
-                        </span>
-                        {% if has_filters %}
-                            <span class="small text-muted ms-2 d-inline-block mt-2 mt-sm-0">— filtres actifs</span>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-12 col-lg-4 text-lg-end">
-                    <a href="{{ path('app_annonce_new') }}" class="btn btn-custom-cyan rounded-pill px-4 shadow-sm w-100 w-lg-auto">
-                        <i class="bi bi-plus-circle me-2" aria-hidden="true"></i>Déposer une annonce
-                    </a>
-                </div>
-            </header>
-
-            {# --- Grille --- #}
-            <div class="row g-4">
+            <div class="row g-2 g-sm-3 g-lg-4 page-annonces__grid">
                 {% for annonce in annonces %}
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <article class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative annonce-card annonce-listing-card d-flex flex-column">
-                            <div class="annonce-listing-card__media">
-                                {% if annonce.annonceImages|length > 0 %}
-                                    <img src="{{ asset('uploads/annonces/' ~ annonce.annonceImages[0].imadeName) }}"
-                                         class="annonce-listing-card__img"
-                                         alt="{{ annonce.title }}"
-                                         {% if loop.index > 4 %}loading="lazy"{% endif %}
-                                         decoding="async">
-                                {% else %}
-                                    <img src="{{ asset('images/no-image.jpg') }}"
-                                         class="annonce-listing-card__img"
-                                         alt=""
-                                         {% if loop.index > 4 %}loading="lazy"{% endif %}
-                                         decoding="async">
-                                {% endif %}
-
-                                {% if category is not defined %}
-                                    <span class="annonce-listing-card__chip-cat">{{ annonce.category.name }}</span>
-                                {% endif %}
-
-                                <div class="annonce-listing-card__overlay">
-                                    <span class="annonce-listing-card__price">{{ annonce.price|number_format(0, ',', ' ') }} <small>MAD</small></span>
-                                </div>
-                            </div>
-
-                            <div class="card-body p-3 d-flex flex-column flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
-                                    <span class="badge rounded-pill bg-light text-dark border fw-semibold py-1 px-2 small text-truncate" style="max-width: 58%;">
-                                        <i class="bi bi-geo-alt-fill me-1 text-brand-annonces" aria-hidden="true"></i>{{ annonce.city.name }}
-                                    </span>
-                                    <time class="text-muted small text-nowrap" datetime="{{ annonce.createdAt|date('c') }}">{{ annonce.createdAt|date('d/m/Y') }}</time>
-                                </div>
-
-                                <h2 class="card-title fw-bold h6 mb-2 lh-sm">
-                                    <a href="{{ path('app_annonce_show', { id: annonce.id }) }}" class="text-dark text-decoration-none stretched-link">
-                                        {{ annonce.title|u.truncate(48, '…') }}
-                                    </a>
-                                </h2>
-
-                                <p class="card-text text-muted small mb-3 flex-grow-1 annonce-listing-card__desc">
-                                    {{ annonce.description|striptags|u.truncate(120, '…') }}
-                                </p>
-
-                                <div class="pt-3 border-top d-flex align-items-center justify-content-between mt-auto position-relative" style="z-index: 2;">
-                                    <div class="d-flex align-items-center min-w-0 me-2">
-                                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="width: 32px; height: 32px; border: 1px solid rgba(0,0,0,0.06);">
-                                            <i class="bi bi-person-fill text-brand-annonces small" aria-hidden="true"></i>
-                                        </div>
-                                        <span class="small text-muted text-truncate">
-                                            Par <span class="fw-semibold text-dark">{{ annonce.user.firstName }} {{ annonce.user.lastName }}</span>
-                                        </span>
-                                    </div>
-                                    <i class="bi bi-arrow-right-circle-fill text-brand-annonces flex-shrink-0" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </article>
+                    <div class="col-6 col-md-4 col-xl-3">
+                        {{ include('annonce/_card.html.twig', {
+                            annonce: annonce,
+                            show_category: category is not defined,
+                            eager: loop.index <= 4
+                        }) }}
                     </div>
                 {% else %}
                     <div class="col-12">
-                        <div class="annonce-empty-state text-center py-5 px-4">
+                        <div class="annonce-empty-state text-center py-5 px-3 px-md-4">
                             <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white shadow-sm mb-3" style="width: 4.5rem; height: 4.5rem;">
                                 <i class="bi bi-inboxes fs-2 text-brand-annonces opacity-75" aria-hidden="true"></i>
                             </div>
@@ -207,7 +173,7 @@
                                 {% elseif category is defined %}
                                     Soyez le premier à publier dans cette catégorie.
                                 {% else %}
-                                    Soyez le premier à publier une annonce sur Expat Souk.
+                                    Soyez le premier à publier une annonce sur SoukExpat.
                                 {% endif %}
                             </p>
                             <a href="{{ path('app_annonce_new') }}" class="btn btn-custom-cyan rounded-pill px-4 shadow-sm">
@@ -219,7 +185,7 @@
             </div>
 
             {% if annonces|length > 0 %}
-                <nav class="d-flex justify-content-center mt-5 pt-2" aria-label="Pagination des annonces">
+                <nav class="page-annonces__pagination" aria-label="Pagination des annonces">
                     <div class="pagination-wrapper">
                         {{ knp_pagination_render(annonces) }}
                     </div>

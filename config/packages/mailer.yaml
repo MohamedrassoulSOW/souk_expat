@@ -1,3 +1,7 @@
 framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
+        envelope:
+            sender: '%app.contact_email%'
+        headers:
+            From: 'SoukExpat <%app.contact_email%>'

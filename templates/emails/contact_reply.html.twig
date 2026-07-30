@@ -1,0 +1,13 @@
+{% extends 'emails/_layout.html.twig' %}
+
+{% block title %}Réponse SoukExpat{% endblock %}
+
+{% block body %}
+    <h2>Bonjour{% if toName %} {{ toName }}{% endif %},</h2>
+    <p>Voici la réponse de l’équipe SoukExpat concernant votre message&nbsp;:</p>
+    <div class="meta">
+        <strong>Sujet initial :</strong> {{ originalSubject }}
+    </div>
+    <p>{{ replyBody|nl2br }}</p>
+    <p>Vous pouvez répondre à cet e-mail — il sera reçu sur <strong>{{ siteContactEmail }}</strong>.</p>
+{% endblock %}

@@ -46,13 +46,6 @@ class AnnonceType extends AbstractType
                 ],
             ])
 
-            ->add('phone', null, [
-                'label' => 'Numéro de téléphone',
-                'attr' => [
-                    'placeholder' => 'Ex : 0612345678'
-                ]
-            ])
-
             ->add('category', EntityType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',

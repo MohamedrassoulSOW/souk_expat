@@ -20,8 +20,8 @@
                             <div class="carousel-item {% if loop.first %}active{% endif %}">
                                 {# Correction ici : imageName au lieu de imadeName #}
                                 <img src="{{ asset('uploads/annonces/' ~ image.imadeName) }}"
-                                    class="d-block w-100"
-                                    style="height: 400px; object-fit: cover;"
+                                    class="d-block w-100 mx-auto"
+                                    style="height: 400px; object-fit: cover; object-position: center center;"
                                     alt="{{ annonce.title }}">
                             </div>
                         {% endfor %}
@@ -74,10 +74,6 @@
                             <label class="text-muted small d-block">Catégorie</label>
                             <span>{{ annonce.category.name|default('N/A') }}</span>
                         </div>
-                        <div class="col-6">
-                            <label class="text-muted small d-block">Contact</label>
-                            <span>{{ annonce.phone|default('Non renseigné') }}</span>
-                        </div>
                         <div class="col-12">
                             <label class="text-muted small d-block border-top pt-2 mt-2">Description</label>
                             <p class="mt-1">{{ annonce.description|nl2br }}</p>
@@ -86,21 +82,21 @@
                 </div>
             </div>
 
-            {% if is_granted('ROLE_ADMIN') and annonce.status == 'pending' %}
-                <div class="alert alert-info d-flex align-items-center justify-content-between">
-                    <div>
-                        <strong>Action requise :</strong> Souhaitez-vous publier cette annonce ?
-                    </div>
-                    <div class="d-flex gap-2">
-                        <form method="post" action="{{ path('admin_annonce_approve', {id: annonce.id}) }}" onsubmit="return confirm('Approuver cette annonce ?');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ annonce.id) }}">
-                            <button class="btn btn-success">Valider</button>
-                        </form>
-
-                        <form method="post" action="{{ path('admin_annonce_reject', {id: annonce.id}) }}" onsubmit="return confirm('Rejeter cette annonce ?');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ annonce.id) }}">
-                            <button class="btn btn-danger">Refuser</button>
-                        </form>
+            {% if is_granted('ROLE_EDITOR') %}
+                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between p-3 rounded-3 border bg-light">
+                    <div class="small text-muted">Actions de modération</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if annonce.status == 'pending' %}
+                            <form method="post" action="{{ path('admin_annonce_approve', {id: annonce.id}) }}" onsubmit="return confirm('Approuver cette annonce ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ annonce.id) }}">
+                                <button class="btn btn-success btn-sm">Valider</button>
+                            </form>
+                            <form method="post" action="{{ path('admin_annonce_reject', {id: annonce.id}) }}" onsubmit="return confirm('Rejeter cette annonce ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ annonce.id) }}">
+                                <button class="btn btn-warning btn-sm">Refuser</button>
+                            </form>
+                        {% endif %}
+                        {{ include('admin/annonce/_delete_form.html.twig', { annonce: annonce }) }}
                     </div>
                 </div>
             {% endif %}

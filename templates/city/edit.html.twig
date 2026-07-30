@@ -1,109 +1,45 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Modifier la Ville | Expat Souk{% endblock %}
+{% block title %}Modifier {{ city.name }} | SoukExpat{% endblock %}
+{% block admin_mobile_title %}Modifier{% endblock %}
 
-{% block body %}
-<div class="container-fluid p-0">
-    <div class="row g-0">
+{% block admin_main %}
+    {% set actions %}
+        <a href="{{ path('app_city_index') }}" class="btn btn-light border rounded-pill px-3 bg-white">
+            Annuler
+        </a>
+    {% endset %}
 
-        <main class="col-12 col-md-9 col-lg-10 p-4 bg-light min-vh-100">
-            
-            {# Header avec Fil d'Ariane #}
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-1">
-                            <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ path('app_city_index') }}" class="text-decoration-none">Villes</a></li>
-                            <li class="breadcrumb-item active">Modifier</li>
-                        </ol>
-                    </nav>
-                    <h3 class="fw-bold mb-0 text-dark">
-                        <i class="bi bi-pencil-square me-2" style="color: #42B1CE;"></i>Modifier : {{ city.name }}
-                    </h3>
-                </div>
-                <div class="d-flex gap-2">
-                    <a href="{{ path('app_city_index') }}" class="btn btn-outline-secondary rounded-pill px-3 bg-white shadow-sm">
-                        <i class="bi bi-arrow-left me-2"></i>Annuler
-                    </a>
-                </div>
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Villes',
+        title: 'Modifier : ' ~ city.name,
+        lead: 'Mise à jour de la zone géographique.',
+        actions: actions
+    }) }}
+
+    <div class="row g-3 g-lg-4">
+        <div class="col-lg-8">
+            <div class="admin-panel p-4">
+                {{ include('city/_form.html.twig', { button_label: 'Mettre à jour' }) }}
             </div>
-
-            <div class="row">
-                {# Colonne du formulaire principal #}
-                <div class="col-12 col-lg-8">
-                    <div class="card border-0 shadow-sm rounded-4 mb-4">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-4 border-bottom pb-2">Informations de la ville</h5>
-                            
-                            {# Formulaire Symfony #}
-                            {{ include('city/_form.html.twig', {'button_label': 'Mettre à jour la ville'}) }}
-                        </div>
-                    </div>
-                </div>
-
-                {# Colonne latérale d'actions secondaires #}
-                <div class="col-12 col-lg-4">
-                    <div class="card border-0 shadow-sm rounded-4 mb-4 border-top border-danger border-4">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold text-danger mb-3"><i class="bi bi-exclamation-triangle me-2"></i>Zone de danger</h5>
-                            <p class="text-muted small">
-                                La suppression d'une ville est irréversible. Toutes les annonces liées à cette ville pourraient être affectées.
-                            </p>
-                            <hr>
-                            <div class="d-grid">
-                                {{ include('city/_delete_form.html.twig') }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
-                        <h6 class="fw-bold mb-3">Récapitulatif</h6>
-                        <ul class="list-unstyled small mb-0">
-                            <li class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">ID système :</span>
-                                <span class="fw-bold">#{{ city.id }}</span>
-                            </li>
-                            <li class="d-flex justify-content-between">
-                                <span class="text-muted">Créée le :</span>
-                                <span class="fw-bold text-dark">01/01/2026</span> {# Exemple : si vous avez un champ createdAt #}
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="admin-panel p-4 mb-3">
+                <h2 class="h6 fw-bold mb-3">Récapitulatif</h2>
+                <dl class="row small mb-0">
+                    <dt class="col-5 text-muted">ID</dt>
+                    <dd class="col-7 fw-semibold">#{{ city.id }}</dd>
+                    <dt class="col-5 text-muted">Nom</dt>
+                    <dd class="col-7 fw-semibold">{{ city.name }}</dd>
+                </dl>
             </div>
-        </main>
+            <div class="admin-panel p-4 border-top border-danger border-3">
+                <h2 class="h6 fw-bold text-danger mb-2">Zone de danger</h2>
+                <p class="small text-muted mb-3">
+                    La suppression est irréversible et peut affecter les annonces liées.
+                </p>
+                {{ include('city/_delete_form.html.twig') }}
+            </div>
+        </div>
     </div>
-</div>
-
-<style>
-    .breadcrumb-item a { color: #42B1CE; }
-    
-    /* Harmonisation des inputs de formulaire pour Edit */
-    form input[type="text"] {
-        border-radius: 12px !important;
-        padding: 10px 15px !important;
-        border: 1px solid #e0e0e0 !important;
-    }
-
-    form button {
-        width: 100%; /* Le bouton s'adapte à la largeur de la colonne */
-        border-radius: 50px !important;
-        padding: 12px !important;
-        background-color: #42B1CE !important;
-        border: none !important;
-        font-weight: 600 !important;
-        transition: all 0.3s ease;
-    }
-
-    form button:hover {
-        background-color: #369db7 !important;
-        box-shadow: 0 4px 12px rgba(66, 177, 206, 0.2);
-    }
-
-    /* Style spécifique pour le bouton delete (à adapter dans _delete_form.html.twig si besoin) */
-    .btn-danger {
-        border-radius: 50px !important;
-    }
-</style>
 {% endblock %}

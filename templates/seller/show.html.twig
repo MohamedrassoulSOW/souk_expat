@@ -1,0 +1,407 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ seller.firstName }} {{ seller.lastName }} | Expat Souk{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<main class="seller-profile-page">
+    <div class="seller-profile-hero">
+        <div class="container py-3 py-md-4">
+            <nav aria-label="Fil d'Ariane" class="mb-3 d-none d-md-block">
+                <ol class="breadcrumb small mb-0 seller-profile-breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_annonce_index') }}">Annonces</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ seller.firstName }}</li>
+                </ol>
+            </nav>
+
+            <div class="seller-profile-card" data-animate="fade-up">
+                <div class="seller-profile-card__banner" aria-hidden="true"></div>
+                <div class="seller-profile-card__body">
+                    <div class="row g-4 align-items-center">
+                        <div class="col-12 col-lg-8">
+                            <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-3 gap-md-4 text-center text-sm-start">
+                                <div class="seller-profile-avatar flex-shrink-0">
+                                    {% if seller.avatar %}
+                                        <img src="{{ asset('uploads/avatars/' ~ seller.avatar) }}"
+                                             alt="{{ seller.firstName }} {{ seller.lastName }}"
+                                             width="120" height="120"
+                                             class="seller-profile-avatar__img"
+                                             decoding="async">
+                                    {% else %}
+                                        <span class="seller-profile-avatar__fallback" aria-hidden="true">
+                                            <i class="bi bi-person-fill"></i>
+                                        </span>
+                                    {% endif %}
+                                    <span class="seller-profile-avatar__badge" title="Vendeur vérifié sur Expat Souk">
+                                        <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
+                                    </span>
+                                </div>
+
+                                <div class="min-w-0 flex-grow-1">
+                                    {% if is_own_profile %}
+                                        <span class="seller-profile-pill mb-2">Votre profil public</span>
+                                    {% else %}
+                                        <span class="seller-profile-pill mb-2">Vendeur Expat Souk</span>
+                                    {% endif %}
+                                    <h1 class="seller-profile-name mb-2">{{ seller.firstName }} {{ seller.lastName }}</h1>
+                                    <p class="text-muted mb-3 small mb-sm-3">
+                                        Découvrez toutes les annonces publiées par {{ seller.firstName }}.
+                                    </p>
+
+                                    <div class="d-flex flex-wrap justify-content-center justify-content-sm-start gap-2">
+                                        <div class="seller-stat">
+                                            <span class="seller-stat__value">{{ stats.count|cap999 }}</span>
+                                            <span class="seller-stat__label">Annonce{{ stats.count > 1 ? 's' : '' }}</span>
+                                        </div>
+                                        <div class="seller-stat">
+                                            <span class="seller-stat__value">{{ stats.categories|length }}</span>
+                                            <span class="seller-stat__label">Catégorie{{ stats.categories|length > 1 ? 's' : '' }}</span>
+                                        </div>
+                                        {% if stats.minPrice is not null and stats.maxPrice is not null %}
+                                            <div class="seller-stat seller-stat--wide">
+                                                <span class="seller-stat__value">
+                                                    {% if stats.minPrice == stats.maxPrice %}
+                                                        {{ stats.minPrice|number_format(0, ',', ' ') }}
+                                                    {% else %}
+                                                        {{ stats.minPrice|number_format(0, ',', ' ') }}–{{ stats.maxPrice|number_format(0, ',', ' ') }}
+                                                    {% endif %}
+                                                </span>
+                                                <span class="seller-stat__label">Prix (MAD)</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <div class="seller-profile-actions">
+                                {% if is_own_profile %}
+                                    <a href="{{ path('app_profile') }}" class="btn btn-custom-cyan rounded-pill w-100 fw-semibold">
+                                        <i class="bi bi-gear me-1" aria-hidden="true"></i> Gérer mon compte
+                                    </a>
+                                    <a href="{{ path('app_annonce_new') }}" class="btn btn-outline-secondary rounded-pill w-100">
+                                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Publier une annonce
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('app_annonce_index') }}" class="btn btn-custom-cyan rounded-pill w-100 fw-semibold">
+                                        <i class="bi bi-grid me-1" aria-hidden="true"></i> Toutes les annonces
+                                    </a>
+                                    <a href="{{ path('app_home') }}" class="btn btn-outline-secondary rounded-pill w-100">
+                                        <i class="bi bi-house me-1" aria-hidden="true"></i> Accueil
+                                    </a>
+                                {% endif %}
+
+                                {% if stats.cities is not empty %}
+                                    <div class="seller-cities mt-1">
+                                        <div class="small text-muted mb-2 fw-semibold">
+                                            <i class="bi bi-geo-alt text-brand me-1" aria-hidden="true"></i> Villes
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-1 justify-content-center justify-content-lg-start">
+                                            {% for city in stats.cities %}
+                                                <span class="seller-city-chip">{{ city.name }} <em>{{ city.total|cap999 }}</em></span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <section class="seller-listings" data-animate="fade-up">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
+                <div>
+                    <h2 class="h4 fw-bold mb-1">Annonces de {{ seller.firstName }}</h2>
+                    <p class="text-muted small mb-0">
+                        {% if category_filter %}
+                            Filtrées par catégorie —
+                            <a href="{{ path('app_seller_show', { id: seller.id }) }}" class="text-brand text-decoration-none fw-semibold">tout afficher</a>
+                        {% else %}
+                            {{ annonces.getTotalItemCount|cap999 }} résultat{{ annonces.getTotalItemCount > 1 ? 's' : '' }} affiché{{ annonces.getTotalItemCount > 1 ? 's' : '' }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            {% if stats.categories|length > 1 %}
+                <div class="seller-cat-filters mb-4" role="navigation" aria-label="Filtrer par catégorie">
+                    <a href="{{ path('app_seller_show', { id: seller.id }) }}"
+                       class="seller-cat-chip {{ category_filter is null ? 'is-active' : '' }}">
+                        Toutes <em>{{ stats.count|cap999 }}</em>
+                    </a>
+                    {% for cat in stats.categories %}
+                        <a href="{{ path('app_seller_show', { id: seller.id, category: cat.id }) }}"
+                           class="seller-cat-chip {{ category_filter == cat.id ? 'is-active' : '' }}">
+                            {{ cat.name }} <em>{{ cat.total|cap999 }}</em>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="row g-4">
+                {% for annonce in annonces %}
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        {{ include('annonce/_card.html.twig', {
+                            annonce: annonce,
+                            show_category: true,
+                            show_seller: false,
+                            eager: loop.index <= 4
+                        }) }}
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <div class="annonce-empty-state text-center py-5 px-4">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white shadow-sm mb-3" style="width: 4.5rem; height: 4.5rem;">
+                                <i class="bi bi-inbox fs-2 text-brand opacity-75" aria-hidden="true"></i>
+                            </div>
+                            <h3 class="h5 fw-bold mb-2">
+                                {% if category_filter %}Aucune annonce dans cette catégorie{% else %}Aucune annonce publiée{% endif %}
+                            </h3>
+                            <p class="text-muted mx-auto mb-4" style="max-width: 26rem;">
+                                {% if category_filter %}
+                                    Essayez une autre catégorie ou affichez toutes les annonces de {{ seller.firstName }}.
+                                {% else %}
+                                    {{ seller.firstName }} n’a pas encore d’annonce validée sur Expat Souk.
+                                {% endif %}
+                            </p>
+                            {% if category_filter %}
+                                <a href="{{ path('app_seller_show', { id: seller.id }) }}" class="btn btn-custom-cyan rounded-pill px-4">Voir toutes les annonces</a>
+                            {% else %}
+                                <a href="{{ path('app_annonce_index') }}" class="btn btn-custom-cyan rounded-pill px-4">Voir les annonces</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if annonces|length > 0 %}
+                <nav class="d-flex justify-content-center mt-5" aria-label="Pagination des annonces">
+                    <div class="pagination-wrapper">
+                        {{ knp_pagination_render(annonces) }}
+                    </div>
+                </nav>
+            {% endif %}
+        </section>
+    </div>
+</main>
+
+<style>
+    .seller-profile-page {
+        background:
+            radial-gradient(ellipse 80% 50% at 10% -10%, rgba(66, 177, 206, 0.14), transparent 55%),
+            radial-gradient(ellipse 60% 40% at 100% 0%, rgba(42, 143, 171, 0.08), transparent 50%),
+            var(--page-bg, #f4f7f8);
+    }
+
+    .seller-profile-breadcrumb .breadcrumb-item a {
+        color: var(--cyan-main, #42b1ce);
+        text-decoration: none;
+    }
+    .seller-profile-breadcrumb .breadcrumb-item.active {
+        color: #64748b;
+    }
+
+    .seller-profile-card {
+        background: #fff;
+        border-radius: 1.35rem;
+        overflow: hidden;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(66, 177, 206, 0.12);
+    }
+
+    .seller-profile-card__banner {
+        height: 118px;
+        background:
+            linear-gradient(120deg, rgba(255,255,255,0.12) 0%, transparent 40%),
+            linear-gradient(135deg, #42b1ce 0%, #2a8fab 48%, #1a6f88 100%);
+        position: relative;
+    }
+    .seller-profile-card__banner::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px);
+        background-size: 16px 16px;
+        opacity: 0.35;
+    }
+
+    .seller-profile-card__body {
+        padding: 0 1.25rem 1.5rem;
+        margin-top: -3.25rem;
+    }
+    @media (min-width: 768px) {
+        .seller-profile-card__body {
+            padding: 0 2rem 2rem;
+            margin-top: -3.5rem;
+        }
+    }
+
+    .seller-profile-avatar {
+        position: relative;
+        width: 120px;
+        height: 120px;
+    }
+    .seller-profile-avatar__img,
+    .seller-profile-avatar__fallback {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 5px solid #fff;
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
+        display: block;
+    }
+    .seller-profile-avatar__img {
+        object-fit: cover;
+        background: #fff;
+    }
+    .seller-profile-avatar__fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #e8f4f8, #d7eef5);
+        color: var(--cyan-main, #42b1ce);
+        font-size: 3rem;
+    }
+    .seller-profile-avatar__badge {
+        position: absolute;
+        right: 4px;
+        bottom: 6px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #fff;
+        color: var(--cyan-main, #42b1ce);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+        font-size: 1rem;
+    }
+
+    .seller-profile-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--cyan-hover, #369ab3);
+        background: rgba(66, 177, 206, 0.12);
+        border: 1px solid rgba(66, 177, 206, 0.18);
+    }
+
+    .seller-profile-name {
+        font-size: clamp(1.5rem, 2.4vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .seller-stat {
+        min-width: 5.5rem;
+        padding: 0.65rem 0.9rem;
+        border-radius: 1rem;
+        background: #f8fcfd;
+        border: 1px solid rgba(66, 177, 206, 0.14);
+        text-align: center;
+    }
+    .seller-stat--wide { min-width: 8.5rem; }
+    .seller-stat__value {
+        display: block;
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: #0f172a;
+        line-height: 1.2;
+    }
+    .seller-stat__label {
+        display: block;
+        font-size: 0.7rem;
+        color: #64748b;
+        font-weight: 600;
+        margin-top: 0.15rem;
+    }
+
+    .seller-profile-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+        background: #f8fcfd;
+        border: 1px solid rgba(66, 177, 206, 0.12);
+        border-radius: 1.1rem;
+        padding: 1rem;
+    }
+
+    .seller-city-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #fff;
+        color: #334155;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+    .seller-city-chip em {
+        font-style: normal;
+        color: var(--cyan-main, #42b1ce);
+        font-weight: 800;
+    }
+
+    .seller-cat-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .seller-cat-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.45rem 0.85rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #334155;
+        background: #fff;
+        border: 1px solid rgba(66, 177, 206, 0.2);
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+    .seller-cat-chip em {
+        font-style: normal;
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: var(--cyan-main, #42b1ce);
+        background: rgba(66, 177, 206, 0.12);
+        padding: 0.1rem 0.4rem;
+        border-radius: 999px;
+    }
+    .seller-cat-chip:hover {
+        border-color: var(--cyan-main, #42b1ce);
+        color: var(--cyan-hover, #369ab3);
+        transform: translateY(-1px);
+    }
+    .seller-cat-chip.is-active {
+        background: var(--cyan-main, #42b1ce);
+        border-color: var(--cyan-main, #42b1ce);
+        color: #fff;
+    }
+    .seller-cat-chip.is-active em {
+        background: rgba(255, 255, 255, 0.22);
+        color: #fff;
+    }
+</style>
+
+{{ include('layouts/footer.html.twig') }}
+{% endblock %}

@@ -47,6 +47,8 @@ final class AnnonceController extends AbstractController
             12,
         );
 
+        $annonceRepository->prefetchImages(iterator_to_array($annonces->getItems()));
+
         return $this->render('annonce/index.html.twig', [
             'annonces' => $annonces,
             'search_categories' => $categoryRepository->findAllOrderedByName(),
@@ -101,6 +103,8 @@ final class AnnonceController extends AbstractController
             $request->query->getInt('page', 1),
             12,
         );
+
+        $annonceRepository->prefetchImages(iterator_to_array($annonces->getItems()));
 
         return $this->render('annonce/index.html.twig', [
             'annonces' => $annonces,

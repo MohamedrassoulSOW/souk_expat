@@ -22,9 +22,8 @@
                     <h2 class="fw-bold h3 mb-3">Vérifiez vos emails</h2>
                     
                     <p class="text-muted mb-3 lead fs-6">
-                        Si un compte correspond à <br>
-                        <strong class="text-dark">{{ resetToken.user ? resetToken.user.email : 'cette adresse' }}</strong>,
-                        un lien de réinitialisation vient de vous être envoyé depuis
+                        Si un compte existe pour l’adresse indiquée, un lien de réinitialisation
+                        vient de vous être envoyé depuis
                         <strong class="text-dark">{{ contact_email }}</strong>.
                     </p>
 
@@ -38,7 +37,7 @@
 
                     <div class="p-3 bg-light rounded-3 mb-4 text-start">
                         <p class="small text-secondary mb-2">
-                            L’expéditeur du message est <strong>{{ contact_email }}</strong> (objet : « Expat Souk — Réinitialisation de votre mot de passe »).
+                            L’expéditeur du message est <strong>{{ contact_email }}</strong> (objet : « SoukExpat — Réinitialisation de votre mot de passe »).
                         </p>
                         <p class="small text-secondary mb-0">
                             Rien reçu ? Vérifiez vos <strong>courriers indésirables (spams)</strong> ou

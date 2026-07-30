@@ -5,13 +5,18 @@
 {% block body %}
 {{ include('layouts/navBar.html.twig') }}
 
-<main class="container py-5">
-    {# Fil d'ariane / Retour #}
-    <nav class="mb-4">
-        <a href="{{ path('app_annonce_index') }}" class="text-decoration-none text-muted small">
-            <i class="bi bi-chevron-left"></i> Retour aux annonces
-        </a>
-    </nav>
+<main class="container pt-4 pt-md-5 mt-2 pb-5">
+    {{ include('layouts/_page_header.html.twig', {
+        eyebrow: annonce.category.name,
+        title: annonce.title,
+        lead: annonce.city.name ~ ' · ' ~ annonce.price|number_format(0, ',', ' ') ~ ' MAD',
+        breadcrumbs: [
+            { label: 'Accueil', url: path('app_home') },
+            { label: 'Annonces', url: path('app_annonce_index') },
+            { label: annonce.title|u.truncate(40, '…') }
+        ],
+        actions: '<a href="' ~ path('app_annonce_index') ~ '" class="btn btn-outline-secondary rounded-pill px-3"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Retour</a>'
+    }) }}
 
     <div class="row g-4 g-lg-5">
         {# --- COLONNE GAUCHE : VISUELS --- #}
@@ -22,8 +27,8 @@
                         {% for image in annonce.annonceImages %}
                             <div class="carousel-item {% if loop.first %}active{% endif %}">
                                 <img src="{{ asset('uploads/annonces/' ~ image.imadeName) }}" 
-                                     class="d-block w-100" 
-                                     style="aspect-ratio: 4/3; object-fit: cover; max-height: 500px;" 
+                                     class="d-block w-100 mx-auto" 
+                                     style="aspect-ratio: 4/3; object-fit: cover; object-position: center center; max-height: 500px;" 
                                      alt="{{ annonce.title }}">
                             </div>
                         {% endfor %}
@@ -57,7 +62,7 @@
                     </span>
                 </div>
 
-                <h1 class="fw-bold h2 h3 mb-3">{{ annonce.title }}</h1>
+                <h2 class="fw-bold h3 mb-3">{{ annonce.title }}</h2>
                 
                 <div class="display-6 fw-bold mb-4 price-display" style="color: #42B1CE;">
                     {{ annonce.price|number_format(0, '.', ' ') }} <small class="fs-4 fs-5">MAD</small>
@@ -65,12 +70,27 @@
 
                 <hr class="my-4 opacity-25">
 
+                <a href="{{ path('app_seller_show', { id: annonce.user.id }) }}" class="d-flex align-items-center gap-3 text-decoration-none text-dark mb-4 p-3 rounded-4 border bg-white seller-show-link">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden" style="width: 48px; height: 48px; background: rgba(66,177,206,.12);">
+                        {% if annonce.user.avatar %}
+                            <img src="{{ asset('uploads/avatars/' ~ annonce.user.avatar) }}" alt="" width="48" height="48" style="object-fit: cover;">
+                        {% else %}
+                            <i class="bi bi-person-fill text-brand fs-4" aria-hidden="true"></i>
+                        {% endif %}
+                    </div>
+                    <div class="min-w-0 flex-grow-1">
+                        <div class="small text-muted">Vendeur</div>
+                        <div class="fw-bold text-truncate">{{ annonce.user.firstName }} {{ annonce.user.lastName }}</div>
+                    </div>
+                    <span class="small text-brand fw-semibold flex-shrink-0">Voir le profil <i class="bi bi-chevron-right" aria-hidden="true"></i></span>
+                </a>
+
                 <h5 class="fw-bold mb-3">Description</h5>
                 <p class="text-secondary lh-lg mb-5">
                     {{ annonce.description }}
                 </p>
 
-                {# Actions de Contact #}
+                {# Contact : messagerie site uniquement (pas de tél. stocké/affiché — apps mobiles) #}
                 <div class="d-grid gap-3">
                     {% if app.user and app.user != annonce.user %}
                         <a href="{{ path('app_chat_check', {id: annonce.id}) }}" class="btn btn-custom-cyan btn-lg btn-md rounded-pill fw-bold py-3 py-2 shadow-sm">
@@ -81,20 +101,19 @@
                             Connectez-vous pour contacter
                         </a>
                     {% endif %}
-
-                    {% if annonce.phone %}
-                        <a href="tel:{{ annonce.phone }}" class="btn btn-outline-dark btn-lg btn-md rounded-pill fw-bold py-3 py-2">
-                            <i class="bi bi-telephone me-2"></i> <span class="d-none d-sm-inline">{{ annonce.phone }}</span><span class="d-sm-none">Appeler</span>
-                        </a>
-                    {% endif %}
+                    <p class="small text-muted mb-0 text-center">
+                        Contact via la messagerie SoukExpat — aucun numéro n’est publié sur le site.
+                    </p>
                 </div>
 
                 {# Actions Propriétaire #}
                 {% if app.user and app.user.id == annonce.user.id %}
-                    <div class="mt-5 p-3 rounded-4 bg-light border d-flex align-items-center justify-content-between">
+                    <div class="mt-5 p-3 rounded-4 bg-light border d-flex align-items-center justify-content-between gap-2">
                         <span class="small fw-bold text-muted">Gérer mon annonce</span>
-                        <div class="d-flex gap-2">
-                            <a href="{{ path('app_annonce_edit', {id: annonce.id}) }}" class="btn btn-sm btn-warning rounded-pill px-3">Modifier</a>
+                        <div class="d-flex gap-1">
+                            <a href="{{ path('app_annonce_edit', {id: annonce.id}) }}" class="btn btn-sm btn-warning btn-icon-action" title="Modifier" aria-label="Modifier">
+                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                            </a>
                             {{ include('annonce/_delete_form.html.twig') }}
                         </div>
                     </div>

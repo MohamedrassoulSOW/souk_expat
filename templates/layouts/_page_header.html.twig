@@ -1,0 +1,45 @@
+{# En-tête de page unifié
+   Vars: eyebrow, title, title_html, lead, breadcrumbs ([{label, url?}]), actions (HTML) #}
+{% set breadcrumbs = breadcrumbs|default([]) %}
+<header class="page-header" data-animate="fade-up">
+    <div class="page-header__inner">
+        {% if breadcrumbs is not empty %}
+            <nav aria-label="Fil d'Ariane" class="page-header__crumbs d-none d-md-block">
+                <ol class="breadcrumb mb-0">
+                    {% for crumb in breadcrumbs %}
+                        {% if crumb.url is defined and crumb.url %}
+                            <li class="breadcrumb-item">
+                                <a href="{{ crumb.url }}">{{ crumb.label }}</a>
+                            </li>
+                        {% else %}
+                            <li class="breadcrumb-item active" aria-current="page">{{ crumb.label }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ol>
+            </nav>
+        {% endif %}
+
+        <div class="page-header__row">
+            <div class="page-header__copy min-w-0">
+                {% if eyebrow is defined and eyebrow %}
+                    <span class="page-header__eyebrow">{{ eyebrow }}</span>
+                {% endif %}
+                <h1 class="page-header__title">
+                    {% if title_html is defined and title_html %}
+                        {{ title_html|raw }}
+                    {% else %}
+                        {{ title }}
+                    {% endif %}
+                </h1>
+                {% if lead is defined and lead %}
+                    <p class="page-header__lead">{{ lead }}</p>
+                {% endif %}
+            </div>
+            {% if actions is defined and actions %}
+                <div class="page-header__actions">
+                    {{ actions|raw }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</header>
