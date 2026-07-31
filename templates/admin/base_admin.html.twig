@@ -15,6 +15,7 @@
                     <div class="admin-mobile-kicker">Administration</div>
                     <div class="fw-bold text-truncate admin-mobile-title">{% block admin_mobile_title %}Menu{% endblock %}</div>
                 </div>
+                {{ include('layouts/_theme_toggle.html.twig', { btn_class: 'theme-toggle--admin' }) }}
                 <button class="btn admin-menu-toggle flex-shrink-0"
                         type="button"
                         data-bs-toggle="collapse"

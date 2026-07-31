@@ -2,6 +2,126 @@
     --cyan-main: #4b79a1;
     --cyan-hover: #1b2e4b;
     --cyan-soft: rgba(75, 121, 161, 0.12);
+    --theme-toggle-bg: #f1f5f9;
+    --theme-toggle-color: #1b2e4b;
+}
+
+/* ——— Thème clair / sombre (toggle) ——— */
+.theme-toggle {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid rgba(75, 121, 161, 0.22);
+    border-radius: 999px;
+    background: var(--theme-toggle-bg);
+    color: var(--theme-toggle-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.theme-toggle:hover {
+    background: var(--cyan-soft);
+    color: var(--cyan-main);
+    border-color: rgba(75, 121, 161, 0.4);
+}
+
+.theme-toggle:active {
+    transform: scale(0.96);
+}
+
+.theme-toggle__icon {
+    font-size: 1.15rem;
+    line-height: 1;
+}
+
+/* Clair : montrer la lune (passer en sombre). Sombre : montrer le soleil. */
+.theme-toggle__icon--to-light { display: none; }
+.theme-toggle__icon--to-dark { display: inline-block; }
+
+[data-bs-theme="dark"] .theme-toggle__icon--to-dark { display: none; }
+[data-bs-theme="dark"] .theme-toggle__icon--to-light { display: inline-block; color: #fbbf24; }
+
+[data-bs-theme="dark"] {
+    --theme-toggle-bg: #1e293b;
+    --theme-toggle-color: #e2e8f0;
+    color-scheme: dark;
+}
+
+[data-bs-theme="dark"] body {
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+[data-bs-theme="dark"] .modern-nav {
+    background: rgba(15, 23, 42, 0.96) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+[data-bs-theme="dark"] .modern-nav .nav-link,
+[data-bs-theme="dark"] .modern-nav .btn-link,
+[data-bs-theme="dark"] .modern-nav .text-dark,
+[data-bs-theme="dark"] .modern-nav .nav-icon-link {
+    color: #e2e8f0 !important;
+}
+
+[data-bs-theme="dark"] .modern-nav .nav-icon-link:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #93c5e4 !important;
+}
+
+[data-bs-theme="dark"] .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+[data-bs-theme="dark"] body.dashboard-admin-page,
+[data-bs-theme="dark"] .dashboard-main {
+    background: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .dashboard-sidebar-desktop,
+[data-bs-theme="dark"] .dashboard-mobile-header .bg-white,
+[data-bs-theme="dark"] .admin-panel,
+[data-bs-theme="dark"] .admin-stat-card,
+[data-bs-theme="dark"] .admin-mobile-dropdown,
+[data-bs-theme="dark"] .admin-settings-savebar__inner {
+    background: #1e293b !important;
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .admin-page-header__title,
+[data-bs-theme="dark"] .admin-mobile-title {
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .admin-settings-section__head,
+[data-bs-theme="dark"] .admin-collection-item,
+[data-bs-theme="dark"] .admin-settings-card-block {
+    background: #0f172a !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: #e2e8f0;
+    --bs-table-border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-bs-theme="dark"] .bg-light,
+[data-bs-theme="dark"] .table thead.bg-light {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+}
+
+.theme-toggle--admin {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
     --page-bg: #f4f7f8;
     --text-strong: #1e293b;
     --text-muted-custom: #64748b;

@@ -30,6 +30,8 @@
 
             {# 3. ACTIONS UTILISATEUR #}
             <div class="d-flex align-items-center gap-2 gap-lg-3 actions-container">
+                {{ include('layouts/_theme_toggle.html.twig') }}
+
                 {% if app.user %}
                     
                     {# --- DROPDOWN NOTIFICATIONS --- #}

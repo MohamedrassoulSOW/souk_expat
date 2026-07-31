@@ -10,8 +10,13 @@
         <script>
             (function () {
                 try {
-                    if (localStorage.getItem('theme') === 'dark') {
+                    var t = localStorage.getItem('theme');
+                    if (t === 'dark') {
                         document.documentElement.setAttribute('data-bs-theme', 'dark');
+                        document.documentElement.classList.add('theme-dark');
+                    } else {
+                        document.documentElement.removeAttribute('data-bs-theme');
+                        document.documentElement.classList.remove('theme-dark');
                     }
                 } catch (e) {}
             })();

@@ -1,0 +1,8 @@
+{# Bouton thème clair / sombre — vars optionnelles: btn_class #}
+<button type="button"
+        class="theme-toggle js-theme-toggle {{ btn_class|default('nav-icon-link') }}"
+        aria-label="Basculer le thème clair ou sombre"
+        title="Thème clair / sombre">
+    <i class="bi bi-moon-stars-fill theme-toggle__icon theme-toggle__icon--to-dark" aria-hidden="true"></i>
+    <i class="bi bi-sun-fill theme-toggle__icon theme-toggle__icon--to-light" aria-hidden="true"></i>
+</button>

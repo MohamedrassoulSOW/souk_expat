@@ -7,27 +7,47 @@ import { initSiteUi } from './site-ui.js';
 document.addEventListener('DOMContentLoaded', () => {
     initSiteUi();
 
-    const toggleBtn = document.getElementById('themeToggle');
     const html = document.documentElement;
+    const themeToggles = document.querySelectorAll('.js-theme-toggle');
 
-    if (toggleBtn) {
-        if (localStorage.getItem('theme') === 'dark') {
+    const applyTheme = (theme) => {
+        const isDark = theme === 'dark';
+        if (isDark) {
             html.setAttribute('data-bs-theme', 'dark');
-            toggleBtn.textContent = '☀️';
+        } else {
+            html.removeAttribute('data-bs-theme');
         }
-
-        toggleBtn.addEventListener('click', () => {
-            if (html.getAttribute('data-bs-theme') === 'dark') {
-                html.removeAttribute('data-bs-theme');
-                localStorage.setItem('theme', 'light');
-                toggleBtn.textContent = '🌙';
-            } else {
-                html.setAttribute('data-bs-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-                toggleBtn.textContent = '☀️';
-            }
+        html.classList.toggle('theme-dark', isDark);
+        themeToggles.forEach((btn) => {
+            btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+            btn.title = isDark ? 'Passer en mode clair' : 'Passer en mode sombre';
+            btn.setAttribute('aria-label', isDark ? 'Passer en mode clair' : 'Passer en mode sombre');
         });
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) {
+            meta.setAttribute('content', isDark ? '#0f172a' : '#1B2E4B');
+        }
+    };
+
+    let currentTheme = 'light';
+    try {
+        currentTheme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    } catch {
+        currentTheme = html.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
     }
+    applyTheme(currentTheme);
+
+    themeToggles.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const next = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            try {
+                localStorage.setItem('theme', next);
+            } catch {
+                /* ignore */
+            }
+            applyTheme(next);
+        });
+    });
 
     if (typeof bootstrap !== 'undefined' && bootstrap.Alert) {
         document.querySelectorAll('.alert.auto-dismiss').forEach((alert) => {
