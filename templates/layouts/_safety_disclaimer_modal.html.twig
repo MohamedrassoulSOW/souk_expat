@@ -1,0 +1,45 @@
+{# Popup de sécurité transactions — visible sur pages publiques #}
+<div class="modal fade" id="safetyDisclaimerModal" tabindex="-1" aria-labelledby="safetyDisclaimerTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden safety-disclaimer-modal">
+            <div class="safety-disclaimer-modal__head px-4 pt-4 pb-2 text-center">
+                <div class="safety-disclaimer-modal__icon mx-auto mb-3" aria-hidden="true">
+                    <i class="bi bi-shield-exclamation"></i>
+                </div>
+                <h2 class="h5 fw-bold mb-1" id="safetyDisclaimerTitle">Sécurité des échanges</h2>
+                <p class="small text-muted mb-0">Merci de lire ces points avant de contacter un vendeur ou un acheteur.</p>
+            </div>
+            <div class="modal-body px-4 pb-2">
+                <ul class="list-unstyled safety-disclaimer-modal__list mb-0">
+                    <li class="d-flex gap-3 mb-3">
+                        <span class="safety-disclaimer-modal__bullet" aria-hidden="true"><i class="bi bi-cash-coin"></i></span>
+                        <div>
+                            <strong class="d-block">Ne payez jamais avant de recevoir le produit</strong>
+                            <span class="small text-muted">Vérifiez l’article en personne avant tout paiement. Méfiez-vous des demandes d’acompte ou de virement anticipé.</span>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-3 mb-3">
+                        <span class="safety-disclaimer-modal__bullet" aria-hidden="true"><i class="bi bi-people"></i></span>
+                        <div>
+                            <strong class="d-block">SoukExpat vous met seulement en contact</strong>
+                            <span class="small text-muted">Notre rôle se limite à faciliter la mise en relation entre membres de la communauté.</span>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-3">
+                        <span class="safety-disclaimer-modal__bullet" aria-hidden="true"><i class="bi bi-slash-circle"></i></span>
+                        <div>
+                            <strong class="d-block">Aucune responsabilité sur les ventes</strong>
+                            <span class="small text-muted">La plateforme ne gère pas les paiements, la livraison ni les litiges. Les échanges et accords restent entre vous.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer border-0 px-4 pb-4 pt-2 flex-column">
+                <button type="button" class="btn btn-custom-cyan rounded-pill w-100 fw-bold py-2" id="safetyDisclaimerAccept" data-bs-dismiss="modal">
+                    J’ai compris
+                </button>
+                <p class="small text-muted text-center mb-0 mt-2">En continuant, vous acceptez ces conditions d’usage.</p>
+            </div>
+        </div>
+    </div>
+</div>

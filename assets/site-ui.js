@@ -129,8 +129,73 @@ export function initRevealOnScroll() {
     });
 }
 
+export function initSafetyDisclaimer() {
+    const modalEl = document.getElementById('safetyDisclaimerModal');
+    if (!modalEl || typeof bootstrap === 'undefined' || !bootstrap.Modal) {
+        return;
+    }
+
+    const STORAGE_KEY = 'soukexpat-safety-ack-v1';
+    const ACK_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 jours
+
+    function hasAck() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return false;
+            const ts = Number(raw);
+            if (!Number.isFinite(ts)) return false;
+            return Date.now() - ts < ACK_TTL_MS;
+        } catch {
+            return false;
+        }
+    }
+
+    function setAck() {
+        try {
+            localStorage.setItem(STORAGE_KEY, String(Date.now()));
+        } catch {
+            /* ignore */
+        }
+    }
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    let pendingLink = null;
+
+    modalEl.querySelector('#safetyDisclaimerAccept')?.addEventListener('click', () => {
+        setAck();
+        const link = pendingLink;
+        pendingLink = null;
+        if (link && link.href) {
+            const target = link.getAttribute('target');
+            if (target === '_blank') {
+                window.open(link.href, '_blank', 'noopener,noreferrer');
+            } else {
+                window.location.href = link.href;
+            }
+        }
+    });
+
+    // Popup auto sur annonce / chat / boîte de réception (une fois / 7 jours)
+    const autoContext = document.querySelector('[data-safety-context]');
+    if (autoContext && !hasAck()) {
+        window.setTimeout(() => modal.show(), 450);
+    }
+
+    // Avant Message / WhatsApp : forcer l’accusé si pas encore accepté
+    document.addEventListener('click', (event) => {
+        const link = event.target.closest('a[data-require-safety-ack]');
+        if (!link) return;
+        if (hasAck()) return;
+
+        event.preventDefault();
+        pendingLink = link;
+        modal.show();
+    });
+}
+
 export function initSiteUi() {
     document.documentElement.classList.add('site-loaded');
     initFlashToasts();
     initRevealOnScroll();
+    initSafetyDisclaimer();
 }

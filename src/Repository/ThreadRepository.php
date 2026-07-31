@@ -45,28 +45,17 @@ class ThreadRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    //    /**
-    //     * @return Thread[] Returns an array of Thread objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Thread
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Conversations sans aucun message restant.
+     *
+     * @return list<Thread>
+     */
+    public function findEmptyThreads(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.messagesAsThread', 'm')
+            ->andWhere('m.id IS NULL')
+            ->getQuery()
+            ->getResult();
+    }
 }

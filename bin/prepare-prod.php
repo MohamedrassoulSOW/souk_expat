@@ -117,5 +117,7 @@ Checklist manuelle :
        curl -I https://votre-domaine/api/v1
        curl -I https://votre-domaine/manifest.webmanifest
        curl -I https://votre-domaine/sw.js
+ 13. Cron quotidien (messages > 30 jours) :
+       15 3 * * * cd /chemin/vers/projet && php bin/console app:messages:purge-expired --env=prod
 
 TXT;

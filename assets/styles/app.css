@@ -3883,6 +3883,52 @@ body.admin-mobile-menu-open {
     color: #f8fafc !important;
 }
 
+/* ——— Safety disclaimer (transactions) ——— */
+.safety-disclaimer-modal__head {
+    background: linear-gradient(180deg, rgba(245, 158, 11, 0.12), transparent);
+}
+
+.safety-disclaimer-modal__icon {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 158, 11, 0.18);
+    color: #b45309;
+    font-size: 1.5rem;
+}
+
+.safety-disclaimer-modal__bullet {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.75rem;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(27, 46, 75, 0.08);
+    color: var(--navy, #1b2e4b);
+}
+
+.safety-inline-alert {
+    background: rgba(245, 158, 11, 0.12) !important;
+    color: #78350f;
+}
+
+[data-bs-theme="dark"] .safety-inline-alert,
+html.theme-dark .safety-inline-alert {
+    background: rgba(245, 158, 11, 0.16) !important;
+    color: #fde68a;
+}
+
+[data-bs-theme="dark"] .safety-disclaimer-modal__bullet,
+html.theme-dark .safety-disclaimer-modal__bullet {
+    background: rgba(148, 163, 184, 0.15);
+    color: #e2e8f0;
+}
+
 /* ——— WhatsApp FAB (mobile / tablette / desktop) ——— */
 .whatsapp-fab {
     position: fixed;

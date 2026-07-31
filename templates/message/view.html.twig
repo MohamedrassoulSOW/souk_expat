@@ -6,8 +6,12 @@
 {% set interlocuteur = adminReadOnly|default(false) ? null : (app.user == thread.buyer ? thread.seller : thread.buyer) %}
 {{ include('layouts/navBar.html.twig') }}
 
-<main class="msg-chat">
+<main class="msg-chat" data-safety-context="chat">
     <div class="container msg-chat__container">
+        <div class="alert alert-warning border-0 rounded-4 small mb-3 safety-inline-alert" role="note">
+            <strong><i class="bi bi-shield-exclamation me-1" aria-hidden="true"></i>Sécurité :</strong>
+            ne payez pas avant réception du produit. SoukExpat vous met en contact uniquement et n’assume aucune responsabilité sur les ventes.
+        </div>
         <div class="card border-0 shadow-sm msg-chat__shell wa-chat-shell">
             <header class="wa-chat-header">
                 <div class="d-flex align-items-center flex-grow-1 min-w-0 gap-2">
@@ -59,7 +63,8 @@
                                class="btn btn-sm btn-success rounded-pill px-3 fw-semibold"
                                target="_blank"
                                rel="noopener noreferrer"
-                               title="Continuer sur WhatsApp">
+                               title="Continuer sur WhatsApp"
+                               data-require-safety-ack="1">
                                 <i class="bi bi-whatsapp me-1" aria-hidden="true"></i>WhatsApp
                             </a>
                         {% endif %}
@@ -76,7 +81,8 @@
                                target="_blank"
                                rel="noopener noreferrer"
                                aria-label="WhatsApp"
-                               title="WhatsApp">
+                               title="WhatsApp"
+                               data-require-safety-ack="1">
                                 <i class="bi bi-whatsapp" aria-hidden="true"></i>
                             </a>
                         </div>

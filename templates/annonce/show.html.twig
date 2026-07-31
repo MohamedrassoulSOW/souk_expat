@@ -90,43 +90,56 @@
                     {{ annonce.description }}
                 </p>
 
-                {# Contact : messagerie + WhatsApp (annonce ou profil vendeur) #}
+                {# Contact : connecté → Message + WhatsApp ; invité → connexion #}
                 {% set wa_phone = annonce.phone|default('') %}
                 {% if wa_phone is empty and annonce.user.whatsappPhone %}
                     {% set wa_phone = annonce.user.whatsappPhone %}
                 {% endif %}
                 {% set wa_text = 'Bonjour, je suis intéressé(e) par votre annonce « ' ~ annonce.title ~ ' » sur SoukExpat.' %}
                 {% set wa_href = wa_phone ? (wa_phone|whatsapp_url(wa_text)) : '#' %}
-                <div class="d-grid gap-3">
+                <div class="d-grid gap-3" data-safety-context="annonce">
+                    <div class="alert alert-warning border-0 rounded-4 small mb-0 safety-inline-alert" role="note">
+                        <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i> Rappel sécurité</div>
+                        <ul class="mb-0 ps-3">
+                            <li>Ne payez pas avant d’avoir reçu et vérifié le produit.</li>
+                            <li>SoukExpat vous met uniquement en contact et n’est pas responsable des ventes.</li>
+                        </ul>
+                    </div>
                     {% if app.user and app.user != annonce.user %}
-                        <a href="{{ path('app_chat_check', {id: annonce.id}) }}" class="btn btn-custom-cyan btn-lg btn-md rounded-pill fw-bold py-3 py-2 shadow-sm">
+                        <a href="{{ path('app_chat_check', {id: annonce.id}) }}"
+                           class="btn btn-custom-cyan btn-lg btn-md rounded-pill fw-bold py-3 py-2 shadow-sm"
+                           data-require-safety-ack="1">
                             <i class="bi bi-chat-dots-fill me-2"></i> Envoyer un message
                         </a>
+                        {% if wa_phone and wa_href != '#' %}
+                            <a href="{{ wa_href }}"
+                               class="btn btn-success btn-lg btn-md rounded-pill fw-bold py-3 py-2 shadow-sm"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               data-require-safety-ack="1">
+                                <i class="bi bi-whatsapp me-2" aria-hidden="true"></i> Contacter sur WhatsApp
+                            </a>
+                        {% endif %}
+                        <p class="small text-muted mb-0 text-center">
+                            {% if wa_phone and wa_href != '#' %}
+                                Choisissez la messagerie SoukExpat ou WhatsApp.
+                            {% else %}
+                                Contact via la messagerie SoukExpat.
+                            {% endif %}
+                        </p>
                     {% elseif not app.user %}
                         <a href="{{ path('app_login') }}" class="btn btn-custom-cyan btn-lg btn-md rounded-pill fw-bold py-3 py-2">
                             Connectez-vous pour contacter
                         </a>
+                        <p class="small text-muted mb-0 text-center">
+                            Connectez-vous pour envoyer un message ou écrire sur WhatsApp.
+                        </p>
+                    {% elseif app.user and app.user.id == annonce.user.id and not wa_phone %}
+                        <p class="small text-muted mb-0 text-center">
+                            <a href="{{ path('app_profile_edit') }}" class="text-brand text-decoration-none">Ajoutez votre WhatsApp</a>
+                            (profil) ou sur l’annonce pour que les acheteurs puissent vous joindre aussi hors messagerie.
+                        </p>
                     {% endif %}
-
-                    {% if wa_phone and wa_href != '#' and (not app.user or app.user != annonce.user) %}
-                        <a href="{{ wa_href }}"
-                           class="btn btn-success btn-lg btn-md rounded-pill fw-bold py-3 py-2 shadow-sm"
-                           target="_blank"
-                           rel="noopener noreferrer">
-                            <i class="bi bi-whatsapp me-2" aria-hidden="true"></i> Contacter sur WhatsApp
-                        </a>
-                    {% endif %}
-
-                    <p class="small text-muted mb-0 text-center">
-                        {% if wa_phone and wa_href != '#' %}
-                            Messagerie SoukExpat ou WhatsApp — répondez de préférence sur la plateforme pour garder une trace.
-                        {% else %}
-                            Contact via la messagerie SoukExpat.
-                            {% if app.user and app.user.id == annonce.user.id and not annonce.user.whatsappPhone %}
-                                <a href="{{ path('app_profile_edit') }}" class="text-brand text-decoration-none">Ajoutez votre WhatsApp</a> pour que les acheteurs puissent vous joindre.
-                            {% endif %}
-                        {% endif %}
-                    </p>
                 </div>
 
                 {# Actions Propriétaire #}

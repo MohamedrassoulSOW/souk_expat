@@ -34,4 +34,17 @@ class MessageRepository extends ServiceEntityRepository
 
         return (int) $result;
     }
+
+    /**
+     * @return list<Message>
+     */
+    public function findCreatedBefore(\DateTimeImmutable $before): array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.createdAt < :before')
+            ->setParameter('before', $before)
+            ->orderBy('m.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
