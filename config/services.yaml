@@ -28,5 +28,9 @@ services:
             $issuer: '%env(JWT_ISSUER)%'
             $ttlSeconds: '%env(int:JWT_TTL)%'
 
+    App\Api\ApiAnnonceWriter:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

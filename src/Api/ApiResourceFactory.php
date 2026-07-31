@@ -7,6 +7,8 @@ namespace App\Api;
 use App\Entity\Annonce;
 use App\Entity\Category;
 use App\Entity\City;
+use App\Entity\Message;
+use App\Entity\Thread;
 use App\Entity\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -98,6 +100,7 @@ final class ApiResourceFactory
 
         if ($detailed) {
             $data['description'] = $annonce->getDescription();
+            $data['phone'] = $annonce->getPhone() !== '' ? $annonce->getPhone() : null;
             $data['approvedAt'] = $annonce->getApprovedAt()?->format(\DateTimeInterface::ATOM);
             $data['updatedAt'] = $annonce->getUpdatedAt()?->format(\DateTimeInterface::ATOM);
             $data['webUrl'] = $this->urlGenerator->generate(
@@ -108,6 +111,66 @@ final class ApiResourceFactory
         }
 
         return $data;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function thread(Thread $thread, ?User $viewer = null, bool $withMessages = false): array
+    {
+        $annonce = $thread->getAnnonce();
+        $messages = $thread->getMessagesAsThread();
+        $last = $messages->last() ?: null;
+        $unread = 0;
+        if ($viewer instanceof User) {
+            foreach ($messages as $message) {
+                if ($message->getSender()?->getId() !== $viewer->getId() && !$message->isIsRead()) {
+                    ++$unread;
+                }
+            }
+        }
+
+        $data = [
+            'id' => $thread->getId(),
+            'annonce' => $annonce ? $this->annonce($annonce) : null,
+            'buyer' => $thread->getBuyer() ? $this->user($thread->getBuyer()) : null,
+            'seller' => $thread->getSeller() ? $this->user($thread->getSeller()) : null,
+            'unreadCount' => $unread,
+            'lastMessage' => $last instanceof Message ? $this->message($last) : null,
+        ];
+
+        if ($withMessages) {
+            $data['messages'] = array_map(
+                fn (Message $message) => $this->message($message),
+                $messages->toArray()
+            );
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function message(Message $message): array
+    {
+        $imageUrl = null;
+        if ($message->getKind() === Message::KIND_IMAGE && $message->getImageFilename()) {
+            $imageUrl = $this->absolute('/uploads/messages/' . $message->getImageFilename());
+        }
+
+        return [
+            'id' => $message->getId(),
+            'kind' => $message->getKind(),
+            'content' => $message->getContent(),
+            'imageUrl' => $imageUrl,
+            'latitude' => $message->getLatitude(),
+            'longitude' => $message->getLongitude(),
+            'locationLabel' => $message->getLocationLabel(),
+            'isRead' => $message->isIsRead(),
+            'createdAt' => $message->getCreatedAt()?->format(\DateTimeInterface::ATOM),
+            'sender' => $message->getSender() ? $this->user($message->getSender()) : null,
+        ];
     }
 
     private function avatarUrl(User $user): ?string
