@@ -9,7 +9,7 @@
                 <p class="text-secondary small pe-lg-5 text-center text-md-start">
                     {{ site ? site.footerText : 'Le Marché Mondial des Expatriés. Achetez, vendez et échangez en toute confiance au sein de votre communauté au Maroc.' }}
                 </p>
-                <div class="social-links d-flex gap-3 mt-4">
+                <div class="social-links d-flex gap-3 mt-4 justify-content-center justify-content-md-start flex-wrap">
                     {% if site and site.facebookUrl %}
                         <a href="{{ site.facebookUrl }}" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
                     {% endif %}
@@ -18,6 +18,11 @@
                     {% endif %}
                     {% if site and site.linkedinUrl %}
                         <a href="{{ site.linkedinUrl }}" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                    {% endif %}
+                    {% set wa_phone = site ? site.contactPhone : null %}
+                    {% set wa_href = wa_phone ? (wa_phone|whatsapp_url('Bonjour SoukExpat, j’ai une question.')) : '#' %}
+                    {% if wa_phone and wa_href != '#' %}
+                        <a href="{{ wa_href }}" class="social-icon social-icon--whatsapp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
                     {% endif %}
                 </div>
             </div>
@@ -48,12 +53,19 @@
             <div class="col-12 col-lg-4 col-md-6">
                 <h5 class="fw-bold mb-4 text-center text-md-start">Restez informé</h5>
                 <p class="text-secondary small text-center text-md-start">{{ site ? site.newsletterText : 'Recevez les meilleures pépites du Souk chaque semaine.' }}</p>
-                <div class="mt-3 text-center text-md-start">
+                <div class="mt-3 text-center text-md-start d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
                     <a href="{{ path('app_contact') }}" class="btn btn-custom-cyan rounded-pill px-4">
                         <i class="bi bi-envelope me-1" aria-hidden="true"></i>Nous contacter
                     </a>
+                    {% set wa_phone = site ? site.contactPhone : null %}
+                    {% set wa_href = wa_phone ? (wa_phone|whatsapp_url('Bonjour SoukExpat, j’ai une question.')) : '#' %}
+                    {% if wa_phone and wa_href != '#' %}
+                        <a href="{{ wa_href }}" class="btn btn-success rounded-pill px-4" target="_blank" rel="noopener noreferrer">
+                            <i class="bi bi-whatsapp me-1" aria-hidden="true"></i>WhatsApp
+                        </a>
+                    {% endif %}
                     {% if contact_email %}
-                        <p class="small mt-3 mb-0">
+                        <p class="small mt-2 mb-0 w-100">
                             <a href="mailto:{{ contact_email }}" class="footer-credit-link">{{ contact_email }}</a>
                         </p>
                     {% endif %}
@@ -133,6 +145,9 @@
         background: #4B79A1;
         color: white;
         transform: translateY(-3px);
+    }
+    .social-icon--whatsapp:hover {
+        background: #25D366;
     }
 
     /* Focus Newsletter */

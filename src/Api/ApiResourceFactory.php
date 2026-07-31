@@ -33,6 +33,7 @@ final class ApiResourceFactory
                 ? $lastName
                 : ($lastName ? mb_substr($lastName, 0, 1) . '.' : null),
             'avatarUrl' => $this->avatarUrl($user),
+            'whatsappPhone' => $user->getWhatsappPhone(),
         ];
 
         if ($private) {

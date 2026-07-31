@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
         <title>{% block title %}Welcome!{% endblock %}</title>
-        <meta name="theme-color" content="#1B2E4B">
+        <meta name="description" content="SoukExpat — achetez et vendez entre expatriés au Maroc.">
+        <meta name="theme-color" content="#1B2E4B" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="SoukExpat">
+        <meta name="format-detection" content="telephone=no">
+        <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.png') }}">
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicon.png') }}">
+        <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}">
         <script>
             (function () {
                 try {
@@ -43,5 +52,8 @@
         <div id="app-toast-stack" class="toast-container position-fixed bottom-0 end-0 p-3 pb-4 pe-3" style="z-index: 1090;" aria-live="polite" aria-atomic="false"></div>
 
         {% block body %}{% endblock %}
+        {% block whatsapp_fab %}
+            {{ include('layouts/_whatsapp_fab.html.twig') }}
+        {% endblock %}
     </body>
 </html>

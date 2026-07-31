@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1B2E4B">
+    <title>Hors ligne | SoukExpat</title>
+    <style>
+        :root {
+            --navy: #1B2E4B;
+            --cyan: #4B79A1;
+            --bg: #f4f7fb;
+            --text: #1e293b;
+            --muted: #64748b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at top, rgba(75, 121, 161, 0.18), transparent 55%),
+                linear-gradient(180deg, #eef3f8 0%, var(--bg) 100%);
+        }
+        .card {
+            width: min(100%, 26rem);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(27, 46, 75, 0.08);
+            border-radius: 1.25rem;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 18px 40px rgba(27, 46, 75, 0.08);
+        }
+        img {
+            width: 140px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            margin: 0 0 0.5rem;
+            font-size: 1.35rem;
+            color: var(--navy);
+        }
+        p {
+            margin: 0 0 1.5rem;
+            color: var(--muted);
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        button {
+            appearance: none;
+            border: 0;
+            border-radius: 999px;
+            padding: 0.75rem 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, var(--cyan), var(--navy));
+            cursor: pointer;
+        }
+        button:focus-visible {
+            outline: 2px solid var(--cyan);
+            outline-offset: 3px;
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <img src="/logo-souk-expat.png" alt="SoukExpat" width="140" height="76" decoding="async">
+        <h1>Vous êtes hors ligne</h1>
+        <p>SoukExpat a besoin d’une connexion pour afficher les annonces. Vérifiez votre réseau, puis réessayez.</p>
+        <button type="button" onclick="location.reload()">Réessayer</button>
+    </main>
+</body>
+</html>

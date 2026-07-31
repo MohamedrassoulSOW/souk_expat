@@ -52,6 +52,17 @@
                             {{ form_errors(form.city) }}
                         </div>
 
+                        {# WHATSAPP #}
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-bold small text-uppercase text-muted" for="{{ form.phone.vars.id }}">WhatsApp <span class="text-muted fw-normal">(optionnel)</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-whatsapp text-success"></i></span>
+                                {{ form_widget(form.phone, {'attr': {'class': 'form-control border-start-0 ps-0', 'placeholder': '+212 6XX XXX XXX'}}) }}
+                            </div>
+                            <div class="form-text small">Les acheteurs pourront vous écrire directement sur WhatsApp.</div>
+                            {{ form_errors(form.phone) }}
+                        </div>
+
                         {# DESCRIPTION #}
                         <div class="col-12">
                             <label class="form-label fw-bold small text-uppercase text-muted">Description détaillée</label>
@@ -62,8 +73,8 @@
                         <div class="col-12">
                             <div class="alert alert-light border rounded-4 small mb-0">
                                 <i class="bi bi-shield-check me-1 text-brand" aria-hidden="true"></i>
-                                Les acheteurs vous contactent via la <strong>messagerie SoukExpat</strong>.
-                                Aucun numéro de téléphone n’est demandé ni publié sur le site (prévu pour les apps mobiles).
+                                Les acheteurs peuvent vous contacter via la <strong>messagerie SoukExpat</strong>
+                                {% if form.phone is defined %} et, si vous renseignez un numéro, via <strong>WhatsApp</strong>{% endif %}.
                             </div>
                         </div>
 

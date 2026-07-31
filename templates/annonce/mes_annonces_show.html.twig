@@ -38,9 +38,14 @@
                         </div>
                     </div>
                     
-                    <div class="d-flex gap-4 align-items-center mt-2">
+                    <div class="d-flex gap-4 align-items-center mt-2 flex-wrap">
                         <div class="h4 fw-bold mb-0" style="color: #42B1CE;">{{ annonce.price|number_format(0, '.', ' ') }} MAD</div>
                         <div class="text-muted small"><i class="bi bi-calendar3 me-1"></i> {{ "now"|date("d/m/Y") }}</div>
+                        {% if annonce.phone %}
+                            <div class="text-muted small">
+                                <i class="bi bi-whatsapp text-success me-1" aria-hidden="true"></i>{{ annonce.phone }}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
 

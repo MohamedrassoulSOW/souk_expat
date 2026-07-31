@@ -40,8 +40,7 @@ class Annonce
     private string $status;
 
     /**
-     * Conservé en base pour compatibilité ; non collecté ni affiché sur le site web
-     * (contact via messagerie — téléphone réservé aux futures apps mobiles).
+     * WhatsApp / téléphone de contact pour l’annonce (optionnel, affiché publiquement).
      */
     #[ORM\Column(length: 30, options: ['default' => ''])]
     private string $phone = '';

@@ -47,6 +47,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
 
+    /** Numéro WhatsApp public pour contact entre membres (optionnel). */
+    #[ORM\Column(length: 30, nullable: true)]
+    private ?string $whatsappPhone = null;
+
     public function getAvatar(): ?string
     {
         return $this->avatar;
@@ -55,6 +59,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAvatar(?string $avatar): self
     {
         $this->avatar = $avatar;
+        return $this;
+    }
+
+    public function getWhatsappPhone(): ?string
+    {
+        return $this->whatsappPhone;
+    }
+
+    public function setWhatsappPhone(?string $whatsappPhone): self
+    {
+        $whatsappPhone = $whatsappPhone !== null ? trim($whatsappPhone) : null;
+        $this->whatsappPhone = $whatsappPhone !== '' ? $whatsappPhone : null;
+
         return $this;
     }
 

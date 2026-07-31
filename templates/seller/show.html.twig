@@ -86,6 +86,16 @@
                                         <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Publier une annonce
                                     </a>
                                 {% else %}
+                                    {% set seller_wa = seller.whatsappPhone|default('') %}
+                                    {% set seller_wa_href = seller_wa ? (seller_wa|whatsapp_url('Bonjour ' ~ seller.firstName ~ ', je vous contacte via SoukExpat.')) : '#' %}
+                                    {% if seller_wa and seller_wa_href != '#' %}
+                                        <a href="{{ seller_wa_href }}"
+                                           class="btn btn-success rounded-pill w-100 fw-semibold"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="bi bi-whatsapp me-1" aria-hidden="true"></i> Contacter sur WhatsApp
+                                        </a>
+                                    {% endif %}
                                     <a href="{{ path('app_annonce_index') }}" class="btn btn-custom-cyan rounded-pill w-100 fw-semibold">
                                         <i class="bi bi-grid me-1" aria-hidden="true"></i> Toutes les annonces
                                     </a>

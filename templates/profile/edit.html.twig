@@ -65,6 +65,17 @@
                                 <div class="text-danger small">{{ form_errors(form.email) }}</div>
                             </div>
 
+                            {# WhatsApp #}
+                            <div class="col-12 mb-3">
+                                <label class="form-label small fw-bold text-muted text-uppercase" for="{{ form.whatsappPhone.vars.id }}">WhatsApp <span class="fw-normal">(optionnel)</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-success"><i class="bi bi-whatsapp"></i></span>
+                                    {{ form_widget(form.whatsappPhone, {'attr': {'class': 'form-control border-start-0 ps-0 py-2', 'placeholder': '+212 6XX XXX XXX'}}) }}
+                                </div>
+                                <div class="form-text small">Les autres membres pourront vous écrire sur WhatsApp (profil, annonces, messagerie).</div>
+                                <div class="text-danger small">{{ form_errors(form.whatsappPhone) }}</div>
+                            </div>
+
                             {# Upload Avatar #}
                             <div class="col-12 mb-4">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Changer la photo de profil</label>

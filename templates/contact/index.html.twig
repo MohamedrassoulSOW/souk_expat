@@ -54,6 +54,22 @@
                                     <a href="mailto:{{ contact_email }}" class="contact-aside-link">{{ contact_email }}</a>
                                 </div>
                             </li>
+                            {% set wa_phone = site ? site.contactPhone : null %}
+                            {% set wa_href = wa_phone ? (wa_phone|whatsapp_url('Bonjour SoukExpat, j’ai une question.')) : '#' %}
+                            {% if wa_phone and wa_href != '#' %}
+                            <li class="d-flex mb-4">
+                                <span class="contact-info-icon"><i class="bi bi-whatsapp"></i></span>
+                                <div>
+                                    <span class="d-block small text-white-50 mb-1">WhatsApp</span>
+                                    <a href="{{ wa_href }}" class="contact-aside-link" target="_blank" rel="noopener noreferrer">{{ wa_phone }}</a>
+                                    <div class="mt-2">
+                                        <a href="{{ wa_href }}" class="btn btn-sm btn-success rounded-pill px-3 fw-semibold" target="_blank" rel="noopener noreferrer">
+                                            <i class="bi bi-whatsapp me-1" aria-hidden="true"></i>Écrire sur WhatsApp
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endif %}
                             <li class="d-flex mb-0">
                                 <span class="contact-info-icon"><i class="bi bi-clock"></i></span>
                                 <div>

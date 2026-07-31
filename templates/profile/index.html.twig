@@ -73,6 +73,26 @@
                                         <label class="info-label">E-mail</label>
                                         <p class="mb-0 fw-medium text-dark"><i class="bi bi-envelope-at me-2 text-brand"></i>{{ user.email }}</p>
                                     </div>
+                                    <div class="col-12 mt-3">
+                                        <label class="info-label">WhatsApp</label>
+                                        {% if user.whatsappPhone %}
+                                            {% set wa_href = user.whatsappPhone|whatsapp_url %}
+                                            <p class="mb-0 fw-medium text-dark">
+                                                <i class="bi bi-whatsapp me-2 text-success"></i>
+                                                {% if wa_href != '#' %}
+                                                    <a href="{{ wa_href }}" class="text-decoration-none text-dark" target="_blank" rel="noopener noreferrer">{{ user.whatsappPhone }}</a>
+                                                {% else %}
+                                                    {{ user.whatsappPhone }}
+                                                {% endif %}
+                                            </p>
+                                        {% else %}
+                                            <p class="mb-0 text-muted small">
+                                                Non renseigné —
+                                                <a href="{{ path('app_profile_edit') }}" class="text-brand fw-semibold text-decoration-none">ajouter un numéro</a>
+                                                pour que les acheteurs puissent vous écrire.
+                                            </p>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>

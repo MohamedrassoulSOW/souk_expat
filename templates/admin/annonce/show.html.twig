@@ -87,6 +87,19 @@
                         <div class="small text-muted">Vendeur</div>
                         <div>{{ annonce.user ? annonce.user.firstName ~ ' ' ~ annonce.user.lastName : '—' }}</div>
                     </div>
+                    {% if annonce.phone %}
+                    <div class="col-6">
+                        <div class="small text-muted">WhatsApp</div>
+                        {% set wa_href = annonce.phone|whatsapp_url('Bonjour, au sujet de l’annonce « ' ~ annonce.title ~ ' ».') %}
+                        {% if wa_href != '#' %}
+                            <a href="{{ wa_href }}" class="fw-semibold text-success text-decoration-none" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-whatsapp me-1" aria-hidden="true"></i>{{ annonce.phone }}
+                            </a>
+                        {% else %}
+                            <div>{{ annonce.phone }}</div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                     <div class="col-12">
                         <div class="small text-muted border-top pt-3">Description</div>
                         <p class="mb-0 mt-1">{{ annonce.description|nl2br }}</p>

@@ -51,7 +51,37 @@
 
                 <div class="d-none d-sm-flex align-items-center gap-2 flex-shrink-0">
                     <span class="wa-price-pill">{{ thread.annonce.price|number_format(0, ',', ' ') }} MAD</span>
+                    {% if interlocuteur and interlocuteur.whatsappPhone %}
+                        {% set chat_wa_text = 'Bonjour ' ~ interlocuteur.firstName ~ ', au sujet de « ' ~ thread.annonce.title ~ ' » sur SoukExpat.' %}
+                        {% set chat_wa_href = interlocuteur.whatsappPhone|whatsapp_url(chat_wa_text) %}
+                        {% if chat_wa_href != '#' %}
+                            <a href="{{ chat_wa_href }}"
+                               class="btn btn-sm btn-success rounded-pill px-3 fw-semibold"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               title="Continuer sur WhatsApp">
+                                <i class="bi bi-whatsapp me-1" aria-hidden="true"></i>WhatsApp
+                            </a>
+                        {% endif %}
+                    {% endif %}
                 </div>
+                {% if interlocuteur and interlocuteur.whatsappPhone %}
+                    {% set chat_wa_text_m = 'Bonjour ' ~ interlocuteur.firstName ~ ', au sujet de « ' ~ thread.annonce.title ~ ' » sur SoukExpat.' %}
+                    {% set chat_wa_href_m = interlocuteur.whatsappPhone|whatsapp_url(chat_wa_text_m) %}
+                    {% if chat_wa_href_m != '#' %}
+                        <div class="d-sm-none flex-shrink-0">
+                            <a href="{{ chat_wa_href_m }}"
+                               class="btn btn-sm btn-success rounded-circle d-inline-flex align-items-center justify-content-center"
+                               style="width:2.35rem;height:2.35rem;"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               aria-label="WhatsApp"
+                               title="WhatsApp">
+                                <i class="bi bi-whatsapp" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
             </header>
 
             <div id="message-container" class="wa-message-container">

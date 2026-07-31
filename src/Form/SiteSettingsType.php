@@ -62,14 +62,14 @@ class SiteSettingsType extends AbstractType
                 'constraints' => [new NotBlank(), new Email()],
             ])
             ->add('contactPhone', TextType::class, [
-                'label' => 'Téléphone (non affiché sur le site)',
-                'help' => 'Conservé en base pour usage interne éventuel. Aucun numéro n’est publié sur le site web (contact via messagerie / e-mail uniquement).',
+                'label' => 'WhatsApp (contact public)',
+                'help' => 'Numéro au format international (+2126…) ou local marocain (06…). Affiché sur Contact, footer et bouton flottant (mobile, tablette, desktop). Laisser vide pour masquer.',
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'Non publié sur le site',
+                    'placeholder' => '+212 6XX XXX XXX',
                     'class' => 'form-control',
+                    'autocomplete' => 'tel',
                 ],
-                'row_attr' => ['class' => 'd-none'],
             ])
             ->add('contactAddress', TextType::class, [
                 'label' => 'Adresse',

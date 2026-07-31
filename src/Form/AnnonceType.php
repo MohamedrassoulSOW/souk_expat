@@ -15,6 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\Constraints\Length;
 
 
 class AnnonceType extends AbstractType
@@ -63,6 +64,22 @@ class AnnonceType extends AbstractType
                 'placeholder' => 'Choisir une ville',
                 'attr' => [
                     'class' => 'form-select',
+                ],
+            ])
+
+            ->add('phone', TextType::class, [
+                'label' => 'WhatsApp (optionnel)',
+                'required' => false,
+                'empty_data' => '',
+                'help' => 'Les acheteurs pourront vous écrire sur WhatsApp. Format +2126… ou 06…',
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => '+212 6XX XXX XXX',
+                    'autocomplete' => 'tel',
+                    'inputmode' => 'tel',
+                ],
+                'constraints' => [
+                    new Length(max: 30),
                 ],
             ])
 

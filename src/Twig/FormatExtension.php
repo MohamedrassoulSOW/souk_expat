@@ -26,12 +26,27 @@ class FormatExtension extends AbstractExtension
     }
 
     /**
-     * Lien WhatsApp (wa.me) à partir d’un numéro international (+indicatif…).
+     * Lien WhatsApp (wa.me) à partir d’un numéro (+212…, 00212… ou 06… Maroc).
      */
     public function whatsappUrl(?string $phone, ?string $prefill = null): string
     {
         $digits = preg_replace('/\D+/', '', (string) $phone) ?? '';
-        if ($digits === '' || str_starts_with($digits, '0')) {
+        if ($digits === '') {
+            return '#';
+        }
+
+        // 00indicatif… → indicatif…
+        if (str_starts_with($digits, '00')) {
+            $digits = substr($digits, 2);
+        }
+
+        // Mobile marocain local 06/07… → 2126/2127…
+        if (preg_match('/^0([67]\d{8})$/', $digits, $m)) {
+            $digits = '212' . $m[1];
+        }
+
+        // Toujours un indicatif pays (pas de numéro local restant)
+        if ($digits === '' || str_starts_with($digits, '0') || \strlen($digits) < 10) {
             return '#';
         }
 

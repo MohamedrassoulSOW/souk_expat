@@ -49,6 +49,7 @@ $dirs = [
     'public/uploads/avatars',
     'public/uploads/categories',
     'public/uploads/sliders',
+    'public/uploads/messages',
 ];
 
 foreach ($dirs as $dir) {
@@ -57,6 +58,21 @@ foreach ($dirs as $dir) {
         fail("Impossible de créer {$dir}");
     }
     echo "[OK] {$dir}\n";
+}
+
+$pwaFiles = [
+    'public/manifest.webmanifest',
+    'public/sw.js',
+    'public/offline.html',
+    'public/icons/icon-192.png',
+    'public/icons/icon-512.png',
+    'public/icons/apple-touch-icon.png',
+];
+foreach ($pwaFiles as $file) {
+    if (!is_file($root . '/' . $file)) {
+        fail("Fichier PWA manquant : {$file}");
+    }
+    echo "[OK] {$file}\n";
 }
 
 $steps = [
@@ -85,13 +101,21 @@ echo <<<TXT
 Checklist manuelle :
   1. APP_ENV=prod et APP_DEBUG=0
   2. APP_SECRET unique (pas celui du .env de dev)
-  3. DATABASE_URL pointe vers la base prod
-  4. MAILER_DSN = SMTP réel (pas Mailtrap) + test :
+  3. JWT_SECRET dédié (≥ 32 caractères)
+  4. DATABASE_URL pointe vers la base prod
+  5. MAILER_DSN = SMTP réel (pas Mailtrap) + test :
        php bin/console app:mailer:smoke-test votre@email.com --env=prod
-  5. DEFAULT_URI = https://votre-domaine (sans / final)
-  6. Document root Apache/Nginx = dossier public/
-  7. Droits écriture : var/ et public/uploads/
-  8. Créer un compte admin si besoin :
+  6. DEFAULT_URI = https://votre-domaine (sans / final)
+  7. Document root Apache/Nginx = dossier public/
+  8. HTTPS obligatoire (PWA + cookies sécurisés)
+  9. Droits écriture : var/ et public/uploads/
+ 10. Admin → Paramètres : WhatsApp du site (bouton flottant)
+ 11. Créer un compte admin si besoin :
        php bin/console app:user:create-editor --env=prod
+ 12. Smoke tests :
+       curl -I https://votre-domaine/
+       curl -I https://votre-domaine/api/v1
+       curl -I https://votre-domaine/manifest.webmanifest
+       curl -I https://votre-domaine/sw.js
 
 TXT;

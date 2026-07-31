@@ -68,6 +68,17 @@ final class MeController extends AbstractController
             $user->setLastName($lastName);
         }
 
+        if (\array_key_exists('whatsappPhone', $payload)) {
+            $phone = trim((string) ($payload['whatsappPhone'] ?? ''));
+            if (mb_strlen($phone) > 30) {
+                return $this->json([
+                    'error' => 'validation_error',
+                    'message' => 'Numéro WhatsApp trop long.',
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+            $user->setWhatsappPhone($phone !== '' ? $phone : null);
+        }
+
         $this->em->flush();
 
         return $this->json(['user' => $this->resources->user($user, true)]);

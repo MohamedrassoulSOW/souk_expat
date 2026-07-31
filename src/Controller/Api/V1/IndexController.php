@@ -21,7 +21,7 @@ final class IndexController extends AbstractController
                 'POST /api/v1/auth/login' => 'Connexion (email + password) → JWT',
                 'POST /api/v1/auth/register' => 'Inscription → JWT',
                 'GET /api/v1/me' => 'Profil connecté (Bearer)',
-                'PATCH /api/v1/me' => 'Mettre à jour prénom/nom (Bearer)',
+                'PATCH /api/v1/me' => 'Mettre à jour prénom/nom/whatsappPhone (Bearer)',
                 'GET /api/v1/me/annonces' => 'Mes annonces (Bearer)',
                 'GET /api/v1/annonces' => 'Liste publique (q, category, city, page, limit)',
                 'GET /api/v1/annonces/{id}' => 'Détail (approuvée, ou propriétaire)',

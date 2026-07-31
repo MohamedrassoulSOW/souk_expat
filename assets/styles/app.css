@@ -3883,12 +3883,176 @@ body.admin-mobile-menu-open {
     color: #f8fafc !important;
 }
 
+/* ——— WhatsApp FAB (mobile / tablette / desktop) ——— */
+.whatsapp-fab {
+    position: fixed;
+    z-index: 1080;
+    right: max(1rem, env(safe-area-inset-right, 0px));
+    bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 3.25rem;
+    padding: 0.65rem 1rem 0.65rem 0.85rem;
+    border-radius: 999px;
+    background: #25d366;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 12px 28px rgba(37, 211, 102, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.whatsapp-fab:hover,
+.whatsapp-fab:focus-visible {
+    background: #1ebe57;
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px rgba(37, 211, 102, 0.45);
+}
+
+.whatsapp-fab i {
+    font-size: 1.45rem;
+    line-height: 1;
+}
+
+.whatsapp-fab__label {
+    letter-spacing: 0.01em;
+}
+
+/* Remonter le FAB si la bannière PWA est visible */
+body:has(#pwa-install-banner) .whatsapp-fab {
+    bottom: max(6.5rem, calc(env(safe-area-inset-bottom, 0px) + 5.5rem));
+}
+
+@media (min-width: 768px) {
+    .whatsapp-fab {
+        right: 1.25rem;
+        bottom: 1.25rem;
+        padding: 0.7rem 1.15rem 0.7rem 0.95rem;
+    }
+
+    body:has(#pwa-install-banner) .whatsapp-fab {
+        bottom: max(7rem, calc(1.25rem + 5.5rem));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .whatsapp-fab {
+        transition: none;
+    }
+}
+
+/* ——— PWA install banner (desktop + mobile) ——— */
+.pwa-install-banner {
+    position: fixed;
+    z-index: 1100;
+    left: 1rem;
+    right: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+    pointer-events: none;
+}
+
+.pwa-install-banner__inner {
+    pointer-events: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    max-width: 36rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(27, 46, 75, 0.1);
+    box-shadow: 0 16px 40px rgba(27, 46, 75, 0.16);
+    backdrop-filter: blur(10px);
+}
+
+.pwa-install-banner__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 0.65rem;
+    flex-shrink: 0;
+}
+
+.pwa-install-banner__copy {
+    flex: 1 1 10rem;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    line-height: 1.25;
+}
+
+.pwa-install-banner__copy strong {
+    color: var(--navy, #1b2e4b);
+    font-size: 0.95rem;
+}
+
+.pwa-install-banner__copy span {
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.pwa-install-banner__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: auto;
+}
+
+@media (min-width: 768px) {
+    .pwa-install-banner {
+        left: auto;
+        right: 1.25rem;
+        bottom: 1.25rem;
+        width: min(28rem, calc(100vw - 2.5rem));
+    }
+
+    .pwa-install-banner__inner {
+        margin: 0;
+        max-width: none;
+    }
+}
+
+/* Tablette : bannière plus lisible, centrée en bas */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    .pwa-install-banner {
+        left: 50%;
+        right: auto;
+        bottom: 1.25rem;
+        width: min(32rem, calc(100vw - 2.5rem));
+        transform: translateX(-50%);
+    }
+}
+
+[data-bs-theme="dark"] .pwa-install-banner__inner,
+html.theme-dark .pwa-install-banner__inner {
+    background: rgba(15, 23, 42, 0.96);
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+[data-bs-theme="dark"] .pwa-install-banner__copy strong,
+html.theme-dark .pwa-install-banner__copy strong {
+    color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .pwa-install-banner__copy span,
+html.theme-dark .pwa-install-banner__copy span {
+    color: #94a3b8;
+}
+
 /* Impression */
 @media print {
     .navbar,
     .footer-modern,
     .btn,
-    .pagination {
+    .pagination,
+    .pwa-install-banner,
+    .whatsapp-fab {
         display: none !important;
     }
     
