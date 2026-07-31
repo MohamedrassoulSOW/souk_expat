@@ -146,7 +146,7 @@
 
 <style>
     .contact-page-body {
-        background: linear-gradient(180deg, #f4fafc 0%, #f8f9fa 40%, #fff 100%);
+        background: linear-gradient(180deg, color-mix(in srgb, var(--cyan-main) 8%, var(--page-bg)) 0%, var(--page-bg) 40%, var(--page-bg) 100%);
         padding-bottom: 3rem;
     }
     .letter-spacing { letter-spacing: 0.06em; }
@@ -204,18 +204,22 @@
     }
     .contact-form-card {
         border: 1px solid rgba(66, 177, 206, 0.12) !important;
+        background: var(--surface) !important;
+        color: var(--text-strong);
     }
     .contact-field {
         border-radius: 12px;
-        border: 2px solid #eef2f5 !important;
+        border: 2px solid var(--border-soft) !important;
         padding: 0.75rem 1rem;
-        background: #fafcfd !important;
+        background: var(--surface-2) !important;
+        color: var(--text-strong) !important;
         transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
     }
     .contact-field:focus {
         border-color: rgba(66, 177, 206, 0.55) !important;
-        background: #fff !important;
+        background: var(--surface) !important;
         box-shadow: 0 0 0 4px rgba(66, 177, 206, 0.12) !important;
+        color: var(--text-strong) !important;
     }
     .contact-field-textarea {
         min-height: 140px;

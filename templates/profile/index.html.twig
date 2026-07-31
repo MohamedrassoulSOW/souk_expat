@@ -58,7 +58,7 @@
                     <div class="row g-4 mt-2">
                         {# Détails #}
                         <div class="col-12 col-md-7">
-                            <div class="bg-light-cyan rounded-4 p-3 p-md-4 h-100 border border-white shadow-sm">
+                            <div class="bg-light-cyan rounded-4 p-3 p-md-4 h-100 border shadow-sm">
                                 <h6 class="fw-bold mb-4 text-dark text-uppercase small letter-spacing">Détails personnels</h6>
                                 <div class="row g-3">
                                     <div class="col-12 col-sm-6 border-end border-sm-end border-0">
@@ -137,7 +137,7 @@
     .avatar-container-custom { margin-top: -70px; }
     .avatar-img-custom {
         width: 140px; height: 140px;
-        object-fit: cover; border: 5px solid #fff;
+        object-fit: cover; border: 5px solid var(--surface);
     }
     
     @media (max-width: 768px) {
@@ -150,7 +150,7 @@
         .avatar-img-custom {
             width: 100px; 
             height: 100px;
-            border: 4px solid #fff;
+            border: 4px solid var(--surface);
         }
         .btn-cyan-round {
             width: 32px;
@@ -166,8 +166,8 @@
     }
     .btn-cyan-round:hover { background-color: #369ab3; color: white; }
     
-    .bg-light-cyan { background-color: #f0faff; }
-    .info-label { font-size: 0.65rem; color: #95a5a6; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    .bg-light-cyan { background-color: color-mix(in srgb, var(--cyan-main) 10%, var(--surface)); }
+    .info-label { font-size: 0.65rem; color: var(--text-muted-custom); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
     
     /* Boutons Actions */
     .btn-action-profile {

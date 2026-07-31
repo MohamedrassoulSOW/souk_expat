@@ -60,7 +60,7 @@
 
         {% for stat in stats %}
             <div class="col">
-                <a href="{{ stat.url }}" class="text-decoration-none text-dark">
+                <a href="{{ stat.url }}" class="text-decoration-none admin-stat-card-link">
                     <div class="admin-stat-card">
                         <div class="card-body d-flex align-items-center p-3">
                             <div class="admin-stat-card__icon me-3" style="background: {{ stat.color }}18; color: {{ stat.color }};">
@@ -68,7 +68,7 @@
                             </div>
                             <div class="overflow-hidden min-w-0">
                                 <div class="text-muted small text-truncate">{{ stat.label }}</div>
-                                <div class="fs-4 fw-bold mb-0">{% if stat.cap|default(false) %}{{ stat.val|cap999 }}{% else %}{{ stat.val }}{% endif %}</div>
+                                <div class="fs-4 fw-bold mb-0 admin-stat-card__value">{% if stat.cap|default(false) %}{{ stat.val|cap999 }}{% else %}{{ stat.val }}{% endif %}</div>
                             </div>
                         </div>
                     </div>

@@ -46,7 +46,7 @@
         {% if show_seller and annonce.user %}
             <div class="annonce-listing-card__seller pt-3 border-top mt-auto">
                 <a href="{{ path('app_seller_show', { id: annonce.user.id }) }}"
-                   class="d-flex align-items-center gap-2 text-decoration-none text-dark seller-card-link"
+                   class="d-flex align-items-center gap-2 text-decoration-none seller-card-link"
                    title="Voir le profil de {{ annonce.user.firstName }}">
                     <div class="annonce-listing-card__avatar flex-shrink-0 overflow-hidden">
                         {% if annonce.user.avatar %}
@@ -61,7 +61,7 @@
                     </div>
                     <span class="small text-truncate">
                         <span class="text-muted">Publié par</span>
-                        <span class="fw-semibold text-dark">{{ annonce.user.firstName }}</span>
+                        <span class="fw-semibold">{{ annonce.user.firstName }}</span>
                     </span>
                 </a>
             </div>

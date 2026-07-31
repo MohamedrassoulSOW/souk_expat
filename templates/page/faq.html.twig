@@ -12,7 +12,7 @@
     {% for item in faqs %}
         <div class="accordion-item border-0 border-bottom" style="border-color: rgba(0,0,0,.06) !important;">
             <h2 class="accordion-header" id="faqHeading{{ loop.index }}">
-                <button class="accordion-button {{ loop.first ? '' : 'collapsed' }} fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="{{ loop.first ? 'true' : 'false' }}" aria-controls="faqCollapse{{ loop.index }}" style="background: {{ loop.first ? '#f8fcfd' : '#fff' }};">
+                <button class="accordion-button {{ loop.first ? '' : 'collapsed' }} fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="{{ loop.first ? 'true' : 'false' }}" aria-controls="faqCollapse{{ loop.index }}">
                     <i class="bi bi-patch-question-fill text-cyan-brand me-2"></i>{{ item.q }}
                 </button>
             </h2>

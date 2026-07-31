@@ -60,18 +60,19 @@
         </div>
 
         {# Bas du footer #}
-        <div class="footer-bottom py-4 border-top border-secondary border-opacity-25 text-center text-md-between d-md-flex align-items-center justify-content-between">
+        <div class="footer-bottom py-4 border-top border-secondary border-opacity-25 text-center text-md-between d-md-flex align-items-center justify-content-between gap-3">
             <p class="text-secondary small mb-md-0">
                 &copy; {{ "now"|date("Y") }} <strong>{{ site ? site.siteName : 'SoukExpat' }}</strong>. Tous droits réservés.
+            </p>
+            <p class="small mb-0 text-secondary">
+                Réalisé par
+                <a href="http://sowcoder.com" class="footer-credit-link" target="_blank" rel="noopener noreferrer">SowCoder</a>
             </p>
             <p class="small mb-0">
                 {% if contact_email %}
                     <a href="mailto:{{ contact_email }}" style="text-decoration: none; color: #4B79A1; font-weight: 600;">{{ contact_email }}</a>
                 {% endif %}
             </p>
-            <div class="payment-icons text-secondary opacity-50 d-none d-md-block">
-                v.0.0.1
-            </div>
         </div>
     </div>
 </footer>
@@ -136,6 +137,17 @@
     .footer-modern .form-control:focus {
         border-color: #4B79A1;
         box-shadow: none;
+    }
+
+    .footer-credit-link {
+        color: #4B79A1;
+        font-weight: 700;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .footer-credit-link:hover {
+        color: #93c5e4;
+        text-decoration: underline;
     }
 
     @media (max-width: 768px) {
