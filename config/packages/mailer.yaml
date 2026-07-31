@@ -1,6 +1,9 @@
 framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
+        # Envoi synchrone : pas de worker Messenger requis pour les e-mails.
+        # (Sinon les messages restent bloqués dans messenger_messages.)
+        message_bus: false
         envelope:
             sender: '%app.contact_email%'
         headers:

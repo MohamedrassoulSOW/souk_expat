@@ -124,7 +124,7 @@
                                     <div class="avatar-placeholder"><i class="bi bi-person"></i></div>
                                 {% endif %}
                             </div>
-                            <span class="ms-2 d-none d-xl-inline fw-semibold text-dark small">{{ app.user.firstName }}</span>
+                            <span class="ms-2 d-none d-xl-inline fw-semibold user-pill__name small">{{ app.user.firstName }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-3 p-2 rounded-4 animate slideIn">
                             <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_mes_annonces') }}"><i class="bi bi-stack me-2 opacity-50"></i>Mes annonces</a></li>
@@ -236,8 +236,22 @@
     .nav-icon-link:hover { color: var(--cyan-main); background: #f8f9fa; }
     .btn-custom-cyan { background-color: var(--cyan-main); color: white !important; border: none; transition: 0.3s; }
     .btn-custom-cyan:hover { background-color: var(--cyan-hover); transform: translateY(-2px); }
-    .user-pill { background: #f8f9fa; padding: 4px 12px 4px 4px; border-radius: 50px; }
-    .avatar-container img, .avatar-placeholder { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #eee; }
+    .user-pill {
+        background: var(--surface-2, #f8f9fa);
+        color: var(--text-strong, #1e293b);
+        padding: 4px 12px 4px 4px;
+        border-radius: 50px;
+        border: 1px solid var(--border-soft, rgba(15, 23, 42, 0.08));
+    }
+    .user-pill__name { color: inherit; }
+    .user-pill.dropdown-toggle::after { color: inherit; opacity: 0.7; }
+    .avatar-container img, .avatar-placeholder {
+        width: 32px; height: 32px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--surface, #fff);
+        border: 1px solid var(--border-soft, #eee);
+        color: var(--cyan-main);
+    }
     .notif-scroll::-webkit-scrollbar { width: 4px; }
     .notif-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
     .animate { animation-duration: 0.3s; animation-fill-mode: both; }
