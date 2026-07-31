@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ seller.firstName }} {{ seller.lastName }} | Expat Souk{% endblock %}
+{% block title %}{{ seller.firstName }} {{ seller.lastName }} | {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
 
 {% block body %}
 {{ include('layouts/navBar.html.twig') }}
@@ -34,7 +34,7 @@
                                             <i class="bi bi-person-fill"></i>
                                         </span>
                                     {% endif %}
-                                    <span class="seller-profile-avatar__badge" title="Vendeur vérifié sur Expat Souk">
+                                    <span class="seller-profile-avatar__badge" title="Vendeur vérifié sur {{ site ? site.siteName : 'SoukExpat' }}">
                                         <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
                                     </span>
                                 </div>
@@ -43,7 +43,7 @@
                                     {% if is_own_profile %}
                                         <span class="seller-profile-pill mb-2">Votre profil public</span>
                                     {% else %}
-                                        <span class="seller-profile-pill mb-2">Vendeur Expat Souk</span>
+                                        <span class="seller-profile-pill mb-2">Vendeur {{ site ? site.siteName : 'SoukExpat' }}</span>
                                     {% endif %}
                                     <h1 class="seller-profile-name mb-2">{{ seller.firstName }} {{ seller.lastName }}</h1>
                                     <p class="text-muted mb-3 small mb-sm-3">
@@ -168,7 +168,7 @@
                                 {% if category_filter %}
                                     Essayez une autre catégorie ou affichez toutes les annonces de {{ seller.firstName }}.
                                 {% else %}
-                                    {{ seller.firstName }} n’a pas encore d’annonce validée sur Expat Souk.
+                                    {{ seller.firstName }} n’a pas encore d’annonce validée sur {{ site ? site.siteName : 'SoukExpat' }}.
                                 {% endif %}
                             </p>
                             {% if category_filter %}
@@ -201,7 +201,7 @@
     }
 
     .seller-profile-breadcrumb .breadcrumb-item a {
-        color: var(--cyan-main, #42b1ce);
+        color: var(--cyan-main, var(--cyan-main));
         text-decoration: none;
     }
     .seller-profile-breadcrumb .breadcrumb-item.active {
@@ -209,7 +209,7 @@
     }
 
     .seller-profile-card {
-        background: #fff;
+        background: var(--surface);
         border-radius: 1.35rem;
         overflow: hidden;
         box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
@@ -220,7 +220,7 @@
         height: 118px;
         background:
             linear-gradient(120deg, rgba(255,255,255,0.12) 0%, transparent 40%),
-            linear-gradient(135deg, #42b1ce 0%, #2a8fab 48%, #1a6f88 100%);
+            linear-gradient(135deg, var(--cyan-main) 0%, #2a8fab 48%, #1a6f88 100%);
         position: relative;
     }
     .seller-profile-card__banner::after {
@@ -259,14 +259,14 @@
     }
     .seller-profile-avatar__img {
         object-fit: cover;
-        background: #fff;
+        background: var(--surface);
     }
     .seller-profile-avatar__fallback {
         display: flex;
         align-items: center;
         justify-content: center;
         background: linear-gradient(145deg, #e8f4f8, #d7eef5);
-        color: var(--cyan-main, #42b1ce);
+        color: var(--cyan-main, var(--cyan-main));
         font-size: 3rem;
     }
     .seller-profile-avatar__badge {
@@ -276,8 +276,8 @@
         width: 30px;
         height: 30px;
         border-radius: 50%;
-        background: #fff;
-        color: var(--cyan-main, #42b1ce);
+        background: var(--surface);
+        color: var(--cyan-main, var(--cyan-main));
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -349,13 +349,13 @@
         border-radius: 999px;
         font-size: 0.75rem;
         font-weight: 600;
-        background: #fff;
+        background: var(--surface);
         color: #334155;
         border: 1px solid rgba(15, 23, 42, 0.08);
     }
     .seller-city-chip em {
         font-style: normal;
-        color: var(--cyan-main, #42b1ce);
+        color: var(--cyan-main, var(--cyan-main));
         font-weight: 800;
     }
 
@@ -374,7 +374,7 @@
         font-size: 0.82rem;
         font-weight: 600;
         color: #334155;
-        background: #fff;
+        background: var(--surface);
         border: 1px solid rgba(66, 177, 206, 0.2);
         transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
     }
@@ -382,19 +382,19 @@
         font-style: normal;
         font-size: 0.72rem;
         font-weight: 800;
-        color: var(--cyan-main, #42b1ce);
+        color: var(--cyan-main, var(--cyan-main));
         background: rgba(66, 177, 206, 0.12);
         padding: 0.1rem 0.4rem;
         border-radius: 999px;
     }
     .seller-cat-chip:hover {
-        border-color: var(--cyan-main, #42b1ce);
+        border-color: var(--cyan-main, var(--cyan-main));
         color: var(--cyan-hover, #369ab3);
         transform: translateY(-1px);
     }
     .seller-cat-chip.is-active {
-        background: var(--cyan-main, #42b1ce);
-        border-color: var(--cyan-main, #42b1ce);
+        background: var(--cyan-main, var(--cyan-main));
+        border-color: var(--cyan-main, var(--cyan-main));
         color: #fff;
     }
     .seller-cat-chip.is-active em {

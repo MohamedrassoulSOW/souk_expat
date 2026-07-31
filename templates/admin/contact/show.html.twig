@@ -63,6 +63,7 @@
             <div class="admin-panel p-4">
                 <h2 class="h6 fw-bold text-uppercase text-muted mb-3" style="letter-spacing: .04em;">Gestion</h2>
                 <form method="post" action="{{ path('app_admin_contact_toggle', {id: contact.id}) }}" class="mb-2">
+                    <input type="hidden" name="_token" value="{{ csrf_token('contact_toggle' ~ contact.id) }}">
                     <button type="submit" class="btn {{ contact.isProcessed ? 'btn-light border' : 'btn-success' }} w-100 rounded-pill">
                         {{ contact.isProcessed ? 'Réouvrir' : 'Marquer comme traité' }}
                     </button>
@@ -71,6 +72,7 @@
                     Notifier l’utilisateur
                 </button>
                 <form method="post" action="{{ path('app_admin_contact_delete', {id: contact.id}) }}" class="text-center" onsubmit="return confirm('Suppression irréversible ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('contact_delete' ~ contact.id) }}">
                     <button type="submit" class="btn btn-outline-danger btn-icon-action" title="Supprimer" aria-label="Supprimer">
                         <i class="bi bi-trash3" aria-hidden="true"></i>
                     </button>
@@ -82,12 +84,13 @@
     <div class="modal fade" id="replyModal{{ contact.id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <form action="{{ path('app_admin_contact_reply', {id: contact.id}) }}" method="POST" class="modal-content border-0 shadow rounded-4">
+                <input type="hidden" name="_token" value="{{ csrf_token('contact_reply' ~ contact.id) }}">
                 <div class="modal-header border-0">
                     <h5 class="modal-title fw-bold">Répondre à {{ contact.name }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="small text-muted mb-3">L’utilisateur recevra une notification sur son compte SoukExpat.</p>
+                    <p class="small text-muted mb-3">L’utilisateur recevra une notification sur son compte{% if site %} {{ site.siteName }}{% else %} SoukExpat{% endif %}.</p>
                     <label class="form-label small fw-bold">Votre réponse</label>
                     <textarea name="reply_message" class="form-control rounded-3" rows="6" placeholder="Soyez clair et courtois…" required></textarea>
                 </div>

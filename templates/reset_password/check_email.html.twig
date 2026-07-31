@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Email envoyé - Expat Souk{% endblock %}
+{% block title %}Email envoyé - {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
 
 {% block body %}
 {{ include('layouts/navBar.html.twig') }}

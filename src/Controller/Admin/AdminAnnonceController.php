@@ -62,6 +62,20 @@ class AdminAnnonceController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'admin_annonce_show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show(?Annonce $annonce): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_EDITOR');
+
+        if (!$annonce) {
+            throw $this->createNotFoundException('Annonce introuvable.');
+        }
+
+        return $this->render('admin/annonce/show.html.twig', [
+            'annonce' => $annonce,
+        ]);
+    }
+
     #[Route('/{id}/approve', name: 'admin_annonce_approve', methods: ['POST'])]
     public function approve(
         ?Annonce $annonce,
@@ -87,16 +101,24 @@ class AdminAnnonceController extends AbstractController
         $em->flush();
 
         $owner = $annonce->getUser();
+        $mailSent = false;
         if ($owner) {
             $notificationService->notifyUser(
                 $owner,
-                'Annonce approuvée',
-                'Votre annonce « ' . $annonce->getTitle() . ' » est maintenant en ligne sur SoukExpat.',
+                'Annonce validée',
+                'Votre annonce « ' . $annonce->getTitle() . ' » est maintenant en ligne.',
             );
-            $platformMailer->sendAnnonceApproved($annonce);
+            $mailSent = $platformMailer->sendAnnonceApproved($annonce);
         }
 
-        $this->addFlash('success', 'Annonce validée — e-mail envoyé depuis contact@soukexpat.com.');
+        if ($mailSent) {
+            $this->addFlash('success', sprintf(
+                'Annonce validée — e-mail envoyé depuis %s.',
+                $platformMailer->contactEmail()
+            ));
+        } else {
+            $this->addFlash('success', 'Annonce validée.' . ($owner ? ' (e-mail non envoyé — vérifiez MAILER_DSN)' : ''));
+        }
 
         return $this->redirectToRoute('admin_annonces_pending');
     }
@@ -125,16 +147,24 @@ class AdminAnnonceController extends AbstractController
         $em->flush();
 
         $owner = $annonce->getUser();
+        $mailSent = false;
         if ($owner) {
             $notificationService->notifyUser(
                 $owner,
-                'Annonce non validée',
-                'Votre annonce « ' . $annonce->getTitle() . ' » n’a pas été validée. Vous pouvez la modifier et la soumettre à nouveau.',
+                'Annonce refusée',
+                'Votre annonce « ' . $annonce->getTitle() . ' » a été refusée. Vous pouvez la modifier et la soumettre à nouveau.',
             );
-            $platformMailer->sendAnnonceRejected($annonce);
+            $mailSent = $platformMailer->sendAnnonceRejected($annonce);
         }
 
-        $this->addFlash('warning', 'Annonce rejetée — e-mail envoyé depuis contact@soukexpat.com.');
+        if ($mailSent) {
+            $this->addFlash('warning', sprintf(
+                'Annonce refusée — e-mail envoyé depuis %s.',
+                $platformMailer->contactEmail()
+            ));
+        } else {
+            $this->addFlash('warning', 'Annonce refusée.' . ($owner ? ' (e-mail non envoyé — vérifiez MAILER_DSN)' : ''));
+        }
 
         return $this->redirectToRoute('admin_annonces_pending');
     }

@@ -1,14 +1,14 @@
 {% extends 'emails/_layout.html.twig' %}
 
-{% block title %}{% if approved %}Annonce approuvée{% else %}Annonce non validée{% endif %}{% endblock %}
+{% block title %}{% if approved %}Annonce validée{% else %}Annonce refusée{% endif %}{% endblock %}
 
 {% block body %}
     <h2>Bonjour {{ user.firstName|default('') }},</h2>
 
     {% if approved %}
-        <p>Bonne nouvelle : votre annonce a été <strong>approuvée</strong> et est maintenant visible sur SoukExpat.</p>
+        <p>Bonne nouvelle : votre annonce a été <strong>validée</strong> et est maintenant visible sur {{ site ? site.siteName : 'SoukExpat' }}.</p>
     {% else %}
-        <p>Votre annonce n’a <strong>pas été validée</strong> par notre équipe de modération.</p>
+        <p>Votre annonce a été <strong>refusée</strong> par notre équipe de modération.</p>
         <p>Vous pouvez la modifier puis la soumettre à nouveau, ou nous contacter si besoin.</p>
     {% endif %}
 

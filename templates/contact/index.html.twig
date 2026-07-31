@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Contact — Expat Souk{% endblock %}
+{% block title %}Contact — {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
 
 {% block body %}
 {{ include('layouts/navBar.html.twig') }}
@@ -54,15 +54,6 @@
                                     <a href="mailto:{{ contact_email }}" class="contact-aside-link">{{ contact_email }}</a>
                                 </div>
                             </li>
-                            {% if site and site.contactPhone %}
-                            <li class="d-flex mb-4">
-                                <span class="contact-info-icon"><i class="bi bi-telephone"></i></span>
-                                <div>
-                                    <span class="d-block small text-white-50 mb-1">Téléphone</span>
-                                    <a href="tel:{{ site.contactPhone }}" class="contact-aside-link">{{ site.contactPhone }}</a>
-                                </div>
-                            </li>
-                            {% endif %}
                             <li class="d-flex mb-0">
                                 <span class="contact-info-icon"><i class="bi bi-clock"></i></span>
                                 <div>
@@ -151,7 +142,7 @@
     }
     .letter-spacing { letter-spacing: 0.06em; }
     .contact-aside-card {
-        background: linear-gradient(160deg, #42B1CE 0%, #2a8da7 55%, #247a92 100%);
+        background: linear-gradient(160deg, var(--cyan-main) 0%, #3d658a 55%, var(--cyan-hover) 100%);
     }
     .contact-aside-pattern {
         position: absolute;
@@ -199,11 +190,11 @@
     }
     .contact-social-btn:hover {
         background: #fff;
-        color: #42B1CE;
+        color: var(--cyan-main);
         transform: translateY(-2px);
     }
     .contact-form-card {
-        border: 1px solid rgba(66, 177, 206, 0.12) !important;
+        border: 1px solid rgba(75, 121, 161, 0.18) !important;
         background: var(--surface) !important;
         color: var(--text-strong);
     }
@@ -216,25 +207,25 @@
         transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
     }
     .contact-field:focus {
-        border-color: rgba(66, 177, 206, 0.55) !important;
+        border-color: rgba(75, 121, 161, 0.55) !important;
         background: var(--surface) !important;
-        box-shadow: 0 0 0 4px rgba(66, 177, 206, 0.12) !important;
+        box-shadow: 0 0 0 4px rgba(75, 121, 161, 0.12) !important;
         color: var(--text-strong) !important;
     }
     .contact-field-textarea {
         min-height: 140px;
         resize: vertical;
     }
-    .text-cyan-brand { color: #42B1CE !important; }
+    .text-cyan-brand { color: var(--cyan-main) !important; }
     .contact-submit-btn {
-        background: #42B1CE;
-        box-shadow: 0 8px 24px rgba(66, 177, 206, 0.35);
+        background: var(--cyan-main);
+        box-shadow: 0 8px 24px rgba(75, 121, 161, 0.35);
         transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
     }
     .contact-submit-btn:hover {
-        background: #369ab3;
+        background: var(--cyan-hover);
         transform: translateY(-2px);
-        box-shadow: 0 12px 28px rgba(66, 177, 206, 0.4);
+        box-shadow: 0 12px 28px rgba(75, 121, 161, 0.4);
         color: #fff;
     }
     @media (max-width: 991px) {

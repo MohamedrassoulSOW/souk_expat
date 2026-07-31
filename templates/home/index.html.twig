@@ -8,7 +8,7 @@
     {% set has_filters = sf.q or sf.categoryId or sf.cityId %}
 
     {# ——— HERO ——— #}
-    <section class="home-hero{% if sliders is empty %} home-hero--fallback{% endif %}" data-animate="fade-up">
+    <section class="home-hero{% if sliders is empty %} home-hero--fallback{% endif %}">
         {% if sliders is not empty %}
             <div id="homeCarousel" class="carousel slide home-hero-carousel" data-bs-ride="carousel" data-bs-interval="5500">
                 <div class="carousel-indicators home-hero-indicators">
@@ -209,7 +209,7 @@
                                 </div>
                                 <h3 class="h5 fw-bold mb-2">{% if has_filters %}Aucun résultat{% else %}Aucune annonce pour le moment{% endif %}</h3>
                                 <p class="text-muted mx-auto mb-4" style="max-width: 26rem;">
-                                    {% if has_filters %}Essayez d’autres mots-clés ou effacez les filtres.{% else %}Soyez le premier à publier sur Expat Souk.{% endif %}
+                                    {% if has_filters %}Essayez d’autres mots-clés ou effacez les filtres.{% else %}Soyez le premier à publier sur {{ site ? site.siteName : 'SoukExpat' }}.{% endif %}
                                 </p>
                                 {% if has_filters %}
                                     <a href="{{ path('app_home') }}" class="btn btn-outline-secondary rounded-pill px-4 me-2">Réinitialiser</a>

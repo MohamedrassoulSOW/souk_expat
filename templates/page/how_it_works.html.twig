@@ -17,7 +17,7 @@
                         <i class="bi {{ s.icon|default('bi-circle') }}"></i>
                     </div>
                     <div>
-                        <span class="badge rounded-pill mb-2" style="background: #42B1CE20; color: #2a8da7;">Étape {{ loop.index }}</span>
+                        <span class="badge rounded-pill mb-2" style="background: var(--cyan-soft); color: var(--cyan-hover);">Étape {{ loop.index }}</span>
                         <h2 class="h5 fw-bold text-dark mb-2">{{ s.title }}</h2>
                         <p class="text-secondary mb-0 small">{{ s.text }}</p>
                     </div>
@@ -30,7 +30,7 @@
 <div class="text-center p-4 p-md-5 rounded-4 border how-it-works-cta" style="border-color: rgba(66, 177, 206, 0.2) !important; background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);">
     <h3 class="h5 fw-bold text-dark mb-3">Prêt à commencer ?</h3>
     <p class="text-secondary mb-4">Rejoignez la communauté {{ site ? site.siteName : 'SoukExpat' }}.</p>
-    <a href="{{ path('app_annonce_index') }}" class="btn btn-lg me-2 mb-2" style="background: #42B1CE; border-color: #42B1CE; color: #fff;">Voir les annonces</a>
+    <a href="{{ path('app_annonce_index') }}" class="btn btn-lg me-2 mb-2 btn-custom-cyan" style="color: #fff;">Voir les annonces</a>
     <a href="{{ path('app_register') }}" class="btn btn-lg btn-outline-secondary mb-2">Créer un compte</a>
 </div>
 {% endblock %}

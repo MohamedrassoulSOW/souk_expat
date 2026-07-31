@@ -52,7 +52,7 @@ class SiteSettingsType extends AbstractType
             ])
             ->add('newsletterText', TextType::class, [
                 'label' => 'Texte bloc « Restez informé »',
-                'help' => 'Colonne newsletter du footer.',
+                'help' => 'Colonne contact du footer (le bouton renvoie vers la page Contact).',
                 'constraints' => [new NotBlank()],
             ])
             ->add('contactEmail', EmailType::class, [
@@ -62,10 +62,14 @@ class SiteSettingsType extends AbstractType
                 'constraints' => [new NotBlank(), new Email()],
             ])
             ->add('contactPhone', TextType::class, [
-                'label' => 'Téléphone (optionnel)',
-                'help' => 'Affiché sur la page Contact uniquement s’il est renseigné. Format recommandé : +212…',
+                'label' => 'Téléphone (non affiché sur le site)',
+                'help' => 'Conservé en base pour usage interne éventuel. Aucun numéro n’est publié sur le site web (contact via messagerie / e-mail uniquement).',
                 'required' => false,
-                'attr' => ['placeholder' => '+2126…'],
+                'attr' => [
+                    'placeholder' => 'Non publié sur le site',
+                    'class' => 'form-control',
+                ],
+                'row_attr' => ['class' => 'd-none'],
             ])
             ->add('contactAddress', TextType::class, [
                 'label' => 'Adresse',

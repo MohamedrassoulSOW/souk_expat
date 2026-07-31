@@ -1,5 +1,6 @@
 /**
  * Toasts pour les flashes Symfony + révélation au scroll (data-animate).
+ * Compatible Turbo Drive (ré-init sur turbo:load).
  */
 function mapFlashToBootstrapTheme(type) {
     const t = (type || 'info').toLowerCase();
@@ -70,44 +71,66 @@ function escapeHtml(text) {
 function revealIfAlreadyVisible(el) {
     const r = el.getBoundingClientRect();
     const vh = window.innerHeight || document.documentElement.clientHeight;
-    return r.top < vh * 0.92 && r.bottom > -24;
+    return r.top < vh * 0.98 && r.bottom > -40;
 }
 
+let revealObserver = null;
+
 export function initRevealOnScroll() {
+    const html = document.documentElement;
+    // Évite un flash invisible pendant les navigations Turbo
+    html.classList.remove('site-animate-ready');
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.querySelectorAll('[data-animate]').forEach((el) => el.classList.add('is-revealed'));
         return;
     }
 
+    if (revealObserver) {
+        revealObserver.disconnect();
+        revealObserver = null;
+    }
+
     const els = document.querySelectorAll('[data-animate]:not(.is-revealed)');
-    if (!els.length) return;
+    if (!els.length) {
+        return;
+    }
 
     els.forEach((el) => {
         if (revealIfAlreadyVisible(el)) el.classList.add('is-revealed');
     });
 
     const pending = document.querySelectorAll('[data-animate]:not(.is-revealed)');
-    if (!pending.length || !('IntersectionObserver' in window)) {
+    if (!pending.length) {
+        return;
+    }
+
+    if (!('IntersectionObserver' in window)) {
         pending.forEach((el) => el.classList.add('is-revealed'));
         return;
     }
 
-    const observer = new IntersectionObserver(
+    revealObserver = new IntersectionObserver(
         (entries) => {
             entries.forEach((entry) => {
                 if (!entry.isIntersecting) return;
                 entry.target.classList.add('is-revealed');
-                observer.unobserve(entry.target);
+                revealObserver.unobserve(entry.target);
             });
         },
-        { root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+        { root: null, rootMargin: '40px 0px 40px 0px', threshold: 0.01 }
     );
 
-    pending.forEach((el) => observer.observe(el));
+    pending.forEach((el) => revealObserver.observe(el));
+
+    // Masquer seulement les blocs encore hors écran, après révélation du viewport
+    requestAnimationFrame(() => {
+        html.classList.add('site-animate-ready');
+    });
 }
 
 export function initSiteUi() {
     document.documentElement.classList.add('site-loaded');
     initFlashToasts();
-    requestAnimationFrame(() => initRevealOnScroll());
+    initRevealOnScroll();
 }

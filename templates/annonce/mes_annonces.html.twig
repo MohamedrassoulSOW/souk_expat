@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes Annonces | Expat Souk{% endblock %}
+{% block title %}Mes Annonces | {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
 
 {% block body %}
     {{ include('layouts/navBar.html.twig') }}
@@ -65,14 +65,14 @@
                                 </td>
                                 <td>
                                     {% if annonce.status == 'approved' %}
-                                        <span class="badge rounded-pill bg-success-subtle text-success px-3 border border-success-subtle">En ligne</span>
+                                        <span class="badge rounded-pill bg-success-subtle text-success px-3 border border-success-subtle">Validée</span>
                                     {% elseif annonce.status == 'pending' %}
-                                        <span class="badge rounded-pill bg-warning-subtle text-warning px-3 border border-warning-subtle">En révision</span>
+                                        <span class="badge rounded-pill bg-warning-subtle text-warning px-3 border border-warning-subtle">En attente</span>
                                     {% else %}
                                         <span class="badge rounded-pill bg-danger-subtle text-danger px-3 border border-danger-subtle">Refusée</span>
                                     {% endif %}
                                 </td>
-                                <td class="fw-bold" style="color: #2d3436;">{{ annonce.price }} MAD</td>
+                                <td class="fw-bold text-body">{{ annonce.price }} MAD</td>
                                 <td class="text-muted small">{{ annonce.createdAt|date('d/m/Y') }}</td>
                                 <td class="text-end pe-4">
                                     <div class="d-inline-flex gap-1">

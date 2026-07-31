@@ -2,9 +2,9 @@
 
 {% block title %}
     {% if category is defined %}
-        Annonces {{ category.name }} | Expat Souk
+        Annonces {{ category.name }} | {{ site ? site.siteName : 'SoukExpat' }}
     {% else %}
-        Toutes les annonces | Expat Souk
+        Toutes les annonces | {{ site ? site.siteName : 'SoukExpat' }}
     {% endif %}
 {% endblock %}
 
@@ -53,7 +53,7 @@
             {% endif %}
 
             {# Barre résultats + filtres (sticky mobile) #}
-            <div class="page-annonces__toolbar" data-animate="fade-up">
+            <div class="page-annonces__toolbar">
                 <div class="page-annonces__toolbar-meta">
                     <span class="annonce-page-stat">
                         <i class="bi bi-layout-grid" aria-hidden="true"></i>
@@ -87,7 +87,7 @@
                 reset_url: reset_url
             }) }}
 
-            <section class="annonce-search-panel mb-3 mb-md-4" data-animate="fade-up">
+            <section class="annonce-search-panel mb-3 mb-md-4">
                 <div class="annonce-search-panel__inner">
                     <div class="d-none d-md-flex align-items-center justify-content-between gap-2 mb-3">
                         <div>

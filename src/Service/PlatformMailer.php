@@ -120,7 +120,7 @@ final class PlatformMailer
             ->from($this->fromAddress())
             ->replyTo($this->fromAddress())
             ->to((string) $user->getEmail())
-            ->subject($this->fromName() . ' — Votre annonce a été approuvée')
+            ->subject($this->fromName() . ' — Votre annonce a été validée')
             ->htmlTemplate('emails/annonce_status.html.twig')
             ->context([
                 'annonce' => $annonce,
@@ -143,7 +143,7 @@ final class PlatformMailer
             ->from($this->fromAddress())
             ->replyTo($this->fromAddress())
             ->to((string) $user->getEmail())
-            ->subject($this->fromName() . ' — Votre annonce n’a pas été validée')
+            ->subject($this->fromName() . ' — Votre annonce a été refusée')
             ->htmlTemplate('emails/annonce_status.html.twig')
             ->context([
                 'annonce' => $annonce,

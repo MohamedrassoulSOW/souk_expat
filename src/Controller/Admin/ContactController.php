@@ -35,8 +35,14 @@ final class ContactController extends AbstractController
     }
 
     #[Route('/{id}/toggle', name: 'app_admin_contact_toggle', methods: ['POST'])]
-    public function toggleProcessed(Contact $contact, EntityManagerInterface $entityManager): Response
+    public function toggleProcessed(Contact $contact, Request $request, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isCsrfTokenValid('contact_toggle'.$contact->getId(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('app_admin_contact_show', ['id' => $contact->getId()]);
+        }
+
         $contact->setIsProcessed(!$contact->isProcessed());
         $entityManager->flush();
 
@@ -46,8 +52,14 @@ final class ContactController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'app_admin_contact_delete', methods: ['POST'])]
-    public function delete(Contact $contact, EntityManagerInterface $entityManager): Response
+    public function delete(Contact $contact, Request $request, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isCsrfTokenValid('contact_delete'.$contact->getId(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('app_admin_contact_show', ['id' => $contact->getId()]);
+        }
+
         $entityManager->remove($contact);
         $entityManager->flush();
 
@@ -65,6 +77,12 @@ final class ContactController extends AbstractController
         PlatformMailer $platformMailer,
         EntityManagerInterface $em,
     ): Response {
+        if (!$this->isCsrfTokenValid('contact_reply'.$contact->getId(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('app_admin_contact_show', ['id' => $contact->getId()]);
+        }
+
         $replyContent = trim((string) $request->request->get('reply_message', ''));
 
         if ($replyContent === '') {
@@ -93,7 +111,10 @@ final class ContactController extends AbstractController
         $em->flush();
 
         if ($sent) {
-            $this->addFlash('success', 'Réponse envoyée par e-mail depuis contact@soukexpat.com.');
+            $this->addFlash('success', sprintf(
+                'Réponse envoyée par e-mail depuis %s.',
+                $platformMailer->contactEmail()
+            ));
         } else {
             $this->addFlash('warning', 'Réponse enregistrée, mais l’e-mail n’a pas pu être envoyé. Vérifiez MAILER_DSN.');
         }

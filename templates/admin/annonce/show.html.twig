@@ -1,107 +1,125 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
 {% block title %}{{ annonce.title }} | Modération{% endblock %}
+{% block admin_mobile_title %}Modération{% endblock %}
 
-{% block body %}
-<main class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h2 mb-0">{{ annonce.title }}</h1>
-        <a href="{{ path('admin_annonces_pending') }}" class="btn btn-outline-secondary btn-sm">
-            ← Retour à la liste
+{% block admin_main %}
+    {% set back_route = annonce.status == 'approved' ? 'admin_annonces_approved' : (annonce.status == 'rejected' ? 'admin_annonces_rejected' : 'admin_annonces_pending') %}
+    {% set actions %}
+        <a href="{{ path(back_route) }}" class="btn btn-light border rounded-pill px-3">
+            <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Retour
         </a>
-    </div>
+        <a href="{{ path('app_annonce_show', {id: annonce.id}) }}" class="btn btn-outline-secondary rounded-pill px-3" target="_blank" rel="noopener">
+            <i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Voir sur le site
+        </a>
+    {% endset %}
 
-    <div class="row">
-        <div class="col-md-5">
-            {% if annonce.annonceImages|length > 0 %}
-                <div id="carouselAnnonce" class="carousel slide mb-3 shadow-sm" data-bs-ride="carousel">
-                    <div class="carousel-inner rounded">
-                        {% for image in annonce.annonceImages %}
-                            <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                {# Correction ici : imageName au lieu de imadeName #}
-                                <img src="{{ asset('uploads/annonces/' ~ image.imadeName) }}"
-                                    class="d-block w-100 mx-auto"
-                                    style="height: 400px; object-fit: cover; object-position: center center;"
-                                    alt="{{ annonce.title }}">
-                            </div>
-                        {% endfor %}
-                    </div>
-                    {% if annonce.annonceImages|length > 1 %}
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselAnnonce" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carouselAnnonce" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                    {% endif %}
-                </div>
-            {% else %}
-                <div class="bg-light d-flex align-items-center justify-content-center rounded mb-3" style="height: 300px;">
-                    <span class="text-muted">Aucune image disponible</span>
-                </div>
-            {% endif %}
-        </div>
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Modération',
+        title: annonce.title,
+        lead: 'Contrôle et actions sur l’annonce #' ~ annonce.id ~ '.',
+        actions: actions
+    }) }}
 
-        <div class="col-md-7">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title border-bottom pb-2 mb-3">Détails de l'annonce</h5>
-                    
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <label class="text-muted small d-block">Référence (ID)</label>
-                            <span>#{{ annonce.id }}</span>
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="admin-panel p-3">
+                {% if annonce.annonceImages|length > 0 %}
+                    <div id="carouselAnnonceAdmin" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-3">
+                            {% for image in annonce.annonceImages %}
+                                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                    <img src="{{ asset('uploads/annonces/' ~ image.imadeName) }}"
+                                         class="d-block w-100"
+                                         style="height: 320px; object-fit: cover;"
+                                         alt="{{ annonce.title }}">
+                                </div>
+                            {% endfor %}
                         </div>
-                        <div class="col-6">
-                            <label class="text-muted small d-block">Prix</label>
-                            <span class="fw-bold text-primary">{{ annonce.price|number_format(0, '.', ' ') }} MAD</span>
-                        </div>
-                        <div class="col-6">
-                            <label class="text-muted small d-block">Statut actuel</label>
-                            {% if annonce.status == 'pending' %}
-                                <span class="badge bg-warning text-dark">⏳ En attente</span>
-                            {% elseif annonce.status == 'approved' %}
-                                <span class="badge bg-success">✅ Validée</span>
-                            {% else %}
-                                <span class="badge bg-danger">❌ Rejetée</span>
-                            {% endif %}
-                        </div>
-                        <div class="col-6">
-                            <label class="text-muted small d-block">Ville / Quartier</label>
-                            <span>{{ annonce.city.name|default('N/A') }}</span>
-                        </div>
-                        <div class="col-6">
-                            <label class="text-muted small d-block">Catégorie</label>
-                            <span>{{ annonce.category.name|default('N/A') }}</span>
-                        </div>
-                        <div class="col-12">
-                            <label class="text-muted small d-block border-top pt-2 mt-2">Description</label>
-                            <p class="mt-1">{{ annonce.description|nl2br }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {% if is_granted('ROLE_EDITOR') %}
-                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between p-3 rounded-3 border bg-light">
-                    <div class="small text-muted">Actions de modération</div>
-                    <div class="d-flex flex-wrap gap-2">
-                        {% if annonce.status == 'pending' %}
-                            <form method="post" action="{{ path('admin_annonce_approve', {id: annonce.id}) }}" onsubmit="return confirm('Approuver cette annonce ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ annonce.id) }}">
-                                <button class="btn btn-success btn-sm">Valider</button>
-                            </form>
-                            <form method="post" action="{{ path('admin_annonce_reject', {id: annonce.id}) }}" onsubmit="return confirm('Rejeter cette annonce ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ annonce.id) }}">
-                                <button class="btn btn-warning btn-sm">Refuser</button>
-                            </form>
+                        {% if annonce.annonceImages|length > 1 %}
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselAnnonceAdmin" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon"></span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselAnnonceAdmin" data-bs-slide="next">
+                                <span class="carousel-control-next-icon"></span>
+                            </button>
                         {% endif %}
-                        {{ include('admin/annonce/_delete_form.html.twig', { annonce: annonce }) }}
+                    </div>
+                {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center rounded-3" style="height: 240px;">
+                        <span class="text-muted">Aucune image</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="admin-panel p-4 mb-3">
+                <h2 class="h6 fw-bold text-uppercase text-muted mb-3" style="letter-spacing:.04em;">Détails</h2>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="small text-muted">Référence</div>
+                        <div class="fw-semibold">#{{ annonce.id }}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="small text-muted">Prix</div>
+                        <div class="fw-bold text-brand">{{ annonce.price|number_format(0, '.', ' ') }} MAD</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="small text-muted">Statut</div>
+                        {% if annonce.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">En attente</span>
+                        {% elseif annonce.status == 'approved' %}
+                            <span class="badge bg-success">Validée</span>
+                        {% else %}
+                            <span class="badge bg-danger">Refusée</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-6">
+                        <div class="small text-muted">Ville</div>
+                        <div>{{ annonce.city.name|default('N/A') }}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="small text-muted">Catégorie</div>
+                        <div>{{ annonce.category.name|default('N/A') }}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="small text-muted">Vendeur</div>
+                        <div>{{ annonce.user ? annonce.user.firstName ~ ' ' ~ annonce.user.lastName : '—' }}</div>
+                    </div>
+                    <div class="col-12">
+                        <div class="small text-muted border-top pt-3">Description</div>
+                        <p class="mb-0 mt-1">{{ annonce.description|nl2br }}</p>
                     </div>
                 </div>
-            {% endif %}
+            </div>
+
+            <div class="admin-panel p-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+                <div class="small text-muted">Actions de modération</div>
+                <div class="d-flex flex-wrap gap-2">
+                    {% if annonce.status == 'pending' %}
+                        <form method="post" action="{{ path('admin_annonce_approve', {id: annonce.id}) }}" onsubmit="return confirm('Valider cette annonce ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ annonce.id) }}">
+                            <button class="btn btn-success btn-sm rounded-pill px-3">Valider</button>
+                        </form>
+                        <form method="post" action="{{ path('admin_annonce_reject', {id: annonce.id}) }}" onsubmit="return confirm('Refuser cette annonce ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ annonce.id) }}">
+                            <button class="btn btn-warning btn-sm rounded-pill px-3">Refuser</button>
+                        </form>
+                    {% elseif annonce.status == 'rejected' %}
+                        <form method="post" action="{{ path('admin_annonce_approve', {id: annonce.id}) }}" onsubmit="return confirm('Valider cette annonce ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ annonce.id) }}">
+                            <button class="btn btn-success btn-sm rounded-pill px-3">Valider</button>
+                        </form>
+                    {% elseif annonce.status == 'approved' %}
+                        <form method="post" action="{{ path('admin_annonce_reject', {id: annonce.id}) }}" onsubmit="return confirm('Suspendre cette annonce ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ annonce.id) }}">
+                            <button class="btn btn-warning btn-sm rounded-pill px-3">Suspendre</button>
+                        </form>
+                    {% endif %}
+                    {{ include('admin/annonce/_delete_form.html.twig', { annonce: annonce }) }}
+                </div>
             </div>
         </div>
     </div>
-</main>
 {% endblock %}

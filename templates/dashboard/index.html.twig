@@ -23,6 +23,7 @@
     <div class="modal fade" id="modalNotifAll" tabindex="-1" aria-labelledby="modalNotifAllLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
             <form action="{{ path('admin_notify_all') }}" method="POST" class="modal-content border-0 shadow rounded-4">
+                <input type="hidden" name="_token" value="{{ csrf_token('admin_notify_all') }}">
                 <div class="modal-header border-0">
                     <h5 class="modal-title fw-bold" id="modalNotifAllLabel">Diffuser une information</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>

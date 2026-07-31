@@ -483,16 +483,19 @@
     color: #94a3b8 !important;
 }
 
-[data-bs-theme="dark"] .annonce-listing-card__seller,
 [data-bs-theme="dark"] .annonce-listing-card__placeholder {
     border-color: var(--border-soft) !important;
-    background: rgba(15, 23, 42, 0.55) !important;
+    background: var(--surface-2) !important;
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .annonce-listing-card__seller {
+    background: transparent !important;
+    border-top-color: var(--border-soft) !important;
     color: #cbd5e1 !important;
 }
 
 [data-bs-theme="dark"] .annonce-listing-card__seller .seller-card-link,
-[data-bs-theme="dark"] .annonce-listing-card__seller .seller-card-link.text-dark,
-[data-bs-theme="dark"] .annonce-listing-card__seller .text-dark,
 [data-bs-theme="dark"] .annonce-listing-card__seller .fw-semibold {
     color: #f1f5f9 !important;
 }
@@ -538,7 +541,7 @@
 
 [data-bs-theme="dark"] .home-search__input,
 [data-bs-theme="dark"] .home-search__select {
-    background: transparent !important;
+    background-color: transparent !important;
     color: #f1f5f9 !important;
 }
 
@@ -849,7 +852,7 @@ body {
     overflow: hidden;
     background:
         linear-gradient(120deg, rgba(255, 255, 255, 0.1) 0%, transparent 42%),
-        linear-gradient(135deg, #42b1ce 0%, #2a8fab 52%, #1a6f88 100%);
+        linear-gradient(135deg, var(--cyan-main) 0%, #3d658a 52%, var(--cyan-hover) 100%);
     border-bottom-left-radius: 1.75rem;
     border-bottom-right-radius: 1.75rem;
     box-shadow: 0 14px 40px rgba(66, 177, 206, 0.22);
@@ -1044,6 +1047,10 @@ body {
 .annonce-listing-card__seller {
     position: relative;
     z-index: 2;
+    background: transparent;
+    margin-top: auto;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--border-soft);
 }
 
 .annonce-listing-card__seller .seller-card-link {
@@ -2139,7 +2146,7 @@ body {
 }
 
 [data-bs-theme="dark"] .home-search__select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%94a3b8' d='M1.5 5.5L8 12l6.5-6.5'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%2394a3b8' d='M1.5 5.5L8 12l6.5-6.5'/%3E%3C/svg%3E");
 }
 
 .home-search__actions {
@@ -2524,18 +2531,15 @@ body {
     }
 }
 
+/* Visible par défaut (Turbo / JS lent / no-JS).
+   Masquage uniquement après init JS, pour les blocs encore hors écran. */
 [data-animate] {
     opacity: 1;
     transform: none;
 }
 
-@supports (animation-timeline: view()) {
-    /* no-op: keep simple for speed */
-}
-
-/* Révélation légère seulement hors premier paint critique */
 @media (prefers-reduced-motion: no-preference) {
-    [data-animate]:not(.is-revealed) {
+    html.site-animate-ready [data-animate]:not(.is-revealed) {
         opacity: 0.001;
     }
     [data-animate].is-revealed {

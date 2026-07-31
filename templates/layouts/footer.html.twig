@@ -44,18 +44,20 @@
                 </ul>
             </div>
 
-            {# Colonne 4 : Newsletter #}
+            {# Colonne 4 : Contact / info #}
             <div class="col-12 col-lg-4 col-md-6">
                 <h5 class="fw-bold mb-4 text-center text-md-start">Restez informé</h5>
                 <p class="text-secondary small text-center text-md-start">{{ site ? site.newsletterText : 'Recevez les meilleures pépites du Souk chaque semaine.' }}</p>
-                <form class="mt-3">
-                    <div class="input-group">
-                        <input type="email" class="form-control bg-transparent border-secondary text-white shadow-none" placeholder="Votre email" aria-label="Email">
-                        <button class="btn btn-custom-cyan px-3" type="button">
-                            <i class="bi bi-send"></i>
-                        </button>
-                    </div>
-                </form>
+                <div class="mt-3 text-center text-md-start">
+                    <a href="{{ path('app_contact') }}" class="btn btn-custom-cyan rounded-pill px-4">
+                        <i class="bi bi-envelope me-1" aria-hidden="true"></i>Nous contacter
+                    </a>
+                    {% if contact_email %}
+                        <p class="small mt-3 mb-0">
+                            <a href="mailto:{{ contact_email }}" class="footer-credit-link">{{ contact_email }}</a>
+                        </p>
+                    {% endif %}
+                </div>
             </div>
         </div>
 

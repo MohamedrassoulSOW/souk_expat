@@ -1,6 +1,6 @@
-{% extends 'page/static_base.html.twig' %}
+﻿{% extends 'page/static_base.html.twig' %}
 
-{% block title %}Blog & conseils — Expat Souk{% endblock %}
+{% block title %}Blog & conseils — {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
 
 {% block page_badge %}Inspiration{% endblock %}
 {% block page_heading %}Blog & conseils{% endblock %}
@@ -36,7 +36,7 @@
         <article class="h-100 p-4 static-card-soft d-flex flex-column">
             <div class="static-icon-circle mb-3 align-self-start"><i class="bi bi-shield-check"></i></div>
             <h2 class="h5 fw-bold">Acheter en toute confiance</h2>
-            <p class="text-secondary small flex-grow-1">Vérifiez l’annonce, privilégiez la messagerie Expat Souk, et gardez une trace des accords importants.</p>
+            <p class="text-secondary small flex-grow-1">Vérifiez l’annonce, privilégiez la messagerie {{ site ? site.siteName : 'SoukExpat' }}, et gardez une trace des accords importants.</p>
             <span class="text-cyan-brand small fw-semibold"><i class="bi bi-book me-1"></i>Sécurité</span>
         </article>
     </div>

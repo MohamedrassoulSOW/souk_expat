@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /message
+Disallow: /annonce/new
+Disallow: /annonce/mes-annonces
+Disallow: /api/

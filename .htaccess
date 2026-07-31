@@ -1,0 +1,15 @@
+# Hostinger / mutualisé : document root = racine du projet (pas public/).
+# Idéal : dans hPanel → Domaines → Racine du document = …/public
+
+DirectoryIndex public/index.php index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Déjà dans /public → ne pas réécrire
+    RewriteRule ^public/ - [L]
+
+    # Front controller + assets → dossier public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

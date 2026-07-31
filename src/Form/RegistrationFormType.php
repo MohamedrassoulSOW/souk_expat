@@ -18,31 +18,34 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('firstName', null, [
-                'label' => 'First Name',
+                'label' => 'Prénom',
                 'required' => true,
-                'attr' => ['placeholder' => 'Entrez votre prénom']
-
+                'attr' => ['placeholder' => 'Entrez votre prénom'],
             ])
             ->add('lastName', null, [
-                'label' => 'Last Name',
+                'label' => 'Nom',
                 'required' => true,
-                'attr' => ['placeholder' => 'Entrez votre nom de famille']
+                'attr' => ['placeholder' => 'Entrez votre nom de famille'],
             ])
-            ->add('email')
+            ->add('email', null, [
+                'label' => 'E-mail',
+            ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
+                'label' => 'J’accepte les conditions d’utilisation',
                 'constraints' => [
-                    new IsTrue(message: 'You should agree to our terms.'),
+                    new IsTrue(message: 'Vous devez accepter les conditions d’utilisation.'),
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
+                'label' => 'Mot de passe',
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
-                    new NotBlank(message: 'Please enter a password'),
+                    new NotBlank(message: 'Veuillez entrer un mot de passe'),
                     new Length(
-                        min: 6,
-                        minMessage: 'Your password should be at least {{ limit }} characters',
+                        min: 8,
+                        minMessage: 'Votre mot de passe doit faire au moins {{ limit }} caractères',
                         max: 4096
                     ),
                 ],

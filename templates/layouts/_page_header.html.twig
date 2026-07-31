@@ -1,7 +1,7 @@
 {# En-tête de page unifié
    Vars: eyebrow, title, title_html, lead, breadcrumbs ([{label, url?}]), actions (HTML) #}
 {% set breadcrumbs = breadcrumbs|default([]) %}
-<header class="page-header" data-animate="fade-up">
+<header class="page-header">
     <div class="page-header__inner">
         {% if breadcrumbs is not empty %}
             <nav aria-label="Fil d'Ariane" class="page-header__crumbs d-none d-md-block">

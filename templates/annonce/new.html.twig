@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Déposer une annonce | Expat Souk{% endblock %}
+{% block title %}Déposer une annonce | {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
 
 {% block body %}
 {{ include('layouts/navBar.html.twig') }}

@@ -44,7 +44,7 @@
         </p>
 
         {% if show_seller and annonce.user %}
-            <div class="annonce-listing-card__seller pt-3 border-top mt-auto">
+            <div class="annonce-listing-card__seller">
                 <a href="{{ path('app_seller_show', { id: annonce.user.id }) }}"
                    class="d-flex align-items-center gap-2 text-decoration-none seller-card-link"
                    title="Voir le profil de {{ annonce.user.firstName }}">

@@ -29,9 +29,17 @@ final class ContactController extends AbstractController
             $entityManager->persist($contact);
             $entityManager->flush();
 
-            $platformMailer->sendContactToInbox($contact);
+            $sent = $platformMailer->sendContactToInbox($contact);
+            $from = $platformMailer->contactEmail();
 
-            $this->addFlash('success', 'Message envoyé ! Nous vous répondrons à partir de contact@soukexpat.com.');
+            if ($sent) {
+                $this->addFlash('success', sprintf(
+                    'Message envoyé ! Nous vous répondrons à partir de %s.',
+                    $from
+                ));
+            } else {
+                $this->addFlash('warning', 'Votre message a été enregistré, mais la notification e-mail a échoué. Notre équipe le traitera tout de même.');
+            }
 
             return $this->redirectToRoute('app_contact');
         }

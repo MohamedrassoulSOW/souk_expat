@@ -61,12 +61,21 @@ final class AnnonceController extends AbstractController
     public function notifyAllUsers(Request $request, NotificationService $notifService): Response
     {
         $this->denyAccessUnlessGranted('ROLE_EDITOR');
-        $title = $request->request->get('title');
-        $message = $request->request->get('message');
 
-        if ($title && $message) {
+        if (!$this->isCsrfTokenValid('admin_notify_all', $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('app_dashboard');
+        }
+
+        $title = trim((string) $request->request->get('title'));
+        $message = trim((string) $request->request->get('message'));
+
+        if ($title !== '' && $message !== '') {
             $notifService->notifyAll($title, $message);
-            $this->addFlash('success', 'Information envoyée à tous les utilisateurs !');
+            $this->addFlash('success', 'Information envoyée à tous les utilisateurs.');
+        } else {
+            $this->addFlash('warning', 'Titre et message requis.');
         }
 
         return $this->redirectToRoute('app_dashboard');

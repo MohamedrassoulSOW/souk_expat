@@ -70,8 +70,8 @@
                                         <p class="fs-6 fw-bold text-dark mb-0">{{ user.lastName }}</p>
                                     </div>
                                     <div class="col-12 mt-4 pt-3 border-top">
-                                        <label class="info-label">Membre depuis</label>
-                                        <p class="mb-0 fw-medium text-dark"><i class="bi bi-calendar3 me-2" style="color: #42B1CE;"></i>Janvier 2024</p>
+                                        <label class="info-label">E-mail</label>
+                                        <p class="mb-0 fw-medium text-dark"><i class="bi bi-envelope-at me-2 text-brand"></i>{{ user.email }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -110,14 +110,14 @@
             <div class="row mt-4 g-3 text-center">
                 <div class="col-6">
                     <div class="card border-0 shadow-sm rounded-4 p-4 stat-card-hover">
-                        <div class="mb-2"><i class="bi bi-megaphone display-6" style="color: #42B1CE;"></i></div>
+                        <div class="mb-2"><i class="bi bi-megaphone display-6 text-brand"></i></div>
                         <h4 class="fw-bold mb-0">{{ user.annonces|length|cap999 }}</h4>
                         <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Annonces</small>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="card border-0 shadow-sm rounded-4 p-4 stat-card-hover">
-                        <div class="mb-2"><i class="bi bi-chat-dots display-6" style="color: #42B1CE;"></i></div>
+                        <div class="mb-2"><i class="bi bi-chat-dots display-6 text-brand"></i></div>
                         <h4 class="fw-bold mb-0">{{ user.messagesAsSender|length }}</h4>
                         <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Messages</small>
                     </div>
@@ -129,10 +129,9 @@
 </div>
 
 <style>
-    /* --- Styles Custom #42B1CE --- */
     .profile-header-custom {
         height: 140px;
-        background: linear-gradient(135deg, #42B1CE 0%, #2980b9 100%);
+        background: linear-gradient(135deg, var(--cyan-main) 0%, var(--cyan-hover) 100%);
     }
     .avatar-container-custom { margin-top: -70px; }
     .avatar-img-custom {
@@ -159,35 +158,34 @@
         }
     }
     .btn-cyan-round {
-        background-color: #42B1CE;
+        background-color: var(--cyan-main);
         color: white; border-radius: 50%;
         width: 40px; height: 40px;
         display: flex; align-items: center; justify-content: center;
     }
-    .btn-cyan-round:hover { background-color: #369ab3; color: white; }
+    .btn-cyan-round:hover { background-color: var(--cyan-hover); color: white; }
     
     .bg-light-cyan { background-color: color-mix(in srgb, var(--cyan-main) 10%, var(--surface)); }
     .info-label { font-size: 0.65rem; color: var(--text-muted-custom); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
     
-    /* Boutons Actions */
     .btn-action-profile {
-        background-color: #2d3436; color: white;
+        background-color: var(--cyan-hover); color: white;
         border-radius: 15px; border: none; transition: 0.3s;
         font-weight: 600;
     }
-    .btn-action-profile:hover { background-color: #42B1CE; transform: translateX(5px); color: white; }
+    .btn-action-profile:hover { background-color: var(--cyan-main); transform: translateX(5px); color: white; }
     
     .btn-action-profile-outline {
-        background-color: transparent; color: #2d3436;
-        border-radius: 15px; border: 2px solid #2d3436; transition: 0.3s;
+        background-color: transparent; color: var(--text-strong);
+        border-radius: 15px; border: 2px solid var(--border-soft); transition: 0.3s;
         font-weight: 600;
     }
-    .btn-action-profile-outline:hover { border-color: #42B1CE; color: #42B1CE; }
+    .btn-action-profile-outline:hover { border-color: var(--cyan-main); color: var(--cyan-main); }
 
     .stat-card-hover { transition: 0.3s; border: 1px solid transparent !important; }
-    .stat-card-hover:hover { transform: translateY(-5px); border-color: #42B1CE !important; }
+    .stat-card-hover:hover { transform: translateY(-5px); border-color: var(--cyan-main) !important; }
     
-    .hover-cyan:hover { color: #42B1CE !important; }
+    .hover-cyan:hover { color: var(--cyan-main) !important; }
     .letter-spacing { letter-spacing: 1.5px; }
 </style>
 
