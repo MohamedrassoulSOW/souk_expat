@@ -1,23 +1,14 @@
 {% extends 'page/static_base.html.twig' %}
 
-{% block title %}FAQ — Expat Souk{% endblock %}
+{% block title %}FAQ — {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
 
 {% block page_badge %}FAQ{% endblock %}
 {% block page_heading %}Questions fréquentes{% endblock %}
-{% block page_lead %}Les réponses aux demandes les plus courantes sur le fonctionnement de la plateforme.{% endblock %}
+{% block page_lead %}{{ site ? site.faqLead : 'Les réponses aux demandes les plus courantes.' }}{% endblock %}
 
 {% block static_body %}
+{% set faqs = site ? site.faqItems : [] %}
 <div class="accordion accordion-flush shadow-sm rounded-4 overflow-hidden border" id="faqAccordion" style="border-color: rgba(66, 177, 206, 0.22) !important;">
-    {% set faqs = [
-        { 'q': 'Expat Souk est-il payant ?', 'a': 'La création de compte et la consultation des annonces sont gratuites. La publication d’annonces peut être soumise aux règles du site (limites, options) décrites lors du dépôt.' },
-        { 'q': 'Combien de temps une annonce reste-t-elle en ligne ?', 'a': 'Les annonces validées restent visibles jusqu’à ce que vous les retiriez ou jusqu’à suppression pour non-respect des conditions. Les délais précis peuvent être précisés dans votre espace « Mes annonces ».' },
-        { 'q': 'Pourquoi mon annonce est-elle « en attente » ?', 'a': 'Pour protéger la communauté, chaque annonce peut être vérifiée par l’équipe avant publication. Vous recevrez une notification lorsqu’elle sera approuvée ou si une modification est nécessaire.' },
-        { 'q': 'Comment contacter un vendeur ?', 'a': 'Sur la page de l’annonce, utilisez le bouton pour ouvrir une conversation. La messagerie vous permet d’échanger du texte, des photos et votre position si vous le souhaitez.' },
-        { 'q': 'Expat Souk gère-t-il les paiements ou la livraison ?', 'a': 'Non : nous mettons en relation acheteurs et vendeurs. Le paiement, la remise du bien et les formalités restent entre vous — pensez à toujours privilégier des échanges transparents.' },
-        { 'q': 'Comment signaler une annonce douteuse ?', 'a': 'Utilisez les canaux prévus sur la plateforme ou le formulaire de contact en précisant le lien ou l’identifiant de l’annonce. Notre équipe traitera votre signalement.' },
-        { 'q': 'Puis-je modifier ou supprimer mon annonce ?', 'a': 'Oui : connectez-vous, rendez-vous dans « Mes annonces », puis choisissez modifier ou supprimer selon vos besoins.' },
-        { 'q': 'Mes données personnelles sont-elles protégées ?', 'a': 'Le site est accessible en HTTPS. Pour les traitements détaillés (cookies, droits RGPD), consultez nos mentions légales et politiques lorsqu’elles sont publiées.' }
-    ] %}
     {% for item in faqs %}
         <div class="accordion-item border-0 border-bottom" style="border-color: rgba(0,0,0,.06) !important;">
             <h2 class="accordion-header" id="faqHeading{{ loop.index }}">
@@ -29,6 +20,8 @@
                 <div class="accordion-body text-secondary small">{{ item.a }}</div>
             </div>
         </div>
+    {% else %}
+        <div class="p-4 text-muted">Aucune question pour le moment.</div>
     {% endfor %}
 </div>
 

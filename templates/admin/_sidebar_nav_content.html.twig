@@ -93,6 +93,13 @@
         </li>
 
         <li class="nav-item">
+            <a href="{{ path('admin_site_settings') }}"
+               class="nav-link {{ _r == 'admin_site_settings' ? 'active-cyan shadow-sm' : 'text-dark hover-light' }}"
+               {% if mobile %}data-admin-nav-link{% endif %}>
+                <i class="bi bi-sliders me-2" aria-hidden="true"></i> Paramètres du site
+            </a>
+        </li>
+        <li class="nav-item">
             <a href="{{ path('app_annonce_index') }}"
                class="nav-link {{ _r == 'app_annonce_index' ? 'active-cyan shadow-sm' : 'text-dark hover-light' }}"
                {% if mobile %}data-admin-nav-link{% endif %}>

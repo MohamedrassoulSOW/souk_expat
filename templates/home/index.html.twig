@@ -37,9 +37,9 @@
         <div class="home-hero-overlay">
             <div class="container home-hero-overlay-inner">
                 <div class="home-hero-copy text-center text-white mx-auto">
-                    <img class="home-hero-brand-logo" src="{{ asset('logo-souk-expat.png') }}" alt="SoukExpat — Le Marché Mondial des Expatriés" width="220" height="120" decoding="async" fetchpriority="high">
-                    <h1 class="home-hero-title">Trouvez tout, partout.</h1>
-                    <p class="home-hero-sub">Achetez et vendez entre expatriés au Maroc</p>
+                    <img class="home-hero-brand-logo" src="{{ asset('logo-souk-expat.png') }}" alt="{{ site ? site.siteName ~ ' — ' ~ site.tagline : 'SoukExpat' }}" width="220" height="120" decoding="async" fetchpriority="high">
+                    <h1 class="home-hero-title">{{ site ? site.heroTitle : 'Trouvez tout, partout.' }}</h1>
+                    <p class="home-hero-sub">{{ site ? site.heroSubtitle : 'Achetez et vendez entre expatriés au Maroc' }}</p>
                 </div>
 
                 <form action="{{ path('app_home') }}" method="get" id="home-search-form" class="home-search" aria-label="Rechercher une annonce">

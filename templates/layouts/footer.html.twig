@@ -3,16 +3,22 @@
         <div class="row g-4 mb-5">
             {# Colonne 1 : À propos #}
             <div class="col-12 col-lg-4 col-md-6 mb-4 mb-md-0">
-                <a class="footer-brand mb-3 d-inline-flex flex-column align-items-center align-items-md-start text-decoration-none" href="{{ path('app_home') }}" title="SoukExpat — Accueil">
-                    <img class="footer-brand-logo" src="{{ asset('logo-souk-expat.png') }}" alt="SoukExpat — Le Marché Mondial des Expatriés" width="200" height="110" loading="lazy" decoding="async">
+                <a class="footer-brand mb-3 d-inline-flex flex-column align-items-center align-items-md-start text-decoration-none" href="{{ path('app_home') }}" title="{{ site ? site.siteName : 'SoukExpat' }} — Accueil">
+                    <img class="footer-brand-logo" src="{{ asset('logo-souk-expat.png') }}" alt="{{ site ? site.siteName ~ ' — ' ~ site.tagline : 'SoukExpat' }}" width="200" height="110" loading="lazy" decoding="async">
                 </a>
                 <p class="text-secondary small pe-lg-5 text-center text-md-start">
-                    Le Marché Mondial des Expatriés. Achetez, vendez et échangez en toute confiance au sein de votre communauté au Maroc.
+                    {{ site ? site.footerText : 'Le Marché Mondial des Expatriés. Achetez, vendez et échangez en toute confiance au sein de votre communauté au Maroc.' }}
                 </p>
                 <div class="social-links d-flex gap-3 mt-4">
-                    <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="social-icon"><i class="bi bi-linkedin"></i></a>
+                    {% if site and site.facebookUrl %}
+                        <a href="{{ site.facebookUrl }}" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                    {% endif %}
+                    {% if site and site.instagramUrl %}
+                        <a href="{{ site.instagramUrl }}" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    {% endif %}
+                    {% if site and site.linkedinUrl %}
+                        <a href="{{ site.linkedinUrl }}" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                    {% endif %}
                 </div>
             </div>
 
@@ -41,7 +47,7 @@
             {# Colonne 4 : Newsletter #}
             <div class="col-12 col-lg-4 col-md-6">
                 <h5 class="fw-bold mb-4 text-center text-md-start">Restez informé</h5>
-                <p class="text-secondary small text-center text-md-start">Recevez les meilleures pépites du Souk chaque semaine.</p>
+                <p class="text-secondary small text-center text-md-start">{{ site ? site.newsletterText : 'Recevez les meilleures pépites du Souk chaque semaine.' }}</p>
                 <form class="mt-3">
                     <div class="input-group">
                         <input type="email" class="form-control bg-transparent border-secondary text-white shadow-none" placeholder="Votre email" aria-label="Email">
@@ -56,9 +62,13 @@
         {# Bas du footer #}
         <div class="footer-bottom py-4 border-top border-secondary border-opacity-25 text-center text-md-between d-md-flex align-items-center justify-content-between">
             <p class="text-secondary small mb-md-0">
-                &copy; {{ "now"|date("Y") }} <strong>SoukExpat</strong>. Tous droits réservés.
+                &copy; {{ "now"|date("Y") }} <strong>{{ site ? site.siteName : 'SoukExpat' }}</strong>. Tous droits réservés.
             </p>
-            <p class="small mb-0">Développé avec ❤️ par <a href="#" style="text-decoration: none; color: #4B79A1; font-weight: 600;">SoukExpat Team</a></p>
+            <p class="small mb-0">
+                {% if contact_email %}
+                    <a href="mailto:{{ contact_email }}" style="text-decoration: none; color: #4B79A1; font-weight: 600;">{{ contact_email }}</a>
+                {% endif %}
+            </p>
             <div class="payment-icons text-secondary opacity-50 d-none d-md-block">
                 v.0.0.1
             </div>

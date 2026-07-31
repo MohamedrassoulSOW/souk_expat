@@ -1,25 +1,21 @@
 {% extends 'page/static_base.html.twig' %}
 
-{% block title %}À propos de nous — Expat Souk{% endblock %}
+{% block title %}À propos — {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
 
 {% block page_badge %}Qui sommes-nous{% endblock %}
-{% block page_heading %}Bienvenue sur Expat Souk{% endblock %}
-{% block page_lead %}La passerelle entre les expatriés et les meilleures opportunités locales au Maroc.{% endblock %}
+{% block page_heading %}{{ site ? site.aboutHeading : 'Bienvenue sur SoukExpat' }}{% endblock %}
+{% block page_lead %}{{ site ? site.aboutLead : 'La passerelle entre les expatriés et les meilleures opportunités locales au Maroc.' }}{% endblock %}
 
 {% block static_body %}
 <div class="row align-items-center g-4 g-lg-5 mb-5">
     <div class="col-lg-6 order-lg-2">
         <img src="{{ asset('images/souk_expat.jpg') }}"
-             alt="Communauté Expat Souk"
+             alt="Communauté {{ site ? site.siteName : 'SoukExpat' }}"
              class="img-fluid rounded-4 shadow-sm w-100 about-hero-img"
              style="border: 1px solid rgba(66, 177, 206, 0.2); object-fit: cover; max-height: 420px;">
     </div>
     <div class="col-lg-6 order-lg-1">
-        <p class="text-secondary mb-4">
-            Expat Souk est né d’une idée simple : faciliter la vie des expatriés en créant un espace sécurisé
-            pour acheter, vendre et échanger des biens. Que vous cherchiez un appartement, un véhicule
-            ou des services de proximité, nous sommes là pour vous.
-        </p>
+        <p class="text-secondary mb-4">{{ site ? site.aboutBody : '' }}</p>
         <div class="d-flex flex-wrap gap-2">
             <a href="{{ path('app_annonce_new') }}" class="btn btn-lg text-white border-0 px-4 rounded-pill about-btn-brand">
                 Déposer une annonce
@@ -34,55 +30,29 @@
 <div class="row g-4">
     <div class="col-md-4">
         <div class="p-4 h-100 text-center static-card-soft">
-            <div class="static-icon-circle mx-auto mb-3">
-                <i class="bi bi-shield-check"></i>
-            </div>
-            <h3 class="h5 fw-bold text-dark mb-2">Sécurité</h3>
-            <p class="text-secondary small mb-0">
-                Les annonces sont modérées par notre équipe avant publication pour protéger la communauté.
-            </p>
+            <div class="static-icon-circle mx-auto mb-3"><i class="bi bi-shield-check"></i></div>
+            <h3 class="h5 fw-bold text-dark mb-2">{{ site ? site.aboutValue1Title : 'Sécurité' }}</h3>
+            <p class="text-secondary small mb-0">{{ site ? site.aboutValue1Text : '' }}</p>
         </div>
     </div>
     <div class="col-md-4">
         <div class="p-4 h-100 text-center static-card-soft">
-            <div class="static-icon-circle mx-auto mb-3">
-                <i class="bi bi-people"></i>
-            </div>
-            <h3 class="h5 fw-bold text-dark mb-2">Communauté</h3>
-            <p class="text-secondary small mb-0">
-                Un réseau d’expatriés qui partagent les mêmes besoins et la même envie d’entre-aide.
-            </p>
+            <div class="static-icon-circle mx-auto mb-3"><i class="bi bi-people"></i></div>
+            <h3 class="h5 fw-bold text-dark mb-2">{{ site ? site.aboutValue2Title : 'Communauté' }}</h3>
+            <p class="text-secondary small mb-0">{{ site ? site.aboutValue2Text : '' }}</p>
         </div>
     </div>
     <div class="col-md-4">
         <div class="p-4 h-100 text-center static-card-soft">
-            <div class="static-icon-circle mx-auto mb-3">
-                <i class="bi bi-lightning-charge"></i>
-            </div>
-            <h3 class="h5 fw-bold text-dark mb-2">Rapidité</h3>
-            <p class="text-secondary small mb-0">
-                Une interface fluide pour trouver ou proposer ce dont vous avez besoin en quelques clics.
-            </p>
+            <div class="static-icon-circle mx-auto mb-3"><i class="bi bi-lightning-charge"></i></div>
+            <h3 class="h5 fw-bold text-dark mb-2">{{ site ? site.aboutValue3Title : 'Rapidité' }}</h3>
+            <p class="text-secondary small mb-0">{{ site ? site.aboutValue3Text : '' }}</p>
         </div>
     </div>
 </div>
 
 <style>
-    .about-btn-brand {
-        background: #42B1CE;
-        border-color: #42B1CE;
-    }
-    .about-btn-brand:hover {
-        background: #369ab3;
-        border-color: #369ab3;
-        color: #fff;
-    }
-    .about-hero-img {
-        transition: transform .25s ease, box-shadow .25s ease;
-    }
-    .about-hero-img:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 18px 40px rgba(66, 177, 206, 0.18) !important;
-    }
+    .about-btn-brand { background: #42B1CE; border-color: #42B1CE; }
+    .about-btn-brand:hover { background: #369ab3; border-color: #369ab3; color: #fff; }
 </style>
 {% endblock %}

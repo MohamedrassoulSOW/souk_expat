@@ -16,19 +16,46 @@ use Symfony\Component\Mime\Address;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordToken;
 
 /**
- * Tous les e-mails transactionnels partent de / répondent via contact@soukexpat.com.
+ * E-mails transactionnels — adresse depuis les paramètres du site (fallback SiteContact).
  */
 final class PlatformMailer
 {
     public function __construct(
         private readonly MailerInterface $mailer,
         private readonly LoggerInterface $logger,
+        private readonly SiteSettingsService $siteSettings,
     ) {
+    }
+
+    public function contactEmail(): string
+    {
+        try {
+            $email = trim($this->siteSettings->get()->getContactEmail());
+            if ($email !== '') {
+                return $email;
+            }
+        } catch (\Throwable) {
+        }
+
+        return SiteContact::EMAIL;
+    }
+
+    public function fromName(): string
+    {
+        try {
+            $name = trim($this->siteSettings->get()->getSiteName());
+            if ($name !== '') {
+                return $name;
+            }
+        } catch (\Throwable) {
+        }
+
+        return SiteContact::FROM_NAME;
     }
 
     public function fromAddress(): Address
     {
-        return new Address(SiteContact::EMAIL, SiteContact::FROM_NAME);
+        return new Address($this->contactEmail(), $this->fromName());
     }
 
     public function sendPasswordReset(User $user, ResetPasswordToken $resetToken): bool
@@ -37,48 +64,46 @@ final class PlatformMailer
             ->from($this->fromAddress())
             ->replyTo($this->fromAddress())
             ->to((string) $user->getEmail())
-            ->subject('SoukExpat — Réinitialisation de votre mot de passe')
+            ->subject($this->fromName() . ' — Réinitialisation de votre mot de passe')
             ->htmlTemplate('reset_password/email.html.twig')
             ->textTemplate('reset_password/email.txt.twig')
             ->context([
                 'resetToken' => $resetToken,
-                'siteContactEmail' => SiteContact::EMAIL,
+                'siteContactEmail' => $this->contactEmail(),
             ]);
 
         return $this->dispatch($email);
     }
 
-    /** Message du formulaire contact → boîte contact@soukexpat.com */
     public function sendContactToInbox(Contact $contact): bool
     {
         $email = (new TemplatedEmail())
             ->from($this->fromAddress())
             ->replyTo(new Address((string) $contact->getEmail(), (string) $contact->getName()))
             ->to($this->fromAddress())
-            ->subject('Contact SoukExpat — ' . (string) $contact->getSubject())
+            ->subject('Contact ' . $this->fromName() . ' — ' . (string) $contact->getSubject())
             ->htmlTemplate('emails/contact_inbox.html.twig')
             ->context([
                 'contact' => $contact,
-                'siteContactEmail' => SiteContact::EMAIL,
+                'siteContactEmail' => $this->contactEmail(),
             ]);
 
         return $this->dispatch($email);
     }
 
-    /** Réponse admin → e-mail de l’utilisateur */
     public function sendContactReply(string $toEmail, string $toName, string $originalSubject, string $replyBody): bool
     {
         $email = (new TemplatedEmail())
             ->from($this->fromAddress())
             ->replyTo($this->fromAddress())
             ->to(new Address($toEmail, $toName !== '' ? $toName : $toEmail))
-            ->subject('SoukExpat — Réponse : ' . $originalSubject)
+            ->subject($this->fromName() . ' — Réponse : ' . $originalSubject)
             ->htmlTemplate('emails/contact_reply.html.twig')
             ->context([
                 'toName' => $toName,
                 'originalSubject' => $originalSubject,
                 'replyBody' => $replyBody,
-                'siteContactEmail' => SiteContact::EMAIL,
+                'siteContactEmail' => $this->contactEmail(),
             ]);
 
         return $this->dispatch($email);
@@ -95,13 +120,13 @@ final class PlatformMailer
             ->from($this->fromAddress())
             ->replyTo($this->fromAddress())
             ->to((string) $user->getEmail())
-            ->subject('SoukExpat — Votre annonce a été approuvée')
+            ->subject($this->fromName() . ' — Votre annonce a été approuvée')
             ->htmlTemplate('emails/annonce_status.html.twig')
             ->context([
                 'annonce' => $annonce,
                 'user' => $user,
                 'approved' => true,
-                'siteContactEmail' => SiteContact::EMAIL,
+                'siteContactEmail' => $this->contactEmail(),
             ]);
 
         return $this->dispatch($email);
@@ -118,13 +143,13 @@ final class PlatformMailer
             ->from($this->fromAddress())
             ->replyTo($this->fromAddress())
             ->to((string) $user->getEmail())
-            ->subject('SoukExpat — Votre annonce n’a pas été validée')
+            ->subject($this->fromName() . ' — Votre annonce n’a pas été validée')
             ->htmlTemplate('emails/annonce_status.html.twig')
             ->context([
                 'annonce' => $annonce,
                 'user' => $user,
                 'approved' => false,
-                'siteContactEmail' => SiteContact::EMAIL,
+                'siteContactEmail' => $this->contactEmail(),
             ]);
 
         return $this->dispatch($email);

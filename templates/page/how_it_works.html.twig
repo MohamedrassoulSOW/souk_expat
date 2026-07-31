@@ -1,28 +1,23 @@
 {% extends 'page/static_base.html.twig' %}
 
-{% block title %}Comment ça marche ? — Expat Souk{% endblock %}
+{% block title %}Comment ça marche ? — {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
 
 {% block page_badge %}Guide{% endblock %}
 {% block page_heading %}Comment ça marche ?{% endblock %}
-{% block page_lead %}Quatre étapes simples pour vendre ou acheter entre expatriés, en toute confiance sur Expat Souk.{% endblock %}
+{% block page_lead %}{{ site ? site.howItWorksLead : 'Étapes simples pour vendre ou acheter entre expatriés.' }}{% endblock %}
 
 {% block static_body %}
+{% set steps = site ? site.howItWorksSteps : [] %}
 <div class="row g-4 mb-5">
-    {% set steps = [
-        { 'n': '1', 'icon': 'bi-person-plus', 'title': 'Créez votre compte', 'text': 'Inscrivez-vous gratuitement avec votre e-mail. Complétez votre profil pour rassurer les autres membres de la communauté.' },
-        { 'n': '2', 'icon': 'bi-megaphone', 'title': 'Publiez ou parcourez', 'text': 'Déposez une annonce avec photos et description claire, ou utilisez les filtres (catégorie, ville, mots-clés) pour trouver ce qu’il vous faut.' },
-        { 'n': '3', 'icon': 'bi-chat-dots', 'title': 'Échangez en direct', 'text': 'Contactez le vendeur via la messagerie intégrée : questions, photos, partage de position — comme sur une app de chat moderne.' },
-        { 'n': '4', 'icon': 'bi-shield-check', 'title': 'Concluez sereinement', 'text': 'Rencontrez-vous, vérifiez le bien et le paiement. Les annonces passent par une modération pour limiter les arnaques.' }
-    ] %}
     {% for s in steps %}
         <div class="col-12 col-md-6">
             <div class="p-4 p-md-4 h-100 static-card-soft">
                 <div class="d-flex align-items-start gap-3">
                     <div class="static-icon-circle flex-shrink-0">
-                        <i class="bi {{ s.icon }}"></i>
+                        <i class="bi {{ s.icon|default('bi-circle') }}"></i>
                     </div>
                     <div>
-                        <span class="badge rounded-pill mb-2" style="background: #42B1CE20; color: #2a8da7;">Étape {{ s.n }}</span>
+                        <span class="badge rounded-pill mb-2" style="background: #42B1CE20; color: #2a8da7;">Étape {{ loop.index }}</span>
                         <h2 class="h5 fw-bold text-dark mb-2">{{ s.title }}</h2>
                         <p class="text-secondary mb-0 small">{{ s.text }}</p>
                     </div>
@@ -34,7 +29,7 @@
 
 <div class="text-center p-4 p-md-5 rounded-4 border" style="border-color: rgba(66, 177, 206, 0.2) !important; background: linear-gradient(180deg, #f6fcfd 0%, #fff 100%);">
     <h3 class="h5 fw-bold text-dark mb-3">Prêt à commencer ?</h3>
-    <p class="text-secondary mb-4">Rejoignez la communauté Expat Souk et donnez une seconde vie à vos affaires.</p>
+    <p class="text-secondary mb-4">Rejoignez la communauté {{ site ? site.siteName : 'SoukExpat' }}.</p>
     <a href="{{ path('app_annonce_index') }}" class="btn btn-lg me-2 mb-2" style="background: #42B1CE; border-color: #42B1CE; color: #fff;">Voir les annonces</a>
     <a href="{{ path('app_register') }}" class="btn btn-lg btn-outline-secondary mb-2">Créer un compte</a>
 </div>

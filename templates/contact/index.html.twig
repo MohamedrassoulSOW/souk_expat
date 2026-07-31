@@ -44,7 +44,7 @@
                                 <span class="contact-info-icon"><i class="bi bi-geo-alt"></i></span>
                                 <div>
                                     <span class="d-block small text-white-50 mb-1">Adresse</span>
-                                    <span class="fw-medium">Anfa Place, 20250 Casablanca, Maroc</span>
+                                    <span class="fw-medium">{{ site ? site.contactAddress : 'Anfa Place, 20250 Casablanca, Maroc' }}</span>
                                 </div>
                             </li>
                             <li class="d-flex mb-4">
@@ -54,23 +54,34 @@
                                     <a href="mailto:{{ contact_email }}" class="contact-aside-link">{{ contact_email }}</a>
                                 </div>
                             </li>
+                            {% if site and site.contactPhone %}
+                            <li class="d-flex mb-4">
+                                <span class="contact-info-icon"><i class="bi bi-telephone"></i></span>
+                                <div>
+                                    <span class="d-block small text-white-50 mb-1">Téléphone</span>
+                                    <a href="tel:{{ site.contactPhone }}" class="contact-aside-link">{{ site.contactPhone }}</a>
+                                </div>
+                            </li>
+                            {% endif %}
                             <li class="d-flex mb-0">
                                 <span class="contact-info-icon"><i class="bi bi-clock"></i></span>
                                 <div>
                                     <span class="d-block small text-white-50 mb-1">Disponibilité</span>
-                                    <span class="fw-medium">Lun – Ven, 9h – 18h (Maroc)</span>
+                                    <span class="fw-medium">{{ site ? site.contactHours : 'Lun – Ven, 9h – 18h (Maroc)' }}</span>
                                 </div>
                             </li>
                         </ul>
 
+                        {% if site and (site.facebookUrl or site.instagramUrl or site.linkedinUrl) %}
                         <div class="mt-5 pt-4 border-top border-white border-opacity-25">
                             <p class="small text-white-50 mb-3">Réseaux</p>
                             <div class="d-flex gap-2 flex-wrap">
-                                <a href="#" class="contact-social-btn" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                                <a href="#" class="contact-social-btn" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-                                <a href="#" class="contact-social-btn" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                                {% if site.facebookUrl %}<a href="{{ site.facebookUrl }}" class="contact-social-btn" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>{% endif %}
+                                {% if site.instagramUrl %}<a href="{{ site.instagramUrl }}" class="contact-social-btn" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="bi bi-instagram"></i></a>{% endif %}
+                                {% if site.linkedinUrl %}<a href="{{ site.linkedinUrl }}" class="contact-social-btn" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>{% endif %}
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

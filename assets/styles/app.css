@@ -1873,6 +1873,194 @@ body {
     color: #fff;
 }
 
+/* ——— Paramètres du site (admin) ——— */
+.admin-settings-guide__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cyan-soft);
+    color: var(--cyan-main);
+    font-size: 1.25rem;
+}
+
+.admin-settings-nav {
+    position: sticky;
+    top: 0.5rem;
+    z-index: 20;
+    padding: 0.55rem 0.65rem;
+}
+
+.admin-settings-nav__scroll {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.15rem;
+}
+
+.admin-settings-nav__link {
+    flex: 0 0 auto;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--cyan-hover);
+    background: #f8fafc;
+    border: 1px solid rgba(75, 121, 161, 0.18);
+    white-space: nowrap;
+}
+
+.admin-settings-nav__link:hover {
+    background: var(--cyan-soft);
+    color: var(--cyan-hover);
+}
+
+.admin-settings-section__head {
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    background: linear-gradient(180deg, #fbfdff 0%, #fff 100%);
+}
+
+.admin-settings-section__num {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cyan-main);
+}
+
+.admin-settings-section__body {
+    padding: 1.15rem 1.25rem 1.35rem;
+}
+
+.admin-settings-section .form-text {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.admin-settings-card-block {
+    height: 100%;
+    padding: 0.9rem;
+    border-radius: 0.9rem;
+    background: #f8fafc;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.admin-collection-item {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0.9rem;
+    background: #f8fafc;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.admin-collection-item__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.admin-collection-item__label {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--cyan-main);
+}
+
+.admin-settings-savebar {
+    position: sticky;
+    bottom: 0;
+    z-index: 25;
+    margin: 0 -0.25rem;
+    padding: 0.75rem 0.25rem 0.25rem;
+    background: linear-gradient(180deg, rgba(241, 245, 249, 0) 0%, #f1f5f9 28%);
+}
+
+.admin-settings-savebar__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+.admin-settings-form .form-label {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.45rem;
+}
+
+.admin-settings-form .form-control,
+.admin-settings-form .form-select {
+    min-height: 3.15rem;
+    padding: 0.85rem 1rem;
+    font-size: 1.05rem;
+    border-radius: 0.75rem;
+    line-height: 1.45;
+}
+
+.admin-settings-form textarea.form-control {
+    min-height: 8.5rem;
+    padding: 1rem 1.1rem;
+    font-size: 1.05rem;
+    line-height: 1.55;
+}
+
+.admin-settings-form textarea.form-control[rows="2"] {
+    min-height: 5.5rem;
+}
+
+.admin-settings-form textarea.form-control[rows="3"] {
+    min-height: 7rem;
+}
+
+.admin-settings-form textarea.form-control[rows="4"],
+.admin-settings-form textarea.form-control[rows="5"] {
+    min-height: 10rem;
+}
+
+.admin-settings-form .form-text {
+    margin-top: 0.4rem;
+    font-size: 0.88rem;
+}
+
+.admin-collection-item .form-control,
+.admin-collection-item .form-select {
+    min-height: 3rem;
+}
+
+@media (max-width: 767.98px) {
+    .admin-settings-nav {
+        top: 0;
+    }
+
+    .admin-settings-savebar__inner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-settings-savebar__inner .ms-auto {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    .admin-settings-savebar__inner .btn {
+        width: 100%;
+    }
+}
+
 /* ——— Boutons d’action icône seule ——— */
 .btn-icon-action {
     width: 2.15rem;

@@ -1,0 +1,321 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Paramètres du site | SoukExpat{% endblock %}
+{% block admin_mobile_title %}Paramètres{% endblock %}
+
+{% block admin_main %}
+    {% set actions %}
+        <a href="{{ path('app_home') }}" class="btn btn-light border rounded-pill px-3" target="_blank" rel="noopener">
+            <i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Voir le site
+        </a>
+        <span class="admin-badge">Dernière maj {{ settings.updatedAt|date('d/m/Y H:i') }}</span>
+    {% endset %}
+
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Site',
+        title: 'Paramètres du site',
+        lead: 'Chaque section correspond à une zone visible sur le site. Modifiez, puis cliquez sur Enregistrer en bas.',
+        actions: actions
+    }) }}
+
+    <div class="admin-settings-guide admin-panel p-3 p-md-4 mb-3">
+        <div class="d-flex flex-wrap align-items-start gap-3">
+            <div class="admin-settings-guide__icon flex-shrink-0">
+                <i class="bi bi-lightbulb" aria-hidden="true"></i>
+            </div>
+            <div class="min-w-0">
+                <h2 class="h6 fw-bold mb-1">Comment modifier efficacement</h2>
+                <ul class="small text-muted mb-0 ps-3">
+                    <li>Utilisez le menu ci-dessous pour aller directement à la bonne section.</li>
+                    <li>Sous chaque champ, une aide indique <strong>où</strong> le texte apparaît sur le site.</li>
+                    <li>Pour la FAQ et « Comment ça marche », ajoutez ou retirez des cartes avec les boutons + / supprimer.</li>
+                    <li>Les liens réseaux vides n’affichent pas l’icône (footer & contact).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <nav class="admin-settings-nav admin-panel mb-3" aria-label="Sections des paramètres">
+        <div class="admin-settings-nav__scroll">
+            <a href="#sec-identite" class="admin-settings-nav__link">1. Identité</a>
+            <a href="#sec-accueil" class="admin-settings-nav__link">2. Accueil</a>
+            <a href="#sec-contact" class="admin-settings-nav__link">3. Contact</a>
+            <a href="#sec-about" class="admin-settings-nav__link">4. À propos</a>
+            <a href="#sec-howto" class="admin-settings-nav__link">5. Guide</a>
+            <a href="#sec-faq" class="admin-settings-nav__link">6. FAQ</a>
+            <a href="#sec-legal" class="admin-settings-nav__link">7. Légal</a>
+        </div>
+    </nav>
+
+    {{ form_start(form, { attr: { class: 'admin-settings-form', novalidate: 'novalidate' } }) }}
+
+        {# ——— 1. Identité ——— #}
+        <section id="sec-identite" class="admin-settings-section admin-panel mb-3">
+            <header class="admin-settings-section__head">
+                <div>
+                    <p class="admin-settings-section__num mb-1">Section 1</p>
+                    <h2 class="h5 fw-bold mb-1">Identité du site</h2>
+                    <p class="small text-muted mb-0">Nom et slogan utilisés partout (footer, e-mails, titres).</p>
+                </div>
+            </header>
+            <div class="admin-settings-section__body">
+                <div class="row g-3">
+                    <div class="col-md-6">{{ form_row(form.siteName) }}</div>
+                    <div class="col-md-6">{{ form_row(form.tagline) }}</div>
+                </div>
+            </div>
+        </section>
+
+        {# ——— 2. Accueil ——— #}
+        <section id="sec-accueil" class="admin-settings-section admin-panel mb-3">
+            <header class="admin-settings-section__head">
+                <div>
+                    <p class="admin-settings-section__num mb-1">Section 2</p>
+                    <h2 class="h5 fw-bold mb-1">Page d’accueil</h2>
+                    <p class="small text-muted mb-0">
+                        Textes du bandeau d’accueil.
+                        <a href="{{ path('app_home') }}" target="_blank" rel="noopener" class="ms-1">Ouvrir l’accueil ↗</a>
+                        · Images du carrousel :
+                        <a href="{{ path('admin_slider_index') }}">gérer le slider</a>
+                    </p>
+                </div>
+            </header>
+            <div class="admin-settings-section__body">
+                <div class="row g-3">
+                    <div class="col-md-6">{{ form_row(form.heroTitle) }}</div>
+                    <div class="col-md-6">{{ form_row(form.heroSubtitle) }}</div>
+                    <div class="col-12">{{ form_row(form.footerText) }}</div>
+                    <div class="col-12">{{ form_row(form.newsletterText) }}</div>
+                </div>
+            </div>
+        </section>
+
+        {# ——— 3. Contact ——— #}
+        <section id="sec-contact" class="admin-settings-section admin-panel mb-3">
+            <header class="admin-settings-section__head">
+                <div>
+                    <p class="admin-settings-section__num mb-1">Section 3</p>
+                    <h2 class="h5 fw-bold mb-1">Contact & réseaux sociaux</h2>
+                    <p class="small text-muted mb-0">
+                        Colonne gauche de la page Contact + icônes du footer.
+                        <a href="{{ path('app_contact') }}" target="_blank" rel="noopener" class="ms-1">Ouvrir Contact ↗</a>
+                    </p>
+                </div>
+            </header>
+            <div class="admin-settings-section__body">
+                <div class="row g-3">
+                    <div class="col-md-6">{{ form_row(form.contactEmail) }}</div>
+                    <div class="col-md-6">{{ form_row(form.contactPhone) }}</div>
+                    <div class="col-md-6">{{ form_row(form.contactAddress) }}</div>
+                    <div class="col-md-6">{{ form_row(form.contactHours) }}</div>
+                    <div class="col-12"><hr class="my-1 opacity-25"></div>
+                    <div class="col-md-4">{{ form_row(form.facebookUrl) }}</div>
+                    <div class="col-md-4">{{ form_row(form.instagramUrl) }}</div>
+                    <div class="col-md-4">{{ form_row(form.linkedinUrl) }}</div>
+                </div>
+            </div>
+        </section>
+
+        {# ——— 4. À propos ——— #}
+        <section id="sec-about" class="admin-settings-section admin-panel mb-3">
+            <header class="admin-settings-section__head">
+                <div>
+                    <p class="admin-settings-section__num mb-1">Section 4</p>
+                    <h2 class="h5 fw-bold mb-1">Page À propos</h2>
+                    <p class="small text-muted mb-0">
+                        Contenu de <code>/about</code>.
+                        <a href="{{ path('app_about') }}" target="_blank" rel="noopener" class="ms-1">Ouvrir À propos ↗</a>
+                    </p>
+                </div>
+            </header>
+            <div class="admin-settings-section__body">
+                <div class="row g-3">
+                    <div class="col-md-6">{{ form_row(form.aboutHeading) }}</div>
+                    <div class="col-md-6">{{ form_row(form.aboutLead) }}</div>
+                    <div class="col-12">{{ form_row(form.aboutBody) }}</div>
+                    <div class="col-12">
+                        <p class="small fw-semibold text-muted mb-2">Les 3 cartes d’arguments</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="admin-settings-card-block">
+                            {{ form_row(form.aboutValue1Title) }}
+                            {{ form_row(form.aboutValue1Text) }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="admin-settings-card-block">
+                            {{ form_row(form.aboutValue2Title) }}
+                            {{ form_row(form.aboutValue2Text) }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="admin-settings-card-block">
+                            {{ form_row(form.aboutValue3Title) }}
+                            {{ form_row(form.aboutValue3Text) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# ——— 5. Comment ça marche ——— #}
+        <section id="sec-howto" class="admin-settings-section admin-panel mb-3">
+            <header class="admin-settings-section__head">
+                <div>
+                    <p class="admin-settings-section__num mb-1">Section 5</p>
+                    <h2 class="h5 fw-bold mb-1">Comment ça marche</h2>
+                    <p class="small text-muted mb-0">
+                        Étapes numérotées de la page guide.
+                        <a href="{{ path('app_how_it_works') }}" target="_blank" rel="noopener" class="ms-1">Ouvrir le guide ↗</a>
+                    </p>
+                </div>
+            </header>
+            <div class="admin-settings-section__body">
+                {{ form_row(form.howItWorksLead) }}
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 mt-3">
+                    <p class="small fw-semibold text-muted mb-0">Étapes (ordre = affichage)</p>
+                    <button type="button" class="btn btn-sm btn-admin-primary rounded-pill" data-collection-add="steps">
+                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Ajouter une étape
+                    </button>
+                </div>
+                <div class="admin-collection-list" data-collection-list="steps"
+                     data-prototype="{{ form_widget(form.howItWorksSteps.vars.prototype)|e('html_attr') }}"
+                     data-index="{{ form.howItWorksSteps|length }}">
+                    {% for step in form.howItWorksSteps %}
+                        <div class="admin-collection-item">
+                            <div class="admin-collection-item__bar">
+                                <span class="admin-collection-item__label">Étape {{ loop.index }}</span>
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-icon-action" data-collection-remove title="Supprimer" aria-label="Supprimer">
+                                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-4">{{ form_row(step.icon) }}</div>
+                                <div class="col-md-8">{{ form_row(step.title) }}</div>
+                                <div class="col-12">{{ form_row(step.text) }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% do form.howItWorksSteps.setRendered %}
+            </div>
+        </section>
+
+        {# ——— 6. FAQ ——— #}
+        <section id="sec-faq" class="admin-settings-section admin-panel mb-3">
+            <header class="admin-settings-section__head">
+                <div>
+                    <p class="admin-settings-section__num mb-1">Section 6</p>
+                    <h2 class="h5 fw-bold mb-1">FAQ</h2>
+                    <p class="small text-muted mb-0">
+                        Questions / réponses de la page FAQ.
+                        <a href="{{ path('app_faq') }}" target="_blank" rel="noopener" class="ms-1">Ouvrir la FAQ ↗</a>
+                    </p>
+                </div>
+            </header>
+            <div class="admin-settings-section__body">
+                {{ form_row(form.faqLead) }}
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 mt-3">
+                    <p class="small fw-semibold text-muted mb-0">Liste des questions</p>
+                    <button type="button" class="btn btn-sm btn-admin-primary rounded-pill" data-collection-add="faq">
+                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Ajouter une question
+                    </button>
+                </div>
+                <div class="admin-collection-list" data-collection-list="faq"
+                     data-prototype="{{ form_widget(form.faqItems.vars.prototype)|e('html_attr') }}"
+                     data-index="{{ form.faqItems|length }}">
+                    {% for item in form.faqItems %}
+                        <div class="admin-collection-item">
+                            <div class="admin-collection-item__bar">
+                                <span class="admin-collection-item__label">Question {{ loop.index }}</span>
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-icon-action" data-collection-remove title="Supprimer" aria-label="Supprimer">
+                                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            {{ form_row(item.q) }}
+                            {{ form_row(item.a) }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% do form.faqItems.setRendered %}
+            </div>
+        </section>
+
+        {# ——— 7. Légal ——— #}
+        <section id="sec-legal" class="admin-settings-section admin-panel mb-3">
+            <header class="admin-settings-section__head">
+                <div>
+                    <p class="admin-settings-section__num mb-1">Section 7</p>
+                    <h2 class="h5 fw-bold mb-1">Mentions légales</h2>
+                    <p class="small text-muted mb-0">
+                        Textes réglementaires.
+                        <a href="{{ path('app_legal') }}" target="_blank" rel="noopener" class="ms-1">Ouvrir Mentions ↗</a>
+                    </p>
+                </div>
+            </header>
+            <div class="admin-settings-section__body">
+                <div class="row g-3">
+                    <div class="col-lg-6">{{ form_row(form.legalPublisher) }}</div>
+                    <div class="col-lg-6">{{ form_row(form.legalHosting) }}</div>
+                    <div class="col-12">{{ form_row(form.legalExtra) }}</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="admin-settings-savebar">
+            <div class="admin-settings-savebar__inner">
+                <p class="small text-muted mb-0 d-none d-md-block">Pensez à enregistrer après vos modifications.</p>
+                <div class="d-flex flex-wrap gap-2 ms-auto">
+                    <a href="{{ path('app_dashboard') }}" class="btn btn-light border rounded-pill px-3">Annuler</a>
+                    <button type="submit" class="btn btn-admin-primary rounded-pill px-4">
+                        <i class="bi bi-check2 me-1" aria-hidden="true"></i>Enregistrer toutes les modifications
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    {{ form_end(form) }}
+
+    <script>
+    (function () {
+        function renumber(list, word) {
+            list.querySelectorAll('.admin-collection-item').forEach(function (item, i) {
+                var label = item.querySelector('.admin-collection-item__label');
+                if (label) label.textContent = word + ' ' + (i + 1);
+            });
+        }
+
+        document.querySelectorAll('[data-collection-add]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var key = btn.getAttribute('data-collection-add');
+                var list = document.querySelector('[data-collection-list="' + key + '"]');
+                if (!list) return;
+                var proto = list.getAttribute('data-prototype');
+                var index = parseInt(list.getAttribute('data-index') || '0', 10);
+                var placeholder = key === 'faq' ? '__faq__' : '__step__';
+                var html = proto.replace(new RegExp(placeholder, 'g'), String(index));
+                var wrap = document.createElement('div');
+                wrap.className = 'admin-collection-item';
+                wrap.innerHTML =
+                    '<div class="admin-collection-item__bar">' +
+                    '<span class="admin-collection-item__label"></span>' +
+                    '<button type="button" class="btn btn-sm btn-outline-danger btn-icon-action" data-collection-remove title="Supprimer" aria-label="Supprimer">' +
+                    '<i class="bi bi-trash3" aria-hidden="true"></i></button></div>' +
+                    '<div class="admin-collection-item__fields">' + html + '</div>';
+                list.appendChild(wrap);
+                list.setAttribute('data-index', String(index + 1));
+                renumber(list, key === 'faq' ? 'Question' : 'Étape');
+            });
+        });
+
+        document.addEventListener('click', function (e) {
+            var rm = e.target.closest('[data-collection-remove]');
+            if (!rm) return;
+            var item = rm.closest('.admin-collection-item');
+            var list = rm.closest('[data-collection-list]');
+            if (item) item.remove();
+            if (list) renumber(list, list.getAttribute('data-collection-list') === 'faq' ? 'Question' : 'Étape');
+        });
+    })();
+    </script>
+{% endblock %}
