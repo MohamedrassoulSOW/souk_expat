@@ -27,6 +27,13 @@ class Message
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageFilename = null;
 
+    /** Contenu binaire image (API mobile) — préféré au fichier disque. */
+    #[ORM\Column(type: Types::BLOB, nullable: true)]
+    private $imageContent = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $imageMimeType = null;
+
     #[ORM\Column(nullable: true)]
     private ?float $latitude = null;
 
@@ -92,6 +99,48 @@ class Message
     {
         $this->imageFilename = $imageFilename;
         return $this;
+    }
+
+    public function getImageContent(): ?string
+    {
+        if ($this->imageContent === null) {
+            return null;
+        }
+
+        if (\is_resource($this->imageContent)) {
+            $data = stream_get_contents($this->imageContent);
+            $this->imageContent = $data === false ? null : $data;
+
+            return $this->imageContent;
+        }
+
+        return \is_string($this->imageContent) ? $this->imageContent : null;
+    }
+
+    public function setImageContent(?string $imageContent): static
+    {
+        $this->imageContent = $imageContent;
+
+        return $this;
+    }
+
+    public function getImageMimeType(): ?string
+    {
+        return $this->imageMimeType;
+    }
+
+    public function setImageMimeType(?string $imageMimeType): static
+    {
+        $this->imageMimeType = $imageMimeType;
+
+        return $this;
+    }
+
+    public function hasDatabaseImage(): bool
+    {
+        $content = $this->getImageContent();
+
+        return $content !== null && $content !== '';
     }
 
     public function getLatitude(): ?float

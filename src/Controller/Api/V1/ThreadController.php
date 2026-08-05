@@ -158,6 +158,8 @@ final class ThreadController extends AbstractController
         $message->setSender($user);
         $message->setIsRead(false);
 
+        $base64Image = $payload['imageBase64'] ?? $payload['photoBase64'] ?? null;
+
         if ($photo instanceof UploadedFile && $photo->isValid()) {
             $mime = (string) $photo->getMimeType();
             if (!\in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
@@ -167,15 +169,38 @@ final class ThreadController extends AbstractController
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
-            $uploadRoot = $this->getParameter('kernel.project_dir') . '/public/uploads/messages';
-            if (!is_dir($uploadRoot)) {
-                mkdir($uploadRoot, 0775, true);
+            if ($photo->getSize() !== false && $photo->getSize() > 4 * 1024 * 1024) {
+                return $this->json([
+                    'error' => 'validation_error',
+                    'message' => 'Image trop lourde (max 4 Mo).',
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
-            $filename = sprintf('%d_%s.%s', $thread->getId(), uniqid(), $photo->guessExtension() ?: 'jpg');
-            $photo->move($uploadRoot, $filename);
+            $binary = @file_get_contents($photo->getPathname());
+            if ($binary === false || $binary === '') {
+                return $this->json([
+                    'error' => 'validation_error',
+                    'message' => 'Impossible de lire l’image.',
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
             $message->setKind(Message::KIND_IMAGE);
-            $message->setImageFilename($filename);
+            $message->setImageFilename(null);
+            $message->setImageContent($binary);
+            $message->setImageMimeType($mime);
+            $message->setContent($content !== '' ? $content : null);
+        } elseif (\is_string($base64Image) && $base64Image !== '') {
+            $parsed = $this->parseImageBase64($base64Image, isset($payload['mimeType']) ? (string) $payload['mimeType'] : null);
+            if ($parsed === null) {
+                return $this->json([
+                    'error' => 'validation_error',
+                    'message' => 'imageBase64 invalide (jpeg/png/webp, max 4 Mo).',
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+            $message->setKind(Message::KIND_IMAGE);
+            $message->setImageFilename(null);
+            $message->setImageContent($parsed['binary']);
+            $message->setImageMimeType($parsed['mime']);
             $message->setContent($content !== '' ? $content : null);
         } elseif ($latRaw !== null && $latRaw !== '' && $lngRaw !== null && $lngRaw !== '') {
             $lat = filter_var($latRaw, FILTER_VALIDATE_FLOAT);
@@ -213,6 +238,28 @@ final class ThreadController extends AbstractController
         ], Response::HTTP_CREATED);
     }
 
+    /**
+     * @return array{binary: string, mime: string}|null
+     */
+    private function parseImageBase64(string $raw, ?string $mimeHint): ?array
+    {
+        $mime = $mimeHint && \in_array($mimeHint, ['image/jpeg', 'image/png', 'image/webp'], true)
+            ? $mimeHint
+            : 'image/jpeg';
+
+        if (preg_match('#^data:(image/(?:jpeg|png|webp));base64,(.+)$#i', $raw, $m)) {
+            $mime = strtolower($m[1]);
+            $raw = $m[2];
+        }
+
+        $binary = base64_decode($raw, true);
+        if ($binary === false || $binary === '' || \strlen($binary) > 4 * 1024 * 1024) {
+            return null;
+        }
+
+        return ['binary' => $binary, 'mime' => $mime];
+    }
+
     private function isParticipant(Thread $thread, User $user): bool
     {
         return $thread->getBuyer()?->getId() === $user->getId()
@@ -247,7 +294,7 @@ final class ThreadController extends AbstractController
         }
 
         $payload = [];
-        foreach (['content', 'latitude', 'longitude', 'locationLabel'] as $key) {
+        foreach (['content', 'latitude', 'longitude', 'locationLabel', 'imageBase64', 'photoBase64', 'mimeType'] as $key) {
             if ($request->request->has($key)) {
                 $payload[$key] = $request->request->get($key);
             }

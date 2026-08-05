@@ -44,9 +44,14 @@
         </p>
 
         {% if show_seller and annonce.user %}
+            {% set card_wa = annonce.phone|default('') %}
+            {% if card_wa is empty and annonce.user.whatsappPhone %}
+                {% set card_wa = annonce.user.whatsappPhone %}
+            {% endif %}
+            {% set card_wa_href = card_wa ? (card_wa|whatsapp_url('Bonjour, je suis intéressé(e) par « ' ~ annonce.title ~ ' » sur SoukExpat.')) : '#' %}
             <div class="annonce-listing-card__seller">
                 <a href="{{ path('app_seller_show', { id: annonce.user.id }) }}"
-                   class="d-flex align-items-center gap-2 text-decoration-none seller-card-link"
+                   class="d-flex align-items-center gap-2 text-decoration-none seller-card-link min-w-0"
                    title="Voir le profil de {{ annonce.user.firstName }}">
                     <div class="annonce-listing-card__avatar flex-shrink-0 overflow-hidden">
                         {% if annonce.user.avatar %}
@@ -64,6 +69,19 @@
                         <span class="fw-semibold">{{ annonce.user.firstName }}</span>
                     </span>
                 </a>
+                {% if card_wa and card_wa_href != '#' and (not app.user or app.user.id != annonce.user.id) %}
+                    <a href="{{ card_wa_href }}"
+                       class="annonce-listing-card__wa d-inline-flex align-items-center gap-1 text-decoration-none"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       title="WhatsApp"
+                       aria-label="Contacter {{ annonce.user.firstName }} sur WhatsApp"
+                       data-require-safety-ack="1"
+                       data-safety-context="annonce">
+                        <i class="bi bi-whatsapp" aria-hidden="true"></i>
+                        <span class="d-none d-md-inline small text-success">WhatsApp</span>
+                    </a>
+                {% endif %}
             </div>
         {% endif %}
     </div>

@@ -105,12 +105,18 @@ final class AnnonceController extends AbstractController
         $annonce->setStatus(Annonce::STATUS_PENDING);
         if (isset($payload['phone'])) {
             $annonce->setPhone(trim((string) $payload['phone']));
+        } elseif ($user->getWhatsappPhone()) {
+            $annonce->setPhone($user->getWhatsappPhone());
         }
 
         $this->writer->assignUniqueSlug($annonce);
         $this->em->persist($annonce);
 
         $images = $this->writer->attachUploadedImages($annonce, $this->writer->collectImageFiles($request));
+        $images = array_merge(
+            $images,
+            $this->writer->attachBase64Images($annonce, $this->writer->collectBase64FromPayload($payload))
+        );
         foreach ($images as $image) {
             $this->em->persist($image);
         }
@@ -217,6 +223,10 @@ final class AnnonceController extends AbstractController
         $annonce->setUpdatedAt(new \DateTimeImmutable());
 
         $images = $this->writer->attachUploadedImages($annonce, $this->writer->collectImageFiles($request));
+        $images = array_merge(
+            $images,
+            $this->writer->attachBase64Images($annonce, $this->writer->collectBase64FromPayload($payload))
+        );
         foreach ($images as $image) {
             $this->em->persist($image);
         }
@@ -249,15 +259,19 @@ final class AnnonceController extends AbstractController
         }
 
         $files = $this->writer->collectImageFiles($request);
-        if ($files === []) {
+        $payload = $this->extractPayload($request);
+        $base64Items = $this->writer->collectBase64FromPayload($payload);
+        if ($files === [] && $base64Items === []) {
             return $this->json([
                 'error' => 'validation_error',
-                'message' => 'Aucuneune image valide (jpeg/png/webp, max 4 Mo). Envoyez images[] en multipart.',
+                'message' => 'Aucuneune image valide. Envoyez images[] (multipart) ou imagesBase64 (JSON). Stockage en base uniquement.',
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $remaining = max(0, 8 - $annonce->getAnnonceImages()->count());
         $images = $this->writer->attachUploadedImages($annonce, $files, $remaining);
+        $left = max(0, $remaining - \count($images));
+        $images = array_merge($images, $this->writer->attachBase64Images($annonce, $base64Items, $left));
         foreach ($images as $image) {
             $this->em->persist($image);
         }

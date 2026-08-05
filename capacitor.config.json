@@ -1,0 +1,6 @@
+{
+    "appId": "com.soukexpat.app",
+    "appName": "SoukExpat",
+    "webDir": "public",
+    "bundledWebRuntime": false
+}

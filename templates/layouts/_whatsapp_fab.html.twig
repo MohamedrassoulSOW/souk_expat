@@ -1,12 +1,15 @@
 {# Bouton WhatsApp flottant — visible mobile / tablette / desktop #}
-{% set wa_phone = site ? site.contactPhone : null %}
-{% set wa_href = wa_phone ? (wa_phone|whatsapp_url('Bonjour SoukExpat, j’ai une question.')) : '#' %}
-{% if wa_phone and wa_href != '#' %}
+{# Bouton WhatsApp flottant — visible mobile / tablette / desktop #}
+{# Accept a page-level override: include this template with `wa_phone` and optional `wa_text`. #}
+{% set fab_phone = (wa_phone is defined and wa_phone) ? wa_phone : (site ? site.contactPhone : null) %}
+{% set fab_text = (wa_text is defined and wa_text) ? wa_text : 'Bonjour SoukExpat, j’ai une question.' %}
+{% set wa_href = fab_phone ? (fab_phone|whatsapp_url(fab_text)) : '#' %}
+{% if fab_phone and wa_href != '#' %}
 <a href="{{ wa_href }}"
    class="whatsapp-fab"
    target="_blank"
    rel="noopener noreferrer"
-   aria-label="Contacter SoukExpat sur WhatsApp"
+   aria-label="Contacter sur WhatsApp"
    title="WhatsApp">
     <i class="bi bi-whatsapp" aria-hidden="true"></i>
     <span class="whatsapp-fab__label">WhatsApp</span>

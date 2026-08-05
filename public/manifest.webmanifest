@@ -1,43 +1,62 @@
 {
-  "id": "/",
-  "name": "SoukExpat — Le Marché Mondial des Expatriés",
-  "short_name": "SoukExpat",
-  "description": "Achetez et vendez entre expatriés au Maroc.",
-  "lang": "fr",
-  "dir": "ltr",
-  "start_url": "/?source=pwa",
-  "scope": "/",
-  "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
-  "orientation": "any",
-  "background_color": "#1B2E4B",
-  "theme_color": "#1B2E4B",
-  "categories": ["shopping", "lifestyle"],
-  "prefer_related_applications": false,
-  "icons": [
-    {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ]
+    "id": "/",
+    "name": "SoukExpat — Le Marché Mondial des Expatriés",
+    "short_name": "SoukExpat",
+    "description": "Achetez et vendez entre expatriés au Maroc.",
+    "lang": "fr",
+    "dir": "ltr",
+    "start_url": "/?source=pwa",
+    "scope": "/",
+    "display": "standalone",
+    "display_override": ["standalone", "minimal-ui"],
+    "orientation": "any",
+    "background_color": "#1B2E4B",
+    "theme_color": "#1B2E4B",
+    "categories": ["shopping", "lifestyle"],
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Publier une annonce",
+            "short_name": "Publier",
+            "description": "Créer une nouvelle annonce",
+            "url": "/annonce/new",
+            "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Vos annonces",
+            "short_name": "Mes annonces",
+            "description": "Voir vos annonces publiées",
+            "url": "/annonce/mes-annonces",
+            "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+        }
+    ],
+    "screenshots": [],
+    "related_applications": [],
+    "iarc_rating_id": ""
 }

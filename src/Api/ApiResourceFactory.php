@@ -16,6 +16,7 @@ final class ApiResourceFactory
 {
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly \App\Service\WhatsAppLinkBuilder $whatsApp,
     ) {
     }
 
@@ -34,6 +35,8 @@ final class ApiResourceFactory
                 : ($lastName ? mb_substr($lastName, 0, 1) . '.' : null),
             'avatarUrl' => $this->avatarUrl($user),
             'whatsappPhone' => $user->getWhatsappPhone(),
+            'whatsappUrl' => $this->whatsApp->url($user->getWhatsappPhone()),
+            'hasWhatsapp' => $this->whatsApp->url($user->getWhatsappPhone()) !== null,
         ];
 
         if ($private) {
@@ -78,11 +81,23 @@ final class ApiResourceFactory
     {
         $images = [];
         foreach ($annonce->getAnnonceImages() as $image) {
+            if ($image->isStoredInDatabase() && $image->getId()) {
+                $images[] = $this->urlGenerator->generate(
+                    'api_v1_media_annonce_image',
+                    ['id' => $image->getId()],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+                continue;
+            }
+
             $name = $image->getImadeName();
             if ($name) {
                 $images[] = $this->absolute('/uploads/annonces/' . $name);
             }
         }
+
+        $contactPhone = $this->whatsApp->contactPhoneForAnnonce($annonce);
+        $whatsappUrl = $this->whatsApp->urlForAnnonce($annonce);
 
         $data = [
             'id' => $annonce->getId(),
@@ -97,6 +112,9 @@ final class ApiResourceFactory
             'seller' => $annonce->getUser() ? $this->user($annonce->getUser()) : null,
             'imageUrl' => $images[0] ?? null,
             'images' => $images,
+            'whatsappPhone' => $contactPhone,
+            'whatsappUrl' => $whatsappUrl,
+            'hasWhatsapp' => $whatsappUrl !== null,
         ];
 
         if ($detailed) {
@@ -156,8 +174,16 @@ final class ApiResourceFactory
     public function message(Message $message): array
     {
         $imageUrl = null;
-        if ($message->getKind() === Message::KIND_IMAGE && $message->getImageFilename()) {
-            $imageUrl = $this->absolute('/uploads/messages/' . $message->getImageFilename());
+        if ($message->getKind() === Message::KIND_IMAGE) {
+            if ($message->hasDatabaseImage() && $message->getId()) {
+                $imageUrl = $this->urlGenerator->generate(
+                    'api_v1_media_message_image',
+                    ['id' => $message->getId()],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+            } elseif ($message->getImageFilename()) {
+                $imageUrl = $this->absolute('/uploads/messages/' . $message->getImageFilename());
+            }
         }
 
         return [

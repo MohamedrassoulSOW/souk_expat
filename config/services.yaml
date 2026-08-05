@@ -28,10 +28,6 @@ services:
             $issuer: '%env(JWT_ISSUER)%'
             $ttlSeconds: '%env(int:JWT_TTL)%'
 
-    App\Api\ApiAnnonceWriter:
-        arguments:
-            $projectDir: '%kernel.project_dir%'
-
     App\Service\MessageRetentionService:
         arguments:
             $projectDir: '%kernel.project_dir%'

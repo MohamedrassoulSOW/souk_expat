@@ -42,6 +42,31 @@
         <noscript><style>[data-animate]{opacity:1!important}</style></noscript>
         {% block stylesheets %}
         {% endblock %}
+        <style>
+            /* WhatsApp FAB styling: visible label on md+ */
+            .whatsapp-fab {
+                position: fixed;
+                right: 1rem;
+                bottom: 1rem;
+                z-index: 1095;
+                display: inline-flex;
+                align-items: center;
+                gap: .6rem;
+                background: #25D366;
+                color: #fff;
+                padding: .5rem .9rem;
+                border-radius: 999px;
+                box-shadow: 0 6px 18px rgba(0,0,0,.12);
+                text-decoration: none;
+                font-weight: 600;
+            }
+            .whatsapp-fab:hover { transform: translateY(-3px); }
+            .whatsapp-fab i { font-size: 1.05rem; }
+            .whatsapp-fab__label { display: none; }
+            @media (min-width: 768px) {
+                .whatsapp-fab__label { display: inline-block; }
+            }
+        </style>
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}

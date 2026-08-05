@@ -162,13 +162,21 @@ final class AnnonceController extends AbstractController
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
         $annonce = new Annonce();
+        if ($user->getWhatsappPhone()) {
+            $annonce->setPhone($user->getWhatsappPhone());
+        }
         $form = $this->createForm(AnnonceType::class, $annonce);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $annonce->setUser($this->getUser());
+            $annonce->setUser($user);
             $annonce->setStatus(Annonce::STATUS_PENDING);
+            if ($annonce->getPhone() === '' && $user->getWhatsappPhone()) {
+                $annonce->setPhone($user->getWhatsappPhone());
+            }
 
             // Gestion du Slug Unique
             $baseSlug = $slugger->slug($annonce->getTitle())->lower();

@@ -5,6 +5,13 @@
 {% block body %}
 {{ include('layouts/navBar.html.twig') }}
 
+{# Override floating WhatsApp FAB to contact this seller if available #}
+{% set seller_wa = seller.whatsappPhone|default('') %}
+{% set seller_wa_text = 'Bonjour ' ~ seller.firstName ~ ', je vous contacte via SoukExpat.' %}
+{% block whatsapp_fab %}
+    {{ include('layouts/_whatsapp_fab.html.twig', { wa_phone: seller_wa, wa_text: seller_wa_text }) }}
+{% endblock %}
+
 <main class="seller-profile-page">
     <div class="seller-profile-hero">
         <div class="container py-3 py-md-4">

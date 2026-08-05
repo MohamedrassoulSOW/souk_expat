@@ -27,14 +27,20 @@ final class IndexController extends AbstractController
                 'GET /api/v1/annonces/{id}' => 'Détail (approuvée, ou propriétaire)',
                 'POST /api/v1/annonces' => 'Créer une annonce (Bearer, JSON ou multipart)',
                 'PATCH /api/v1/annonces/{id}' => 'Modifier une annonce (Bearer)',
-                'POST /api/v1/annonces/{id}/images' => 'Ajouter des photos (multipart images[])',
+                'POST /api/v1/annonces/{id}/images' => 'Ajouter des photos (BLOB en base : multipart ou imagesBase64)',
                 'DELETE /api/v1/annonces/{id}' => 'Supprimer une annonce (Bearer)',
+                'GET /api/v1/media/annonce-images/{id}' => 'Binary image annonce (stockée en DB)',
+                'GET /api/v1/media/messages/{id}' => 'Binary image message (Bearer, participant)',
                 'GET /api/v1/categories' => 'Catégories',
                 'GET /api/v1/cities' => 'Villes',
                 'GET /api/v1/threads' => 'Mes conversations (Bearer)',
                 'POST /api/v1/annonces/{id}/thread' => 'Ouvrir / créer un thread sur une annonce',
                 'GET /api/v1/threads/{id}' => 'Messages d’une conversation',
-                'POST /api/v1/threads/{id}/messages' => 'Envoyer texte / photo / position',
+                'POST /api/v1/threads/{id}/messages' => 'Envoyer texte / photo (BLOB) / position',
+            ],
+            'storage' => [
+                'mobileMedia' => 'database',
+                'note' => 'Les images uploadées via /api/v1 sont stockées en BLOB (pas dans public/uploads).',
             ],
         ]);
     }

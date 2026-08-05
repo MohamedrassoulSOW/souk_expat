@@ -2,11 +2,17 @@
 
 namespace App\Twig;
 
+use App\Service\WhatsAppLinkBuilder;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 class FormatExtension extends AbstractExtension
 {
+    public function __construct(
+        private readonly WhatsAppLinkBuilder $whatsAppLinkBuilder,
+    ) {
+    }
+
     public function getFilters(): array
     {
         return [
@@ -30,31 +36,6 @@ class FormatExtension extends AbstractExtension
      */
     public function whatsappUrl(?string $phone, ?string $prefill = null): string
     {
-        $digits = preg_replace('/\D+/', '', (string) $phone) ?? '';
-        if ($digits === '') {
-            return '#';
-        }
-
-        // 00indicatif… → indicatif…
-        if (str_starts_with($digits, '00')) {
-            $digits = substr($digits, 2);
-        }
-
-        // Mobile marocain local 06/07… → 2126/2127…
-        if (preg_match('/^0([67]\d{8})$/', $digits, $m)) {
-            $digits = '212' . $m[1];
-        }
-
-        // Toujours un indicatif pays (pas de numéro local restant)
-        if ($digits === '' || str_starts_with($digits, '0') || \strlen($digits) < 10) {
-            return '#';
-        }
-
-        $url = 'https://wa.me/' . $digits;
-        if ($prefill !== null && trim($prefill) !== '') {
-            $url .= '?text=' . rawurlencode($prefill);
-        }
-
-        return $url;
+        return $this->whatsAppLinkBuilder->url($phone, $prefill) ?? '#';
     }
 }

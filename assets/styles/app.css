@@ -1047,6 +1047,10 @@ body {
 .annonce-listing-card__seller {
     position: relative;
     z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
     background: transparent;
     margin-top: auto;
     padding-top: 0.85rem;
@@ -1055,6 +1059,7 @@ body {
 
 .annonce-listing-card__seller .seller-card-link {
     color: var(--text-strong);
+    min-width: 0;
 }
 
 .annonce-listing-card__seller .seller-card-link .fw-semibold {
@@ -1063,6 +1068,30 @@ body {
 
 .annonce-listing-card__seller .seller-card-link:hover .fw-semibold {
     color: var(--cyan-main) !important;
+}
+
+.annonce-listing-card__wa {
+    position: relative;
+    z-index: 3;
+    flex-shrink: 0;
+    width: 2.15rem;
+    height: 2.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #25d366;
+    color: #fff !important;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.28);
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.annonce-listing-card__wa:hover,
+.annonce-listing-card__wa:focus-visible {
+    background: #1ebe57;
+    color: #fff !important;
+    transform: scale(1.06);
 }
 
 .annonce-listing-card__avatar {
@@ -2579,6 +2608,10 @@ body {
     background: #128c7e;
     border-color: #128c7e;
     color: #fff;
+}
+
+.annonce-contact-panel .btn-whatsapp {
+    letter-spacing: 0.01em;
 }
 
 /* ——— Paramètres du site (admin) ——— */

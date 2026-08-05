@@ -1,0 +1,24 @@
+{
+    "name": "soukexpat",
+    "version": "1.0.0",
+    "private": true,
+    "description": "SoukExpat — web + PWA + native packaging helper",
+    "scripts": {
+        "build:web": "echo \"Build web assets (replace with your real build command)\"",
+        "icons:generate": "node tools/generate-icons.js",
+        "pwa:sw:update": "echo \"Update service worker if needed\"",
+        "cap:init": "npx cap init soukexpat com.soukexpat",
+        "cap:add:android": "npx cap add android",
+        "cap:add:ios": "npx cap add ios",
+        "cap:copy": "npx cap copy",
+        "electron:dev": "electron electron/main.js",
+        "electron:build": "electron-builder --dir",
+        "check:pwa": "node -e \"console.log('Ensure you build and deploy to HTTPS to test PWA install')\""
+    },
+    "devDependencies": {
+        "electron": "^26.0.0",
+        "electron-builder": "^24.0.0",
+        "@capacitor/cli": "^6.0.0",
+        "@capacitor/core": "^6.0.0"
+    }
+}

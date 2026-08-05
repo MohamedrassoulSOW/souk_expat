@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\AnnonceSearchFilters;
+use App\Service\AnnonceDisplayMixer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,21 +24,35 @@ final class HomeController extends AbstractController
         CityRepository $cityRepository,
         PaginatorInterface $paginator,
         Request $request,
+        AnnonceDisplayMixer $displayMixer,
     ): Response {
         $filters = AnnonceSearchFilters::fromRequest($request);
         $categories = $categoryRepository->findAllOrderedByName();
         $categoriesWithCounts = $categoryRepository->findWithApprovedCounts();
 
-        // Accueil : ordre chronologique (indexable) + peu d’items pour un 1er paint rapide
+        // Accueil : récupérer un pool plus large, mélanger puis paginer
+        $page = $request->query->getInt('page', 1);
+        $perPage = 12;
+        $poolSize = $perPage * 5; // prendre un pool plus large pour permettre l'alternance
+
+        $qb = $annonceRepository->createApprovedSearchQueryBuilder(
+            $filters->q,
+            $filters->categoryId,
+            $filters->cityId,
+            true,
+        );
+
+        $itemsPool = $qb->setMaxResults($poolSize)
+            ->getQuery()
+            ->getResult();
+
+        $mixedItems = $displayMixer->mix($itemsPool);
+
+        // Paginer à partir du tableau mélangé
         $annoncesPaginees = $paginator->paginate(
-            $annonceRepository->createApprovedSearchQueryBuilder(
-                $filters->q,
-                $filters->categoryId,
-                $filters->cityId,
-                false,
-            ),
-            $request->query->getInt('page', 1),
-            8,
+            $mixedItems,
+            $page,
+            $perPage,
         );
 
         $annonceRepository->prefetchImages(iterator_to_array($annoncesPaginees->getItems()));

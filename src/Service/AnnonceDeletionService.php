@@ -37,9 +37,12 @@ final class AnnonceDeletionService
         }
 
         foreach ($annonce->getAnnonceImages()->toArray() as $image) {
-            $path = $uploadAnnonces . $image->getImadeName();
-            if (is_file($path)) {
-                unlink($path);
+            $name = $image->getImadeName();
+            if ($name) {
+                $path = $uploadAnnonces . $name;
+                if (is_file($path)) {
+                    unlink($path);
+                }
             }
         }
 

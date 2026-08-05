@@ -53,7 +53,8 @@ curl -I https://votre-domaine/api/v1
 
 Base : `/api/v1` (JWT Bearer). Voir `GET /api/v1` pour la liste des endpoints.
 
-Auth, catalogue, **CRUD annonces** (JSON ou multipart), **messagerie** (threads + envoi texte/photo/position).
+Auth, catalogue, **CRUD annonces**, **messagerie**.  
+Les images mobile sont stockées **en base (BLOB)** et servies via `/api/v1/media/...` — pas d’écriture dans `public/uploads` pour l’API.
 
 ## Structure utile
 
