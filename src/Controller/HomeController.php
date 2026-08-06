@@ -62,7 +62,7 @@ final class HomeController extends AbstractController
             'popular_categories' => $categoriesWithCounts,
             'search_categories' => $categories,
             'cities' => $cityRepository->findAllOrderedByName(),
-            'sliders' => $sliderRepository->findBy(['isActive' => true], ['id' => 'DESC'], 5),
+            'sliders' => $sliderRepository->findBy(['isActive' => true], ['id' => 'DESC'], 12),
             'search_filters' => $filters,
         ]);
     }

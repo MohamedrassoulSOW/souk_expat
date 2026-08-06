@@ -5,6 +5,7 @@ const SHELL_URLS = [
   '/manifest.webmanifest',
   '/favicon.png',
   '/logo-souk-expat.png',
+  '/logo-souk-expat-blanc.png',
   '/logo-souk-expat-nav.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',

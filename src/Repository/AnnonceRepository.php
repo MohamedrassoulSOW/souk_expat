@@ -217,28 +217,55 @@ class AnnonceRepository extends ServiceEntityRepository
         ];
     }
 
-    //    /**
-    //     * @return Annonce[] Returns an array of Annonce objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Annonces validées antérieures à une date (nettoyage admin).
+     * Critère : approvedAt, sinon createdAt.
+     *
+     * @return list<Annonce>
+     */
+    public function findApprovedOlderThan(\DateTimeImmutable $cutoff): array
+    {
+        return $this->createQueryBuilder('a')
+            ->innerJoin('a.user', 'seller')->addSelect('seller')
+            ->innerJoin('a.category', 'category')->addSelect('category')
+            ->andWhere('a.status = :status')
+            ->andWhere('(a.approvedAt IS NOT NULL AND a.approvedAt < :cutoff) OR (a.approvedAt IS NULL AND a.createdAt < :cutoff)')
+            ->setParameter('status', Annonce::STATUS_APPROVED)
+            ->setParameter('cutoff', $cutoff)
+            ->orderBy('a.approvedAt', 'ASC')
+            ->addOrderBy('a.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Annonce
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function countApprovedOlderThan(\DateTimeImmutable $cutoff): int
+    {
+        return (int) $this->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->andWhere('a.status = :status')
+            ->andWhere('(a.approvedAt IS NOT NULL AND a.approvedAt < :cutoff) OR (a.approvedAt IS NULL AND a.createdAt < :cutoff)')
+            ->setParameter('status', Annonce::STATUS_APPROVED)
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @param list<int> $ids
+     * @return list<Annonce>
+     */
+    public function findApprovedByIds(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.id IN (:ids)')
+            ->andWhere('a.status = :status')
+            ->setParameter('ids', $ids)
+            ->setParameter('status', Annonce::STATUS_APPROVED)
+            ->getQuery()
+            ->getResult();
+    }
 }

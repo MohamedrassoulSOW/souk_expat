@@ -1,0 +1,46 @@
+# Fichiers / dossiers exclus du paquet production (upload Hostinger)
+# Une entrée par ligne. Préfixe / = relatif à la racine projet.
+
+.git/
+.phpunit.cache/
+.idea/
+.vscode/
+.cursor/
+node_modules/
+electron/
+tests/
+docs/
+tools/
+var/
+vendor/
+bin/phpunit
+phpunit.dist.xml
+phpunit.xml
+.editorconfig
+.env
+.env.dev
+.env.test
+.env.local
+.env.local.php
+.env.local.example
+.env.prod.example
+.env.*.local
+compose.yaml
+compose.override.yaml
+capacitor.config.json
+package.json
+package-lock.json
+README.md
+DEPLOY.md
+# Les uploads utilisateurs ne partent pas (dossiers vides recréés)
+public/uploads/**
+!public/uploads/.gitkeep
+!public/uploads/*/.gitkeep
+# Cache / assets sources déjà compilés ailleurs
+assets/vendor/
+# Paquet export lui-même
+prod-package/
+*.zip
+*.log
+.DS_Store
+Thumbs.db

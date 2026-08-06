@@ -12,8 +12,15 @@
     <div class="flex-grow-1 overflow-y-auto p-3 custom-scrollbar min-h-0">
         {{ include('admin/_sidebar_nav_content.html.twig') }}
     </div>
-    <div class="p-3 border-top flex-shrink-0 d-flex align-items-center justify-content-between gap-2">
-        <span class="small text-muted fw-semibold">Thème</span>
-        {{ include('layouts/_theme_toggle.html.twig', { btn_class: 'theme-toggle--admin' }) }}
+
+    <div class="dashboard-sidebar-footer p-3 border-top flex-shrink-0">
+        <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+            <span class="small text-muted fw-semibold">Thème</span>
+            {{ include('layouts/_theme_toggle.html.twig', { btn_class: 'theme-toggle--admin' }) }}
+        </div>
+        {{ include('security/_logout_button.html.twig', {
+            variant: 'sidebar-footer',
+            form_class: 'd-block m-0'
+        }) }}
     </div>
 </aside>

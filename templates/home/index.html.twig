@@ -10,7 +10,7 @@
     {# ——— HERO ——— #}
     <section class="home-hero{% if sliders is empty %} home-hero--fallback{% endif %}">
         {% if sliders is not empty %}
-            <div id="homeCarousel" class="carousel slide home-hero-carousel" data-bs-ride="carousel" data-bs-interval="5500">
+            <div id="homeCarousel" class="carousel slide home-hero-carousel" data-bs-ride="carousel" data-bs-interval="6000" data-bs-pause="false">
                 <div class="carousel-indicators home-hero-indicators">
                     {% for slider in sliders %}
                         <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="{{ loop.index0 }}" class="{{ loop.first ? 'active' : '' }}" aria-label="Slide {{ loop.index }}" {% if loop.first %}aria-current="true"{% endif %}></button>
@@ -18,8 +18,17 @@
                 </div>
                 <div class="carousel-inner">
                     {% for slider in sliders %}
-                        <div class="carousel-item {{ loop.first ? 'active' : '' }}">
-                            <img src="{{ asset('uploads/sliders/' ~ slider.imageName) }}" class="home-hero-slide-img" alt="{{ slider.title }}">
+                        <div class="carousel-item {{ loop.first ? 'active' : '' }}" {% if slider.video %}data-slider-video="1"{% endif %}>
+                            {% if slider.video %}
+                                <video class="home-hero-slide-img home-hero-slide-video"
+                                       {% if loop.first %}autoplay{% endif %}
+                                       muted loop playsinline preload="metadata"
+                                       aria-label="{{ slider.title|default('Vidéo slider') }}">
+                                    <source src="{{ asset('uploads/sliders/' ~ slider.imageName) }}" type="{{ slider.imageName ends with '.webm' ? 'video/webm' : 'video/mp4' }}">
+                                </video>
+                            {% else %}
+                                <img src="{{ asset('uploads/sliders/' ~ slider.imageName) }}" class="home-hero-slide-img" alt="{{ slider.title|default('Slide') }}" {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async">
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>
@@ -32,12 +41,34 @@
                     <span class="visually-hidden">Suivant</span>
                 </button>
             </div>
+            <script>
+            (function () {
+                var root = document.getElementById('homeCarousel');
+                if (!root) return;
+                function syncVideos(activeItem) {
+                    root.querySelectorAll('video.home-hero-slide-video').forEach(function (video) {
+                        var inActive = activeItem && activeItem.contains(video);
+                        if (inActive) {
+                            var play = video.play();
+                            if (play && typeof play.catch === 'function') play.catch(function () {});
+                        } else {
+                            video.pause();
+                            try { video.currentTime = 0; } catch (e) {}
+                        }
+                    });
+                }
+                root.addEventListener('slid.bs.carousel', function (event) {
+                    syncVideos(event.relatedTarget || root.querySelector('.carousel-item.active'));
+                });
+                syncVideos(root.querySelector('.carousel-item.active'));
+            })();
+            </script>
         {% endif %}
 
         <div class="home-hero-overlay">
             <div class="container home-hero-overlay-inner">
                 <div class="home-hero-copy text-center text-white mx-auto">
-                    <img class="home-hero-brand-logo" src="{{ asset('logo-souk-expat.png') }}" alt="{{ site ? site.siteName ~ ' — ' ~ site.tagline : 'SoukExpat' }}" width="220" height="120" decoding="async" fetchpriority="high">
+                    <img class="home-hero-brand-logo" src="{{ asset('logo-souk-expat-blanc.png') }}" alt="{{ site ? site.siteName ~ ' — ' ~ site.tagline : 'SoukExpat' }}" width="220" height="120" decoding="async" fetchpriority="high">
                     <h1 class="home-hero-title">{{ site ? site.heroTitle : 'Trouvez tout, partout.' }}</h1>
                     <p class="home-hero-sub">{{ site ? site.heroSubtitle : 'Achetez et vendez entre expatriés au Maroc' }}</p>
                 </div>

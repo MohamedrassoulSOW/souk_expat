@@ -37,15 +37,31 @@ final class AnnonceDeletionService
         }
 
         foreach ($annonce->getAnnonceImages()->toArray() as $image) {
-            $name = $image->getImadeName();
-            if ($name) {
-                $path = $uploadAnnonces . $name;
-                if (is_file($path)) {
-                    unlink($path);
-                }
-            }
+            $this->removeImageFiles($image);
         }
 
         $em->remove($annonce);
+    }
+
+    public function removeImage(EntityManagerInterface $em, \App\Entity\AnnonceImage $image): void
+    {
+        $this->removeImageFiles($image);
+        $annonce = $image->getAnnonce();
+        if ($annonce) {
+            $annonce->removeAnnonceImage($image);
+        }
+        $em->remove($image);
+    }
+
+    private function removeImageFiles(\App\Entity\AnnonceImage $image): void
+    {
+        $uploadAnnonces = $this->projectDir . '/public/uploads/annonces/';
+        $name = $image->getImadeName();
+        if ($name) {
+            $path = $uploadAnnonces . $name;
+            if (is_file($path)) {
+                unlink($path);
+            }
+        }
     }
 }

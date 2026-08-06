@@ -1,22 +1,23 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Nouvelle slide | SoukExpat{% endblock %}
-{% block admin_mobile_title %}Nouvelle slide{% endblock %}
+{% block title %}Médias slider | SoukExpat{% endblock %}
+{% block admin_mobile_title %}Nouveau média{% endblock %}
 
 {% block admin_main %}
     {{ include('admin/_page_header.html.twig', {
         eyebrow: 'Slider',
-        title: 'Ajouter une image',
-        lead: 'Format recommandé : 1920×800 px.',
+        title: 'Ajouter images / vidéos',
+        lead: 'Sélectionnez plusieurs fichiers d’un coup. Images : 1920×800 recommandés · Vidéos : MP4 ou WEBM, idéalement courtes et en muet.',
         actions: '<a href="' ~ path('admin_slider_index') ~ '" class="btn btn-light border rounded-pill">Retour</a>'
     }) }}
 
-    <div class="admin-panel" style="max-width: 560px;">
+    <div class="admin-panel" style="max-width: 640px;">
         <div class="card-body p-4">
-            {{ form_start(form) }}
+            {{ form_start(form, { attr: { enctype: 'multipart/form-data' } }) }}
                 <div class="mb-3">{{ form_row(form.title, {'attr': {'class': 'form-control rounded-3'}}) }}</div>
                 <div class="mb-3">
-                    {{ form_row(form.imageFile, {'attr': {'class': 'form-control rounded-3'}}) }}
+                    {{ form_row(form.mediaFiles) }}
+                    <div id="slider-media-preview" class="row g-2 mt-2"></div>
                 </div>
                 <div class="mb-4">{{ form_row(form.isActive) }}</div>
                 <div class="d-flex gap-2">
@@ -26,4 +27,38 @@
             {{ form_end(form) }}
         </div>
     </div>
+
+    <script>
+    (function () {
+        var input = document.querySelector('#{{ form.mediaFiles.vars.id }}');
+        var preview = document.getElementById('slider-media-preview');
+        if (!input || !preview) return;
+        input.addEventListener('change', function () {
+            preview.innerHTML = '';
+            Array.prototype.slice.call(input.files || [], 0, 12).forEach(function (file) {
+                var col = document.createElement('div');
+                col.className = 'col-4 col-md-3';
+                var url = URL.createObjectURL(file);
+                if (file.type.indexOf('video/') === 0) {
+                    var video = document.createElement('video');
+                    video.src = url;
+                    video.muted = true;
+                    video.className = 'w-100 rounded-3 border';
+                    video.style.aspectRatio = '16/9';
+                    video.style.objectFit = 'cover';
+                    col.appendChild(video);
+                } else {
+                    var img = document.createElement('img');
+                    img.src = url;
+                    img.alt = file.name;
+                    img.className = 'w-100 rounded-3 border';
+                    img.style.aspectRatio = '16/9';
+                    img.style.objectFit = 'cover';
+                    col.appendChild(img);
+                }
+                preview.appendChild(col);
+            });
+        });
+    })();
+    </script>
 {% endblock %}

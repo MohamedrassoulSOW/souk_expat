@@ -23,7 +23,7 @@
 
                     <a href="{{ path('app_annonce_show', { id: thread.annonce.id }) }}" class="wa-avatar-link flex-shrink-0" title="Voir l’annonce">
                         {% if thread.annonce.annonceImages|length > 0 %}
-                            <img src="{{ asset('uploads/annonces/' ~ thread.annonce.annonceImages[0].imadeName) }}" alt="" class="wa-avatar">
+                            <img src="{{ annonce_image_url(thread.annonce.annonceImages[0]) }}" alt="" class="wa-avatar">
                         {% else %}
                             <div class="wa-avatar wa-avatar-placeholder">
                                 <i class="bi bi-image" aria-hidden="true"></i>

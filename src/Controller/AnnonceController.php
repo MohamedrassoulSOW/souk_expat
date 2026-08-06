@@ -188,8 +188,12 @@ final class AnnonceController extends AbstractController
             }
             $annonce->setSlug($slug);
 
-            // Upload des images
-            $images = $form->get('images')->getData();
+            // Upload des images (plusieurs autorisées, max 8 au total)
+            $images = $form->get('images')->getData() ?? [];
+            if (!\is_array($images)) {
+                $images = $images ? [$images] : [];
+            }
+            $images = \array_slice($images, 0, 8);
             foreach ($images as $image) {
                 $filename = uniqid() . '.' . $image->guessExtension();
                 $image->move(
@@ -198,7 +202,7 @@ final class AnnonceController extends AbstractController
                 );
 
                 $annonceImage = new AnnonceImage();
-                $annonceImage->setImadeName($filename); // Corrigé de imadeName à imageName
+                $annonceImage->setImadeName($filename);
                 $annonceImage->setAnnonce($annonce);
                 $entityManager->persist($annonceImage);
             }
@@ -268,7 +272,18 @@ final class AnnonceController extends AbstractController
             $annonce->setSlug($slug);
             $annonce->setUpdatedAt(new \DateTimeImmutable());
 
-            $images = $form->get('images')->getData();
+            $images = $form->get('images')->getData() ?? [];
+            if (!\is_array($images)) {
+                $images = $images ? [$images] : [];
+            }
+            $remaining = max(0, 8 - $annonce->getAnnonceImages()->count());
+            if (\count($images) > $remaining) {
+                $this->addFlash('warning', sprintf(
+                    'Maximum 8 photos par annonce. %d photo(s) ajoutée(s) (places restantes).',
+                    $remaining
+                ));
+                $images = \array_slice($images, 0, $remaining);
+            }
             foreach ($images as $image) {
                 $filename = uniqid() . '.' . $image->guessExtension();
                 $image->move($this->getParameter('kernel.project_dir') . '/public/uploads/annonces', $filename);
@@ -312,6 +327,47 @@ final class AnnonceController extends AbstractController
         }
 
         return $this->redirectToRoute('app_annonce_index');
+    }
+
+    #[Route('/{id}/image/{imageId}/delete', name: 'app_annonce_image_delete', methods: ['POST'], requirements: ['id' => '\d+', 'imageId' => '\d+'])]
+    public function deleteImage(
+        Annonce $annonce,
+        int $imageId,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        AnnonceDeletionService $annonceDeletionService,
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        if ($annonce->getUser() !== $this->getUser() && !$this->isGranted('ROLE_EDITOR')) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (!$this->isCsrfTokenValid('delete_image' . $imageId, $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('app_annonce_edit', ['id' => $annonce->getId()]);
+        }
+
+        $image = null;
+        foreach ($annonce->getAnnonceImages() as $candidate) {
+            if ($candidate->getId() === $imageId) {
+                $image = $candidate;
+                break;
+            }
+        }
+
+        if (!$image) {
+            $this->addFlash('danger', 'Photo introuvable.');
+
+            return $this->redirectToRoute('app_annonce_edit', ['id' => $annonce->getId()]);
+        }
+
+        $annonceDeletionService->removeImage($entityManager, $image);
+        $entityManager->flush();
+        $this->addFlash('success', 'Photo supprimée.');
+
+        return $this->redirectToRoute('app_annonce_edit', ['id' => $annonce->getId()]);
     }
 
     #[Route('/mes-annonces/{id}', name: 'app_mes_annonces_show', methods: ['GET'])]

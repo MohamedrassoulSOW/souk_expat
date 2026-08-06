@@ -6,14 +6,14 @@
 {% block admin_main %}
     {% set actions %}
         <a href="{{ path('admin_slider_new') }}" class="btn btn-admin-primary rounded-pill px-3">
-            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Ajouter une slide
+            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Ajouter images / vidéos
         </a>
     {% endset %}
 
     {{ include('admin/_page_header.html.twig', {
         eyebrow: 'Contenu',
         title: 'Slider d’accueil',
-        lead: 'Images du carrousel sur la page d’accueil.',
+        lead: 'Images et vidéos du carrousel sur la page d’accueil (plusieurs médias possibles).',
         actions: actions
     }) }}
 
@@ -24,6 +24,7 @@
                     <tr>
                         <th class="ps-3 py-3 border-0">Aperçu</th>
                         <th class="py-3 border-0">Titre</th>
+                        <th class="py-3 border-0">Type</th>
                         <th class="py-3 border-0">Statut</th>
                         <th class="pe-3 py-3 border-0 text-end">Actions</th>
                     </tr>
@@ -32,10 +33,27 @@
                     {% for slider in sliders %}
                         <tr>
                             <td class="ps-3">
-                                <img src="{{ asset('uploads/sliders/' ~ slider.imageName) }}"
-                                     alt="" class="rounded-3" width="120" height="60" style="object-fit: cover;" loading="lazy">
+                                {% if slider.video %}
+                                    <div class="position-relative rounded-3 overflow-hidden bg-dark" style="width:120px;height:68px;">
+                                        <video src="{{ asset('uploads/sliders/' ~ slider.imageName) }}"
+                                               class="w-100 h-100" style="object-fit:cover;" muted preload="metadata"></video>
+                                        <span class="position-absolute bottom-0 start-0 m-1 badge text-bg-dark">
+                                            <i class="bi bi-camera-video" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <img src="{{ asset('uploads/sliders/' ~ slider.imageName) }}"
+                                         alt="" class="rounded-3" width="120" height="60" style="object-fit: cover;" loading="lazy">
+                                {% endif %}
                             </td>
                             <td class="fw-semibold">{{ slider.title|default('Sans titre') }}</td>
+                            <td>
+                                {% if slider.video %}
+                                    <span class="badge text-bg-info rounded-pill">Vidéo</span>
+                                {% else %}
+                                    <span class="badge text-bg-light text-dark border rounded-pill">Image</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if slider.isActive %}
                                     <span class="badge bg-success rounded-pill">Actif</span>
@@ -50,7 +68,7 @@
                                         <button type="submit" class="btn btn-outline-secondary btn-sm btn-icon-action" title="Activer / désactiver" aria-label="Activer ou désactiver"><i class="bi bi-arrow-repeat" aria-hidden="true"></i></button>
                                     </form>
                                     <form method="post" action="{{ path('admin_slider_delete', {id: slider.id}) }}"
-                                          onsubmit="return confirm('Supprimer cette image du slider ?');" class="d-inline">
+                                          onsubmit="return confirm('Supprimer ce média du slider ?');" class="d-inline">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ slider.id) }}">
                                         <button type="submit" class="btn btn-outline-danger btn-sm btn-icon-action" title="Supprimer" aria-label="Supprimer"><i class="bi bi-trash3" aria-hidden="true"></i></button>
                                     </form>
@@ -58,7 +76,7 @@
                             </td>
                         </tr>
                     {% else %}
-                        <tr><td colspan="4" class="text-center text-muted py-5">Aucune image dans le slider.</td></tr>
+                        <tr><td colspan="5" class="text-center text-muted py-5">Aucun média dans le slider.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

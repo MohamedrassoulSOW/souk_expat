@@ -134,7 +134,12 @@
                                 <li><a class="dropdown-item rounded-3 py-2 fw-medium text-cyan" href="{{ path('app_dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Tableau de bord</a></li>
                             {% endif %}
                             <li><hr class="dropdown-divider opacity-50"></li>
-                            <li><a class="dropdown-item rounded-3 py-2 text-danger" href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Déconnexion</a></li>
+                            <li>
+                                {{ include('security/_logout_button.html.twig', {
+                                    variant: 'dropdown',
+                                    form_class: 'd-block m-0'
+                                }) }}
+                            </li>
                         </ul>
                     </div>
 

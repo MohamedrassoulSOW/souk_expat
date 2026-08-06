@@ -1,0 +1,665 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Rapport & analytics | SoukExpat{% endblock %}
+{% block admin_mobile_title %}Analytics{% endblock %}
+
+{% set k = report.kpis %}
+{% set c = report.charts %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .analytics-kpi {
+            background: var(--surface, #fff);
+            border: 1px solid var(--border-soft, rgba(15,23,42,.08));
+            border-radius: 1rem;
+            padding: 1rem 1.1rem;
+            height: 100%;
+        }
+        .analytics-kpi__label {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: .35rem;
+        }
+        .analytics-kpi__value {
+            font-size: 1.55rem;
+            font-weight: 800;
+            letter-spacing: -.03em;
+            color: #0f172a;
+            line-height: 1.1;
+        }
+        .analytics-kpi__hint {
+            font-size: .78rem;
+            color: #94a3b8;
+            margin-top: .25rem;
+        }
+        .analytics-chart-card {
+            background: var(--surface, #fff);
+            border: 1px solid var(--border-soft, rgba(15,23,42,.08));
+            border-radius: 1rem;
+            padding: 1.1rem 1.15rem 1.25rem;
+            height: 100%;
+        }
+        .analytics-chart-card h2 {
+            font-size: .95rem;
+            font-weight: 800;
+            margin: 0 0 .85rem;
+        }
+        .analytics-chart-wrap {
+            position: relative;
+            height: 260px;
+        }
+        .analytics-chart-wrap--lg { height: 300px; }
+        .analytics-insight {
+            background: rgba(75, 121, 161, 0.08);
+            border-radius: .85rem;
+            padding: .75rem 1rem;
+            font-size: .9rem;
+        }
+        .analytics-guide {
+            background: rgba(27, 46, 75, 0.05);
+            border: 1px solid rgba(75, 121, 161, 0.2);
+            border-radius: 1rem;
+            padding: 1rem 1.15rem;
+            margin-bottom: 1.25rem;
+        }
+        .analytics-guide h2 {
+            font-size: .95rem;
+            font-weight: 800;
+            margin: 0 0 .5rem;
+            color: #1B2E4B;
+        }
+        .analytics-guide p {
+            margin: 0 0 .55rem;
+            font-size: .9rem;
+            color: #475569;
+            line-height: 1.45;
+        }
+        .analytics-guide p:last-child { margin-bottom: 0; }
+        .analytics-section-note {
+            font-size: .82rem;
+            color: #64748b;
+            margin: -.35rem 0 .85rem;
+            line-height: 1.4;
+        }
+        .analytics-kpi__help {
+            font-size: .72rem;
+            color: #94a3b8;
+            margin-top: .4rem;
+            line-height: 1.35;
+        }
+        [data-bs-theme="dark"] .analytics-guide {
+            background: rgba(148, 163, 184, 0.08);
+            border-color: rgba(148, 163, 184, 0.2);
+        }
+        [data-bs-theme="dark"] .analytics-guide h2 { color: #e2e8f0; }
+        [data-bs-theme="dark"] .analytics-guide p,
+        [data-bs-theme="dark"] .analytics-section-note { color: #94a3b8; }
+        [data-bs-theme="dark"] .analytics-kpi__value { color: #f8fafc; }
+        [data-bs-theme="dark"] .analytics-kpi,
+        [data-bs-theme="dark"] .analytics-chart-card {
+            background: var(--surface);
+            border-color: var(--border-soft);
+        }
+        .analytics-print-banner { display: none; }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 12mm;
+            }
+            body {
+                background: #fff !important;
+                color: #0f172a !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .dashboard-mobile-header,
+            .admin-sidebar,
+            .theme-toggle,
+            .alert,
+            .no-print {
+                display: none !important;
+            }
+            .dashboard-shell,
+            .dashboard-main-row,
+            .dashboard-main {
+                display: block !important;
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            .admin-page-header__actions { display: none !important; }
+            .analytics-print-banner {
+                display: block !important;
+                border-bottom: 2px solid #1B2E4B;
+                padding-bottom: .75rem;
+                margin-bottom: 1rem;
+            }
+            .analytics-print-banner__brand {
+                font-size: 1.15rem;
+                font-weight: 800;
+                color: #1B2E4B;
+                margin: 0;
+            }
+            .analytics-print-banner__meta {
+                font-size: .85rem;
+                color: #64748b;
+                margin: .2rem 0 0;
+            }
+            .analytics-kpi,
+            .analytics-chart-card,
+            .admin-panel {
+                break-inside: avoid;
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0 !important;
+                background: #fff !important;
+            }
+            .analytics-chart-wrap,
+            .analytics-chart-wrap--lg {
+                height: auto !important;
+                min-height: 0 !important;
+            }
+            .analytics-chart-wrap canvas {
+                display: none !important;
+            }
+            .analytics-chart-print-img {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            .analytics-insight {
+                background: #f1f5f9 !important;
+            }
+            a { color: inherit !important; text-decoration: none !important; }
+            .table-responsive { overflow: visible !important; }
+            .analytics-chart-card {
+                page-break-inside: avoid;
+                margin-bottom: .75rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block admin_main %}
+    {% set actions %}
+        <div class="d-flex flex-wrap align-items-end gap-2">
+            <form method="get" action="{{ path('admin_analytics') }}" class="d-flex flex-wrap align-items-end gap-2 no-print">
+                <div>
+                    <label class="form-label small text-muted mb-1" for="analytics-value">Période</label>
+                    <input type="number" class="form-control form-control-sm rounded-3" style="width: 5.5rem;"
+                           id="analytics-value" name="value" min="1"
+                           max="{{ periodUnit == 'days' ? 3650 : 60 }}"
+                           value="{{ periodValue }}" required>
+                </div>
+                <div>
+                    <label class="form-label small text-muted mb-1" for="analytics-unit">Unité</label>
+                    <select class="form-select form-select-sm rounded-3" id="analytics-unit" name="unit">
+                        <option value="days" {{ periodUnit == 'days' ? 'selected' : '' }}>Jours</option>
+                        <option value="months" {{ periodUnit == 'months' ? 'selected' : '' }}>Mois</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-sm btn-admin-primary rounded-pill px-3">
+                    <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>Appliquer
+                </button>
+            </form>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 no-print" id="analytics-print-btn">
+                <i class="bi bi-printer me-1" aria-hidden="true"></i>Imprimer
+            </button>
+            <div class="dropdown no-print">
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false" id="analytics-export-btn">
+                    <i class="bi bi-download me-1" aria-hidden="true"></i>Exporter
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="analytics-export-btn">
+                    <li>
+                        <a class="dropdown-item" href="{{ path('admin_analytics_export', { format: 'excel', unit: periodUnit, value: periodValue }) }}">
+                            <i class="bi bi-file-earmark-excel me-2 text-success" aria-hidden="true"></i>Excel (.xlsx)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ path('admin_analytics_export', { format: 'word', unit: periodUnit, value: periodValue }) }}">
+                            <i class="bi bi-file-earmark-word me-2 text-primary" aria-hidden="true"></i>Word (.docx)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ path('admin_analytics_export', { format: 'pdf', unit: periodUnit, value: periodValue }) }}">
+                            <i class="bi bi-file-earmark-pdf me-2 text-danger" aria-hidden="true"></i>PDF (.pdf)
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    {% endset %}
+
+    <div class="analytics-print-banner">
+        <p class="analytics-print-banner__brand">SoukExpat — Rapport analytics</p>
+        <p class="analytics-print-banner__meta">
+            Période : {{ periodLabel }}
+            · du {{ report.since|date('d/m/Y') }} au {{ report.generatedAt|date('d/m/Y') }}
+            · généré le {{ report.generatedAt|date('d/m/Y à H:i') }}
+        </p>
+        <p class="analytics-print-banner__meta" style="margin-top:.45rem;">{{ report.explanations.intro }}</p>
+    </div>
+
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Pilotage',
+        title: 'Rapport complet du site',
+        lead: 'Données en temps réel · généré le ' ~ report.generatedAt|date('d/m/Y à H:i') ~ ' · période ' ~ periodLabel ~ ' (depuis le ' ~ report.since|date('d/m/Y') ~ ')',
+        actions: actions
+    }) }}
+
+    {% set x = report.explanations %}
+    <div class="analytics-guide">
+        <h2><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Comprendre ce rapport</h2>
+        <p>{{ x.intro }}</p>
+        <p>{{ x.howToRead }}</p>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-3 no-print">
+        <span class="small text-muted align-self-center me-1">Raccourcis :</span>
+        <a href="{{ path('admin_analytics', { unit: 'days', value: 30 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'days' and periodValue == 30 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">30 j</a>
+        <a href="{{ path('admin_analytics', { unit: 'days', value: 90 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'days' and periodValue == 90 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">90 j</a>
+        <a href="{{ path('admin_analytics', { unit: 'days', value: 180 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'days' and periodValue == 180 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">180 j</a>
+        <a href="{{ path('admin_analytics', { unit: 'months', value: 6 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'months' and periodValue == 6 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">6 mois</a>
+        <a href="{{ path('admin_analytics', { unit: 'months', value: 12 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'months' and periodValue == 12 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">12 mois</a>
+        <a href="{{ path('admin_analytics', { unit: 'months', value: 24 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'months' and periodValue == 24 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">24 mois</a>
+    </div>
+
+    <h2 class="h6 fw-bold mb-1">Points clés</h2>
+    <p class="analytics-section-note">{{ x.insights }}</p>
+    <div class="row g-2 mb-4">
+        {% for insight in report.insights %}
+            <div class="col-12 col-md-6">
+                <div class="analytics-insight">
+                    <i class="bi bi-lightbulb me-1 text-brand" aria-hidden="true"></i>{{ insight }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2 class="h6 fw-bold mb-1">Indicateurs clés</h2>
+    <p class="analytics-section-note">{{ x.kpis }}</p>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3 mb-4">
+        {% set kpiCards = [
+            { label: 'Utilisateurs', value: k.users, hint: k.sellersActive ~ ' vendeurs actifs', help: x.kpiUsers },
+            { label: 'Annonces validées', value: k.approved, hint: k.pending ~ ' en attente', help: x.kpiApproved },
+            { label: 'Taux validation', value: (k.approvalRate is not null ? k.approvalRate ~ '%' : '—'), hint: k.rejected ~ ' refusée(s)', help: x.kpiApprovalRate },
+            { label: 'Messages chat', value: k.messages, hint: k.threads ~ ' conversation(s)', help: x.kpiMessages },
+            { label: 'Contacts', value: k.contactsOpen + k.contactsDone, hint: k.contactsOpen ~ ' à traiter', help: x.kpiContacts },
+            { label: 'WhatsApp profil', value: k.usersWithWhatsapp, hint: 'numéros renseignés', help: x.kpiWhatsapp },
+            { label: 'Prix moyen', value: (k.avgPrice is not null ? k.avgPrice|number_format(0, ',', ' ') ~ ' MAD' : '—'), hint: 'annonces validées', help: x.kpiAvgPrice },
+            { label: 'Catégories', value: k.categories, hint: k.cities ~ ' ville(s)', help: x.kpiCategories },
+            { label: 'Fourchette prix', value: (k.minPrice is not null ? k.minPrice|number_format(0, ',', ' ') ~ '–' ~ k.maxPrice|number_format(0, ',', ' ') : '—'), hint: 'MAD', help: x.kpiPriceRange },
+            { label: 'Total annonces', value: k.annoncesTotal, hint: 'tous statuts', help: x.kpiTotal }
+        ] %}
+        {% for card in kpiCards %}
+            <div class="col">
+                <div class="analytics-kpi" title="{{ card.help }}">
+                    <div class="analytics-kpi__label">{{ card.label }}</div>
+                    <div class="analytics-kpi__value">{{ card.value }}</div>
+                    <div class="analytics-kpi__hint">{{ card.hint }}</div>
+                    <div class="analytics-kpi__help d-none d-xl-block">{{ card.help }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {# Charts row 1 #}
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-xl-8">
+            <div class="analytics-chart-card">
+                <h2>Tendances d’activité ({{ periodLabel }})</h2>
+                <p class="analytics-section-note">{{ x.trends }}</p>
+                <div class="analytics-chart-wrap analytics-chart-wrap--lg">
+                    <canvas id="chartTrends" aria-label="Tendances"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="analytics-chart-card">
+                <h2>Annonces par statut</h2>
+                <p class="analytics-section-note">{{ x.status }}</p>
+                <div class="analytics-chart-wrap">
+                    <canvas id="chartStatus" aria-label="Statuts"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Charts row 2 #}
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-lg-6">
+            <div class="analytics-chart-card">
+                <h2>Top catégories (validées)</h2>
+                <p class="analytics-section-note">{{ x.categories }}</p>
+                <div class="analytics-chart-wrap">
+                    <canvas id="chartCategories" aria-label="Catégories"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="analytics-chart-card">
+                <h2>Top villes (validées)</h2>
+                <p class="analytics-section-note">{{ x.cities }}</p>
+                <div class="analytics-chart-wrap">
+                    <canvas id="chartCities" aria-label="Villes"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Charts row 3 #}
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-7">
+            <div class="analytics-chart-card">
+                <h2>Top vendeurs (annonces validées)</h2>
+                <p class="analytics-section-note">{{ x.sellers }}</p>
+                <div class="analytics-chart-wrap analytics-chart-wrap--lg">
+                    <canvas id="chartSellers" aria-label="Vendeurs"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-5">
+            <div class="analytics-chart-card">
+                <h2>Messages contact</h2>
+                <p class="analytics-section-note">{{ x.contacts }}</p>
+                <div class="analytics-chart-wrap">
+                    <canvas id="chartContacts" aria-label="Contacts"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Tables #}
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-xl-6">
+            <div class="admin-panel h-100">
+                <div class="card-header p-3">
+                    <h2 class="h6 fw-bold mb-0">Top vendeurs</h2>
+                    <p class="small text-muted mb-0 mt-1">{{ x.sellers }}</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-3 py-2 border-0">Vendeur</th>
+                                <th class="py-2 border-0">Annonces</th>
+                                <th class="pe-3 py-2 border-0 text-end">Prix moy.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in report.tables.topSellers %}
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="fw-semibold">{{ row.name }}</div>
+                                        <div class="small text-muted">{{ row.email }}</div>
+                                    </td>
+                                    <td><span class="admin-badge">{{ row.total }}</span></td>
+                                    <td class="pe-3 text-end small">{{ row.avgPrice is not null ? row.avgPrice|number_format(0, ',', ' ') ~ ' MAD' : '—' }}</td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="3" class="text-center text-muted py-4">Pas encore de données.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-6">
+            <div class="admin-panel h-100">
+                <div class="card-header p-3">
+                    <h2 class="h6 fw-bold mb-0">Conversations les plus actives</h2>
+                    <p class="small text-muted mb-0 mt-1">{{ x.threads }}</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-3 py-2 border-0">Annonce</th>
+                                <th class="py-2 border-0">Msgs</th>
+                                <th class="pe-3 py-2 border-0 text-end no-print">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in report.tables.busiestThreads %}
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="fw-semibold text-truncate" style="max-width: 16rem;">{{ row.annonce }}</div>
+                                        <div class="small text-muted">{{ row.buyer }} ↔ {{ row.seller }}</div>
+                                    </td>
+                                    <td><span class="admin-badge">{{ row.messages }}</span></td>
+                                    <td class="pe-3 text-end no-print">
+                                        <a href="{{ path('app_chat_view', { id: row.id }) }}" class="btn btn-sm btn-outline-secondary rounded-pill">Voir</a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="3" class="text-center text-muted py-4">Aucune conversation.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-panel mb-4">
+        <div class="card-header p-3 d-flex justify-content-between align-items-start gap-2">
+            <div>
+                <h2 class="h6 fw-bold mb-0">Dernières annonces</h2>
+                <p class="small text-muted mb-0 mt-1">{{ x.recent }}</p>
+            </div>
+            <a href="{{ path('admin_annonces_pending') }}" class="btn btn-sm btn-outline-secondary rounded-pill no-print">Modération</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small">
+                    <tr>
+                        <th class="ps-3 py-2 border-0">Titre</th>
+                        <th class="py-2 border-0">Vendeur</th>
+                        <th class="py-2 border-0">Statut</th>
+                        <th class="py-2 border-0">Prix</th>
+                        <th class="pe-3 py-2 border-0 text-end">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report.tables.recentAnnonces %}
+                        <tr>
+                            <td class="ps-3 fw-semibold">
+                                <a href="{{ path('admin_annonce_show', { id: row.id }) }}" class="text-decoration-none text-dark">{{ row.title|u.truncate(48, '…') }}</a>
+                            </td>
+                            <td class="small">{{ row.seller }}</td>
+                            <td>
+                                {% if row.status == 'approved' %}
+                                    <span class="badge text-bg-success">Validée</span>
+                                {% elseif row.status == 'pending' %}
+                                    <span class="badge text-bg-warning">En attente</span>
+                                {% elseif row.status == 'rejected' %}
+                                    <span class="badge text-bg-danger">Refusée</span>
+                                {% else %}
+                                    <span class="badge text-bg-secondary">{{ row.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="small">{{ row.price|number_format(0, ',', ' ') }} MAD</td>
+                            <td class="pe-3 text-end small text-muted">{{ row.createdAt }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5" class="text-center text-muted py-4">Aucune annonce.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script>
+    (function () {
+        const data = {{ {
+            labels: c.monthLabels,
+            annonces: c.annoncesByMonth,
+            messages: c.messagesByMonth,
+            contacts: c.contactsByMonth,
+            approvals: c.approvalsByMonth,
+            statusLabels: c.statusLabels,
+            statusValues: c.statusValues,
+            catLabels: c.categories.labels,
+            catValues: c.categories.values,
+            cityLabels: c.cities.labels,
+            cityValues: c.cities.values,
+            sellerLabels: c.topSellers.labels,
+            sellerValues: c.topSellers.values,
+            contactLabels: c.contactsSplit.labels,
+            contactValues: c.contactsSplit.values
+        }|json_encode|raw }};
+
+        const brand = '#4B79A1';
+        const brandDark = '#1B2E4B';
+        const green = '#198754';
+        const orange = '#fd7e14';
+        const red = '#dc3545';
+        const teal = '#0d9488';
+        const gray = '#94a3b8';
+
+        const monthPretty = (ym) => {
+            const [y, m] = ym.split('-');
+            const names = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
+            return names[parseInt(m, 10) - 1] + ' ' + y.slice(2);
+        };
+
+        if (typeof Chart === 'undefined') return;
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
+        };
+
+        new Chart(document.getElementById('chartTrends'), {
+            type: 'line',
+            data: {
+                labels: data.labels.map(monthPretty),
+                datasets: [
+                    { label: 'Annonces créées', data: data.annonces, borderColor: brand, backgroundColor: 'rgba(75,121,161,.15)', tension: .35, fill: true },
+                    { label: 'Validations', data: data.approvals, borderColor: green, backgroundColor: 'transparent', tension: .35 },
+                    { label: 'Messages chat', data: data.messages, borderColor: teal, backgroundColor: 'transparent', tension: .35 },
+                    { label: 'Contacts', data: data.contacts, borderColor: orange, backgroundColor: 'transparent', tension: .35 }
+                ]
+            },
+            options: { ...commonOptions, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+
+        new Chart(document.getElementById('chartStatus'), {
+            type: 'doughnut',
+            data: {
+                labels: data.statusLabels,
+                datasets: [{ data: data.statusValues, backgroundColor: [green, orange, red, gray], borderWidth: 0 }]
+            },
+            options: commonOptions
+        });
+
+        new Chart(document.getElementById('chartCategories'), {
+            type: 'bar',
+            data: {
+                labels: data.catLabels,
+                datasets: [{ label: 'Annonces', data: data.catValues, backgroundColor: brand, borderRadius: 6 }]
+            },
+            options: { ...commonOptions, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+
+        new Chart(document.getElementById('chartCities'), {
+            type: 'bar',
+            data: {
+                labels: data.cityLabels,
+                datasets: [{ label: 'Annonces', data: data.cityValues, backgroundColor: brandDark, borderRadius: 6 }]
+            },
+            options: { ...commonOptions, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+
+        new Chart(document.getElementById('chartSellers'), {
+            type: 'bar',
+            data: {
+                labels: data.sellerLabels,
+                datasets: [{ label: 'Annonces validées', data: data.sellerValues, backgroundColor: teal, borderRadius: 6 }]
+            },
+            options: {
+                ...commonOptions,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+        });
+
+        new Chart(document.getElementById('chartContacts'), {
+            type: 'doughnut',
+            data: {
+                labels: data.contactLabels,
+                datasets: [{ data: data.contactValues, backgroundColor: [orange, green], borderWidth: 0 }]
+            },
+            options: commonOptions
+        });
+
+        var unitEl = document.getElementById('analytics-unit');
+        var valueEl = document.getElementById('analytics-value');
+        if (unitEl && valueEl) {
+            unitEl.addEventListener('change', function () {
+                valueEl.max = unitEl.value === 'months' ? '60' : '3650';
+                if (parseInt(valueEl.value, 10) > parseInt(valueEl.max, 10)) {
+                    valueEl.value = valueEl.max;
+                }
+            });
+        }
+
+        var printBtn = document.getElementById('analytics-print-btn');
+        if (printBtn) {
+            printBtn.addEventListener('click', function () {
+                prepareChartsForPrint();
+                window.print();
+            });
+        }
+
+        function prepareChartsForPrint() {
+            document.querySelectorAll('.analytics-chart-wrap').forEach(function (wrap) {
+                var canvas = wrap.querySelector('canvas');
+                if (!canvas) return;
+                var chart = Chart.getChart(canvas);
+                if (chart) {
+                    chart.resize();
+                }
+                wrap.querySelectorAll('.analytics-chart-print-img').forEach(function (img) {
+                    img.remove();
+                });
+                var img = document.createElement('img');
+                img.src = canvas.toDataURL('image/png', 1.0);
+                img.alt = canvas.getAttribute('aria-label') || 'Diagramme';
+                img.className = 'analytics-chart-print-img';
+                wrap.appendChild(img);
+            });
+        }
+
+        function restoreChartsAfterPrint() {
+            document.querySelectorAll('.analytics-chart-print-img').forEach(function (img) {
+                img.remove();
+            });
+            document.querySelectorAll('.analytics-chart-wrap canvas').forEach(function (canvas) {
+                canvas.style.display = '';
+                var chart = Chart.getChart(canvas);
+                if (chart) {
+                    chart.resize();
+                }
+            });
+        }
+
+        window.addEventListener('beforeprint', prepareChartsForPrint);
+        window.addEventListener('afterprint', restoreChartsAfterPrint);
+    })();
+    </script>
+{% endblock %}

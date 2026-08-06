@@ -15,6 +15,8 @@ when@prod:
         session:
             cookie_secure: true
             cookie_samesite: lax
-        # Proxy / HTTPS (Cloudflare, nginx) — définir TRUSTED_PROXIES sur l’hébergeur
-        # Ex. TRUSTED_PROXIES=127.0.0.1,REMOTE_ADDR
-        trusted_proxies: '%env(default::TRUSTED_PROXIES)%'
+        # Si HTTPS / IP client incorrects derrière proxy Hostinger/Cloudflare :
+        # TRUSTED_PROXIES=127.0.0.1,REMOTE_ADDR dans .env.local
+        # puis décommenter :
+        # trusted_proxies: '%env(TRUSTED_PROXIES)%'
+        # trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-host']

@@ -50,7 +50,7 @@
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center">
                                         {% if annonce.annonceImages|length > 0 %}
-                                            <img src="{{ asset('uploads/annonces/' ~ annonce.annonceImages[0].imadeName) }}" 
+                                            <img src="{{ annonce_image_url(annonce.annonceImages[0]) }}" 
                                                  class="rounded-3 me-3 border" style="width: 60px; height: 60px; object-fit: cover;" alt="">
                                         {% else %}
                                             <div class="bg-light rounded-3 me-3 d-flex align-items-center justify-content-center border" style="width: 60px; height: 60px;">

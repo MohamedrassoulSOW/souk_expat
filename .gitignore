@@ -18,3 +18,13 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+# Node
+/node_modules/
+
+# Electron build artifacts
+/electron/dist/
+
+# Paquet export production (généré par bin/export-prod.php)
+/prod-package/
+/prod-package.zip

@@ -6,6 +6,7 @@
     "scripts": {
         "build:web": "echo \"Build web assets (replace with your real build command)\"",
         "icons:generate": "node tools/generate-icons.js",
+        "icons:generate:fast": "node tools/generate-icons-fallback.js",
         "pwa:sw:update": "echo \"Update service worker if needed\"",
         "cap:init": "npx cap init soukexpat com.soukexpat",
         "cap:add:android": "npx cap add android",

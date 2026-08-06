@@ -29,7 +29,7 @@
                         <div class="carousel-inner rounded-3">
                             {% for image in annonce.annonceImages %}
                                 <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                    <img src="{{ asset('uploads/annonces/' ~ image.imadeName) }}"
+                                    <img src="{{ annonce_image_url(image) }}"
                                          class="d-block w-100"
                                          style="height: 320px; object-fit: cover;"
                                          alt="{{ annonce.title }}">

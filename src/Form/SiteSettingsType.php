@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
@@ -182,6 +183,11 @@ class SiteSettingsType extends AbstractType
                 'help' => 'Affiché uniquement s’il est rempli (informations en plus).',
                 'required' => false,
                 'attr' => ['rows' => 5],
+            ])
+            ->add('purgeMessagesEnabled', CheckboxType::class, [
+                'label' => 'Activer la purge automatique des messages (>30 jours)',
+                'help' => 'Si activé, la commande `app:messages:purge-expired` effectuera la suppression lorsque lancée (cron).',
+                'required' => false,
             ]);
     }
 

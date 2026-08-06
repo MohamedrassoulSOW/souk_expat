@@ -14,47 +14,29 @@ symfony server:start
 
 ## Mise en production
 
-### 1. Variables d’environnement
+Guide détaillé : **[DEPLOY.md](DEPLOY.md)** (Hostinger).
 
-Copier `.env.prod.example` vers `.env.local` sur le serveur et renseigner :
+### Résumé
 
-- `APP_ENV=prod` / `APP_DEBUG=0`
-- `APP_SECRET` (unique)
-- `DATABASE_URL`
-- `DEFAULT_URI=https://votre-domaine`
-- `MAILER_DSN` (SMTP réel)
-- `JWT_SECRET` (recommandé pour l’API mobile)
-- Mercure (optionnel pour le chat live)
-
-### 2. Déploiement
-
-**Document root = dossier `public/`** (cPanel → Domaines → « Racine du document »).
-
-Si l’hébergeur force `public_html` = racine du projet, le dépôt contient `index.php` + `.htaccess` à la racine qui redirigent vers `public/`. Mieux : pointer le domaine directement sur `public/`.
+1. Copier `.env.prod.example` → `.env.local` sur le serveur (secrets + `DEFAULT_URI=https://soukexpat.com`)
+2. Document root = dossier **`public/`**
+3. Sur le serveur :
 
 ```bash
 composer install --no-dev --optimize-autoloader
 php bin/prepare-prod.php
 ```
 
-Permissions : dossiers `755`, fichiers `644`, écriture sur `var/` et `public/uploads/`.
+4. Vérifier : `https://soukexpat.com/` et `https://soukexpat.com/api/v1`
 
-**403 Forbidden** = presque toujours mauvaise racine web ou permissions. Vérifier que `public/index.php` est bien dans le document root.
+Permissions : dossiers `755`, fichiers `644` ; écriture sur `var/` et `public/uploads/`.
 
-### 3. Vérifications
-
-```bash
-php bin/console about --env=prod
-php bin/console app:mailer:smoke-test votre@email.com --env=prod
-curl -I https://votre-domaine/api/v1
-```
+**403 Forbidden** = mauvaise racine web ou permissions.
 
 ### API mobile
 
-Base : `/api/v1` (JWT Bearer). Voir `GET /api/v1` pour la liste des endpoints.
-
-Auth, catalogue, **CRUD annonces**, **messagerie**.  
-Les images mobile sont stockées **en base (BLOB)** et servies via `/api/v1/media/...` — pas d’écriture dans `public/uploads` pour l’API.
+Base : `/api/v1` (JWT Bearer). Voir `GET /api/v1`.  
+CRUD annonces + messagerie ; images API en **BLOB** (base de données).
 
 ## Structure utile
 
@@ -65,3 +47,4 @@ Les images mobile sont stockées **en base (BLOB)** et servies via `/api/v1/medi
 | `src/Controller/Admin/` | Back-office |
 | `templates/` | Twig site + admin |
 | `var/` | Cache / logs (non versionné) |
+| `DEPLOY.md` | Checklist mise en ligne |

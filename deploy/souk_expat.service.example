@@ -1,0 +1,14 @@
+[Unit]
+Description=SoukExpat PHP application
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/souk_expat
+ExecStart=/usr/bin/php -S 127.0.0.1:8000 -t public
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

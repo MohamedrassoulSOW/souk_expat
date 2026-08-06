@@ -11,6 +11,13 @@
             <i class="bi bi-speedometer2 me-2" aria-hidden="true"></i> Dashboard
         </a>
     </li>
+    <li class="nav-item">
+        <a href="{{ path('admin_analytics') }}"
+           class="nav-link {{ _r == 'admin_analytics' ? 'active-cyan shadow-sm' : 'text-dark hover-light' }}"
+           {% if mobile %}data-admin-nav-link{% endif %}>
+            <i class="bi bi-graph-up-arrow me-2" aria-hidden="true"></i> Rapport & analytics
+        </a>
+    </li>
 
     {% if is_granted('ROLE_EDITOR') %}
         <li class="admin-nav-section {{ mobile ? 'mt-3' : 'mt-4' }} mb-1 ms-1 small text-uppercase fw-bold text-muted" style="letter-spacing: 1px; font-size: 0.72rem; list-style: none;">
@@ -114,12 +121,4 @@
             </a>
         </li>
     {% endif %}
-
-    <li class="nav-item mt-3 pt-3 border-top">
-        <a href="{{ path('app_logout') }}"
-           class="nav-link text-danger hover-light small"
-           {% if mobile %}data-admin-nav-link{% endif %}>
-            <i class="bi bi-box-arrow-left me-2" aria-hidden="true"></i> Déconnexion
-        </a>
-    </li>
 </ul>

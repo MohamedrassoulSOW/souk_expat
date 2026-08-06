@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Service\MessageRetentionService;
+use App\Service\SiteSettingsService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +21,7 @@ final class PurgeExpiredMessagesCommand extends Command
 {
     public function __construct(
         private readonly MessageRetentionService $retentionService,
+        private readonly SiteSettingsService $settingsService,
     ) {
         parent::__construct();
     }
@@ -55,6 +57,13 @@ final class PurgeExpiredMessagesCommand extends Command
             $days > 1 ? 's' : '',
             $dryRun ? ' (simulation)' : '',
         ));
+
+        // Respect site setting: skip purge if disabled in admin
+        $settings = $this->settingsService->get();
+        if (!$settings->isPurgeMessagesEnabled()) {
+            $io->warning('La purge automatique des messages est désactivée dans les paramètres du site. Aucune action réalisée.');
+            return Command::SUCCESS;
+        }
 
         $result = $this->retentionService->purgeExpired($days, $dryRun);
 

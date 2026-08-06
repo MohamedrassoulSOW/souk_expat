@@ -5,8 +5,8 @@
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                 {# Header de la carte #}
                 <div class="p-4 text-white text-center" style="background-color: #42B1CE;">
-                    <h3 class="fw-bold mb-1">CrÃ©er une annonce</h3>
-                    <p class="mb-0 opacity-75 small">Remplissez les dÃ©tails pour attirer les acheteurs</p>
+                    <h3 class="fw-bold mb-1">Créer une annonce</h3>
+                    <p class="mb-0 opacity-75 small">Remplissez les détails pour attirer les acheteurs</p>
                 </div>
 
                 <div class="card-body p-4 p-md-5 bg-white">
@@ -32,9 +32,9 @@
                             {{ form_errors(form.price) }}
                         </div>
 
-                        {# CATÃ‰GORIE #}
+                        {# CATÉGORIE #}
                         <div class="col-6 col-md-6">
-                            <label class="form-label fw-bold small text-uppercase text-muted">CatÃ©gorie</label>
+                            <label class="form-label fw-bold small text-uppercase text-muted">Catégorie</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-grid text-muted"></i></span>
                                 {{ form_widget(form.category, {'attr': {'class': 'form-select border-start-0 ps-0'}}) }}
@@ -59,14 +59,14 @@
                                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-whatsapp text-success"></i></span>
                                 {{ form_widget(form.phone, {'attr': {'class': 'form-control border-start-0 ps-0', 'placeholder': '+212 6XX XXX XXX'}}) }}
                             </div>
-                            <div class="form-text small">PrÃ©rempli depuis votre profil si disponible. Les acheteurs pourront vous Ã©crire directement sur WhatsApp (mÃªme sans compte).</div>
+                            <div class="form-text small">Prérempli depuis votre profil si disponible. Les acheteurs pourront vous écrire directement sur WhatsApp (même sans compte).</div>
                             {{ form_errors(form.phone) }}
                         </div>
 
                         {# DESCRIPTION #}
                         <div class="col-12">
-                            <label class="form-label fw-bold small text-uppercase text-muted">Description dÃ©taillÃ©e</label>
-                            {{ form_widget(form.description, {'attr': {'class': 'form-control rounded-3', 'rows': 5, 'placeholder': 'DÃ©crivez votre objet, son Ã©tat, etc.'}}) }}
+                            <label class="form-label fw-bold small text-uppercase text-muted">Description détaillée</label>
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control rounded-3', 'rows': 5, 'placeholder': 'Décrivez votre objet, son état, etc.'}}) }}
                             {{ form_errors(form.description) }}
                         </div>
 
@@ -74,18 +74,58 @@
                             <div class="alert alert-light border rounded-4 small mb-0">
                                 <i class="bi bi-shield-check me-1 text-brand" aria-hidden="true"></i>
                                 Les acheteurs peuvent vous contacter via la <strong>messagerie SoukExpat</strong>
-                                {% if form.phone is defined %} et, si vous renseignez un numÃ©ro, via <strong>WhatsApp</strong>{% endif %}.
+                                {% if form.phone is defined %} et, si vous renseignez un numéro, via <strong>WhatsApp</strong>{% endif %}.
                             </div>
                         </div>
 
-                        {# IMAGES - Zone de dÃ©pÃ´t stylisÃ©e #}
+                        {# IMAGES - plusieurs photos #}
+                        {% set currentAnnonce = form.vars.data %}
+                        {% set existingCount = currentAnnonce and currentAnnonce.id ? currentAnnonce.annonceImages|length : 0 %}
                         <div class="col-12">
+                            {% if existingCount > 0 %}
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-uppercase text-muted">Photos actuelles ({{ existingCount }}/8)</label>
+                                    <div class="row g-2">
+                                        {% for image in currentAnnonce.annonceImages %}
+                                            {% set imgUrl = annonce_image_url(image) %}
+                                            <div class="col-6 col-sm-4 col-md-3">
+                                                <div class="position-relative border rounded-3 overflow-hidden bg-light" style="aspect-ratio: 1;">
+                                                    {% if imgUrl %}
+                                                        <img src="{{ imgUrl }}" alt="Photo {{ loop.index }}" class="w-100 h-100" style="object-fit: cover;">
+                                                    {% endif %}
+                                                    <form method="post"
+                                                          action="{{ path('app_annonce_image_delete', { id: currentAnnonce.id, imageId: image.id }) }}"
+                                                          class="position-absolute top-0 end-0 m-1"
+                                                          onsubmit="return confirm('Supprimer cette photo ?');">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_image' ~ image.id) }}">
+                                                        <button type="submit" class="btn btn-sm btn-danger rounded-circle p-1" title="Supprimer" aria-label="Supprimer la photo">
+                                                            <i class="bi bi-x-lg" aria-hidden="true"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
                             <div class="upload-zone p-4 rounded-4 border-dashed text-center position-relative bg-light">
                                 <i class="bi bi-cloud-arrow-up display-5 text-muted mb-2 d-block"></i>
-                                <label class="form-label fw-bold mb-1">Images de l'annonce</label>
-                                <p class="small text-muted mb-3">Plusieurs photos augmentent vos chances de vente</p>
-                                {{ form_widget(form.images, {'attr': {'class': 'form-control form-control-sm'}}) }}
+                                <label class="form-label fw-bold mb-1" for="{{ form.images.vars.id }}">
+                                    {{ existingCount > 0 ? 'Ajouter d?autres photos' : 'Images de l?annonce' }}
+                                </label>
+                                <p class="small text-muted mb-3">
+                                    Sélectionnez <strong>plusieurs fichiers</strong> à la fois (Ctrl ou Cmd).
+                                    {{ existingCount > 0 ? (8 - existingCount) ~ ' place(s) restante(s).' : 'Jusqu?à 8 photos · JPG, PNG, WEBP.' }}
+                                </p>
+                                {{ form_widget(form.images, {'attr': {
+                                    'class': 'form-control form-control-sm',
+                                    'accept': 'image/jpeg,image/png,image/webp',
+                                    'data-preview-target': 'annonce-image-preview'
+                                }}) }}
                                 {{ form_errors(form.images) }}
+                                {{ form_help(form.images) }}
+                                <div id="annonce-image-preview" class="row g-2 mt-3 text-start"></div>
                             </div>
                         </div>
 
@@ -104,7 +144,7 @@
 </main>
 
 <style>
-    /* --- Couleur ThÃ¨me --- */
+    /* --- Couleur Thème --- */
     .btn-custom-cyan {
         background-color: #42B1CE;
         border-color: #42B1CE;
@@ -143,3 +183,34 @@
         .btn-lg { width: 100%; }
     }
 </style>
+<script>
+(function () {
+    var input = document.querySelector('[data-preview-target="annonce-image-preview"]');
+    var preview = document.getElementById('annonce-image-preview');
+    if (!input || !preview) return;
+    input.addEventListener('change', function () {
+        preview.innerHTML = '';
+        var files = Array.prototype.slice.call(input.files || [], 0, 8);
+        files.forEach(function (file) {
+            if (!file.type || file.type.indexOf('image/') !== 0) return;
+            var col = document.createElement('div');
+            col.className = 'col-4 col-md-3';
+            var img = document.createElement('img');
+            img.className = 'img-fluid rounded-3 border';
+            img.style.aspectRatio = '1';
+            img.style.objectFit = 'cover';
+            img.style.width = '100%';
+            img.alt = file.name;
+            img.src = URL.createObjectURL(file);
+            col.appendChild(img);
+            preview.appendChild(col);
+        });
+        if (files.length) {
+            var hint = document.createElement('div');
+            hint.className = 'col-12 small text-muted';
+            hint.textContent = files.length + ' photo(s) selectionnee(s)';
+            preview.appendChild(hint);
+        }
+    });
+})();
+</script>

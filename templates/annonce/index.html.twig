@@ -52,34 +52,6 @@
                 }) }}
             {% endif %}
 
-            {# Barre résultats + filtres (sticky mobile) #}
-            <div class="page-annonces__toolbar">
-                <div class="page-annonces__toolbar-meta">
-                    <span class="annonce-page-stat">
-                        <i class="bi bi-layout-grid" aria-hidden="true"></i>
-                        <strong>{{ annonces.getTotalItemCount|cap999 }}</strong>
-                        <span class="d-none d-sm-inline">annonce{{ annonces.getTotalItemCount > 1 ? 's' : '' }}</span>
-                    </span>
-                    {% if has_filters %}
-                        <a href="{{ reset_url }}" class="page-annonces__reset d-md-none">
-                            <i class="bi bi-x-lg" aria-hidden="true"></i>Effacer
-                        </a>
-                    {% endif %}
-                </div>
-                <button class="page-annonces__filter-toggle d-md-none"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#annonceFiltersCollapse"
-                        aria-expanded="{{ has_filters ? 'true' : 'false' }}"
-                        aria-controls="annonceFiltersCollapse">
-                    <i class="bi bi-sliders" aria-hidden="true"></i>
-                    Filtres
-                    {% if has_filters %}
-                        <span class="page-annonces__filter-dot" aria-hidden="true"></span>
-                    {% endif %}
-                </button>
-            </div>
-
             {{ include('layouts/_filter_chips.html.twig', {
                 sf: sf,
                 search_categories: search_categories,
@@ -89,25 +61,48 @@
 
             <section class="annonce-search-panel mb-3 mb-md-4">
                 <div class="annonce-search-panel__inner">
-                    <div class="d-none d-md-flex align-items-center justify-content-between gap-2 mb-3">
-                        <div>
-                            <h2 class="h6 mb-1 fw-bold text-dark d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                        <div class="min-w-0">
+                            <h2 class="h6 mb-1 fw-bold text-dark d-flex align-items-center gap-2 flex-wrap">
                                 <i class="bi bi-sliders text-brand-annonces" aria-hidden="true"></i>
-                                Affiner votre recherche
+                                <span class="d-none d-md-inline">Affiner votre recherche</span>
+                                <span class="d-md-none">Filtres</span>
                             </h2>
-                            <p class="small text-muted mb-0">
-                                {% if category is defined %}
-                                    Filtrez par mots-clés ou par ville.
-                                {% else %}
-                                    Combinez mots-clés, catégorie et ville.
-                                {% endif %}
-                            </p>
+                            <div class="d-flex align-items-center gap-2 flex-wrap mt-1">
+                                <span class="annonce-page-stat">
+                                    <i class="bi bi-layout-grid" aria-hidden="true"></i>
+                                    <strong>{{ annonces.getTotalItemCount|cap999 }}</strong>
+                                    annonce{{ annonces.getTotalItemCount > 1 ? 's' : '' }}
+                                </span>
+                                <p class="small text-muted mb-0 d-none d-md-block">
+                                    {% if category is defined %}
+                                        Filtrez par mots-clés ou par ville.
+                                    {% else %}
+                                        Combinez mots-clés, catégorie et ville.
+                                    {% endif %}
+                                </p>
+                            </div>
                         </div>
-                        {% if has_filters %}
-                            <a href="{{ reset_url }}" class="btn btn-sm btn-outline-secondary rounded-pill">
-                                <i class="bi bi-x-lg me-1" aria-hidden="true"></i>Réinitialiser
-                            </a>
-                        {% endif %}
+                        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                            {% if has_filters %}
+                                <a href="{{ reset_url }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                    <i class="bi bi-x-lg me-1" aria-hidden="true"></i>
+                                    <span class="d-none d-sm-inline">Réinitialiser</span>
+                                    <span class="d-sm-none">Effacer</span>
+                                </a>
+                            {% endif %}
+                            <button class="page-annonces__filter-toggle d-md-none"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#annonceFiltersCollapse"
+                                    aria-expanded="{{ has_filters ? 'true' : 'false' }}"
+                                    aria-controls="annonceFiltersCollapse">
+                                <i class="bi bi-sliders" aria-hidden="true"></i>
+                                {% if has_filters %}
+                                    <span class="page-annonces__filter-dot" aria-hidden="true"></span>
+                                {% endif %}
+                            </button>
+                        </div>
                     </div>
 
                     <div id="annonceFiltersCollapse" class="collapse d-md-block {{ has_filters ? 'show' : '' }}">

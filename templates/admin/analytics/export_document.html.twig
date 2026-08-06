@@ -1,0 +1,129 @@
+{# Fragment HTML pour export Word / contenu structuré #}
+{% set k = report.kpis %}
+{% set c = report.charts %}
+{% set t = report.tables %}
+{% set x = report.explanations %}
+
+<h1>SoukExpat — Rapport analytics</h1>
+<p>Période : {{ periodLabel }} · du {{ report.since|date('d/m/Y') }} · généré le {{ report.generatedAt|date('d/m/Y à H:i') }}</p>
+
+<h2>Comprendre ce rapport</h2>
+<p>{{ x.intro }}</p>
+<p>{{ x.howToRead }}</p>
+
+{% if report.insights|length %}
+    <h2>Points clés</h2>
+    <p>{{ x.insights }}</p>
+    <ul>
+        {% for insight in report.insights %}
+            <li>{{ insight }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<h2>Indicateurs clés</h2>
+<p>{{ x.kpis }}</p>
+<table>
+    <tr><th>Indicateur</th><th>Valeur</th><th>Détail</th><th>Explication</th></tr>
+    <tr><td>Utilisateurs</td><td>{{ k.users }}</td><td>{{ k.sellersActive }} vendeurs actifs</td><td>{{ x.kpiUsers }}</td></tr>
+    <tr><td>Annonces validées</td><td>{{ k.approved }}</td><td>{{ k.pending }} en attente</td><td>{{ x.kpiApproved }}</td></tr>
+    <tr><td>Taux validation</td><td>{{ k.approvalRate is not null ? k.approvalRate ~ ' %' : '—' }}</td><td>{{ k.rejected }} refusée(s)</td><td>{{ x.kpiApprovalRate }}</td></tr>
+    <tr><td>Messages chat</td><td>{{ k.messages }}</td><td>{{ k.threads }} conversation(s)</td><td>{{ x.kpiMessages }}</td></tr>
+    <tr><td>Contacts ouverts</td><td>{{ k.contactsOpen }}</td><td></td><td>{{ x.kpiContacts }}</td></tr>
+    <tr><td>Contacts traités</td><td>{{ k.contactsDone }}</td><td></td><td>{{ x.kpiContacts }}</td></tr>
+    <tr><td>WhatsApp profil</td><td>{{ k.usersWithWhatsapp }}</td><td></td><td>{{ x.kpiWhatsapp }}</td></tr>
+    <tr><td>Prix moyen</td><td>{{ k.avgPrice is not null ? k.avgPrice|number_format(0, ',', ' ') ~ ' MAD' : '—' }}</td><td></td><td>{{ x.kpiAvgPrice }}</td></tr>
+    <tr><td>Fourchette prix</td><td>{% if k.minPrice is not null %}{{ k.minPrice|number_format(0, ',', ' ') }} – {{ k.maxPrice|number_format(0, ',', ' ') }} MAD{% else %}—{% endif %}</td><td></td><td>{{ x.kpiPriceRange }}</td></tr>
+    <tr><td>Total annonces</td><td>{{ k.annoncesTotal }}</td><td>tous statuts</td><td>{{ x.kpiTotal }}</td></tr>
+</table>
+
+<h2>Tendances</h2>
+<p>{{ x.trends }}</p>
+<table>
+    <tr><th>Mois</th><th>Annonces</th><th>Messages</th><th>Contacts</th><th>Validations</th></tr>
+    {% for label in c.monthLabels %}
+        <tr>
+            <td>{{ label }}</td>
+            <td>{{ c.annoncesByMonth[loop.index0]|default(0) }}</td>
+            <td>{{ c.messagesByMonth[loop.index0]|default(0) }}</td>
+            <td>{{ c.contactsByMonth[loop.index0]|default(0) }}</td>
+            <td>{{ c.approvalsByMonth[loop.index0]|default(0) }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<h2>Annonces par statut</h2>
+<p>{{ x.status }}</p>
+<table>
+    <tr><th>Statut</th><th>Nombre</th></tr>
+    {% for label in c.statusLabels %}
+        <tr><td>{{ label }}</td><td>{{ c.statusValues[loop.index0]|default(0) }}</td></tr>
+    {% endfor %}
+</table>
+
+<h2>Top catégories</h2>
+<p>{{ x.categories }}</p>
+<table>
+    <tr><th>Catégorie</th><th>Annonces</th></tr>
+    {% for label in c.categories.labels %}
+        <tr><td>{{ label }}</td><td>{{ c.categories.values[loop.index0]|default(0) }}</td></tr>
+    {% endfor %}
+</table>
+
+<h2>Top villes</h2>
+<p>{{ x.cities }}</p>
+<table>
+    <tr><th>Ville</th><th>Annonces</th></tr>
+    {% for label in c.cities.labels %}
+        <tr><td>{{ label }}</td><td>{{ c.cities.values[loop.index0]|default(0) }}</td></tr>
+    {% endfor %}
+</table>
+
+<h2>Top vendeurs</h2>
+<p>{{ x.sellers }}</p>
+<table>
+    <tr><th>Vendeur</th><th>Email</th><th>Annonces</th><th>Prix moyen</th></tr>
+    {% for row in t.topSellers %}
+        <tr>
+            <td>{{ row.name }}</td>
+            <td>{{ row.email }}</td>
+            <td>{{ row.total }}</td>
+            <td>{{ row.avgPrice is not null ? row.avgPrice|number_format(0, ',', ' ') ~ ' MAD' : '—' }}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="4">Pas encore de données.</td></tr>
+    {% endfor %}
+</table>
+
+<h2>Conversations les plus actives</h2>
+<p>{{ x.threads }}</p>
+<table>
+    <tr><th>Annonce</th><th>Acheteur</th><th>Vendeur</th><th>Messages</th></tr>
+    {% for row in t.busiestThreads %}
+        <tr>
+            <td>{{ row.annonce }}</td>
+            <td>{{ row.buyer }}</td>
+            <td>{{ row.seller }}</td>
+            <td>{{ row.messages }}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="4">Aucune conversation.</td></tr>
+    {% endfor %}
+</table>
+
+<h2>Dernières annonces</h2>
+<p>{{ x.recent }}</p>
+<table>
+    <tr><th>Titre</th><th>Vendeur</th><th>Statut</th><th>Prix</th><th>Date</th></tr>
+    {% for row in t.recentAnnonces %}
+        <tr>
+            <td>{{ row.title }}</td>
+            <td>{{ row.seller }}</td>
+            <td>{{ row.status }}</td>
+            <td>{{ row.price|number_format(0, ',', ' ') }} MAD</td>
+            <td>{{ row.createdAt }}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="5">Aucune annonce.</td></tr>
+    {% endfor %}
+</table>

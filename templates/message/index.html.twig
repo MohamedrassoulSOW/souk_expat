@@ -55,7 +55,7 @@
                                role="listitem">
                                 <div class="msg-thread-card__media">
                                     {% if thread.annonce.annonceImages|length > 0 %}
-                                        <img src="{{ asset('uploads/annonces/' ~ thread.annonce.annonceImages[0].imadeName) }}"
+                                        <img src="{{ annonce_image_url(thread.annonce.annonceImages[0]) }}"
                                              alt=""
                                              loading="lazy"
                                              decoding="async">

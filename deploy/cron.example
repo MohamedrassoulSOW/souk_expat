@@ -1,0 +1,5 @@
+# Cron examples (run on the production server)
+# Daily purge messages older than 30 days at 03:15
+15 3 * * * cd /var/www/souk_expat && /usr/bin/php bin/console app:messages:purge-expired --env=prod >> var/log/cron-purge.log 2>&1
+
+# If you use supervisor/systemd timers adapt accordingly for workers and messenger:consume

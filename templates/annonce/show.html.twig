@@ -28,7 +28,7 @@
                     <div class="carousel-inner">
                         {% for image in annonce.annonceImages %}
                             <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                <img src="{{ asset('uploads/annonces/' ~ image.imadeName) }}" 
+                                <img src="{{ annonce_image_url(image) }}" 
                                      class="d-block w-100 mx-auto" 
                                      style="aspect-ratio: 4/3; object-fit: cover; object-position: center center; max-height: 500px;" 
                                      alt="{{ annonce.title }}">
@@ -233,6 +233,12 @@
     }
 </style>
 {% block whatsapp_fab %}
-    {{ include('layouts/_whatsapp_fab.html.twig', { wa_phone: wa_phone, wa_text: wa_text }) }}
+    {# Compute phone/text here so they're available when the block is rendered by the base template #}
+    {% set _wa_phone = annonce.phone|default('') %}
+    {% if _wa_phone is empty and annonce.user.whatsappPhone is defined %}
+        {% set _wa_phone = annonce.user.whatsappPhone %}
+    {% endif %}
+    {% set _wa_text = 'Bonjour, je suis intéressé(e) par votre annonce « ' ~ annonce.title ~ ' » sur SoukExpat.' %}
+    {{ include('layouts/_whatsapp_fab.html.twig', { wa_phone: _wa_phone, wa_text: _wa_text }) }}
 {% endblock %}
 {% endblock %}

@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\Length;
 
@@ -84,18 +85,27 @@ class AnnonceType extends AbstractType
             ])
 
             ->add('images', FileType::class, [
-                'label' => 'Photos',
+                'label' => 'Photos (plusieurs possibles)',
                 'mapped' => false,
                 'multiple' => true,
                 'required' => false,
+                'help' => 'Jusqu’à 8 photos · JPG, PNG ou WEBP · 4 Mo max chacune',
+                'attr' => [
+                    'accept' => 'image/jpeg,image/png,image/webp',
+                    'class' => 'form-control form-control-sm',
+                ],
                 'constraints' => [
+                    new Count(
+                        max: 8,
+                        maxMessage: 'Vous pouvez ajouter au maximum {{ limit }} photos à la fois.'
+                    ),
                     new All([
                         new Image(
                             maxSize: '4M',
                             mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
                             mimeTypesMessage: 'Formats autorisés : JPG, PNG, WEBP'
-                        )
-                    ])
+                        ),
+                    ]),
                 ],
             ])
 

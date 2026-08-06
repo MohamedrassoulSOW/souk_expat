@@ -36,7 +36,7 @@
                                 <td class="ps-3">
                                     <div class="d-flex align-items-center gap-2">
                                         {% if annonce.annonceImages|length > 0 %}
-                                            <img src="{{ asset('uploads/annonces/' ~ annonce.annonceImages[0].imadeName) }}"
+                                            <img src="{{ annonce_image_url(annonce.annonceImages[0]) }}"
                                                  class="rounded-3" width="44" height="44" style="object-fit: cover;" alt="" loading="lazy">
                                         {% endif %}
                                         <div class="min-w-0">

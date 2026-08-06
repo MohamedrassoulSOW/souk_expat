@@ -68,11 +68,22 @@ $pwaFiles = [
     'public/icons/icon-512.png',
     'public/icons/apple-touch-icon.png',
 ];
+$missingIcons = false;
 foreach ($pwaFiles as $file) {
     if (!is_file($root . '/' . $file)) {
+        if (str_contains($file, '/icons/')) {
+            $missingIcons = true;
+            continue;
+        }
         fail("Fichier PWA manquant : {$file}");
     }
     echo "[OK] {$file}\n";
+}
+if ($missingIcons) {
+    echo "[INFO] Icônes PWA manquantes — génération…\n";
+    if (run('php bin/generate-pwa-icons.php') !== 0) {
+        fail('Impossible de générer les icônes PWA (logo + extension GD requis).');
+    }
 }
 
 $steps = [
@@ -94,6 +105,9 @@ foreach ($steps as $step) {
 echo "\n=== Vérifications ===\n";
 run('php bin/console about --env=prod');
 run('php bin/console debug:router api_v1_index --env=prod');
+run('php bin/console debug:router admin_analytics --env=prod');
+run('php bin/console debug:router admin_slider_index --env=prod');
+run('php bin/console doctrine:migrations:status --env=prod');
 
 echo <<<TXT
 
@@ -101,7 +115,7 @@ echo <<<TXT
 Checklist manuelle :
   1. APP_ENV=prod et APP_DEBUG=0
   2. APP_SECRET unique (pas celui du .env de dev)
-  3. JWT_SECRET dédié (≥ 32 caractères)
+  3. JWT_SECRET dédié (≥ 32 caractères, ≠ APP_SECRET)
   4. DATABASE_URL pointe vers la base prod
   5. MAILER_DSN = SMTP réel (pas Mailtrap) + test :
        php bin/console app:mailer:smoke-test votre@email.com --env=prod
@@ -113,11 +127,13 @@ Checklist manuelle :
  11. Créer un compte admin si besoin :
        php bin/console app:user:create-editor --env=prod
  12. Smoke tests :
+       php bin/health-check.php https://votre-domaine
        curl -I https://votre-domaine/
        curl -I https://votre-domaine/api/v1
        curl -I https://votre-domaine/manifest.webmanifest
        curl -I https://votre-domaine/sw.js
  13. Cron quotidien (messages > 30 jours) :
        15 3 * * * cd /chemin/vers/projet && php bin/console app:messages:purge-expired --env=prod
+ 14. Valider : slider image+vidéo, multi-photos annonces, export analytics
 
 TXT;

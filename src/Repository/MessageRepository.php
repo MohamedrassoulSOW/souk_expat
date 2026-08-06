@@ -47,4 +47,14 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function countCreatedBefore(\DateTimeImmutable $before): int
+    {
+        return (int) $this->createQueryBuilder('m')
+            ->select('COUNT(m.id)')
+            ->andWhere('m.createdAt < :before')
+            ->setParameter('before', $before)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

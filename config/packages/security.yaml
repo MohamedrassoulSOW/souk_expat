@@ -43,6 +43,7 @@ security:
 
             logout:
                 path: app_logout
+                enable_csrf: true
 
     access_control:
         # API mobile v1

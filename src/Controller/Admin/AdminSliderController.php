@@ -7,9 +7,9 @@ use App\Form\SliderType;
 use App\Repository\SliderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -17,14 +17,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin/slider')]
 class AdminSliderController extends AbstractController
 {
-    // src/Controller/HomeController.php
+    private const UPLOAD_DIR = '/public/uploads/sliders';
 
     #[Route('', name: 'admin_slider_index', methods: ['GET'])]
     public function index(SliderRepository $repo): Response
     {
-        // C'est cette ligne qui définit "sliders" pour Twig
         return $this->render('admin/slider/index.html.twig', [
-            'sliders' => $repo->findAll(),
+            'sliders' => $repo->findBy([], ['id' => 'DESC']),
         ]);
     }
 
@@ -32,32 +31,67 @@ class AdminSliderController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $slider = new Slider();
+        $slider->setIsActive(true);
+        $slider->setTitle('');
+        $slider->setImageName('');
         $form = $this->createForm(SliderType::class, $slider);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $imageFile */
-            $imageFile = $form->get('imageFile')->getData();
-
-            if ($imageFile) {
-                $filename = uniqid() . '.' . $imageFile->guessExtension();
-                
-                $imageFile->move(
-                    $this->getParameter('kernel.project_dir') . '/public/uploads/sliders',
-                    $filename
-                );
-                $slider->setImageName($filename);
+            /** @var list<UploadedFile>|UploadedFile|null $files */
+            $files = $form->get('mediaFiles')->getData();
+            if (!\is_array($files)) {
+                $files = $files ? [$files] : [];
             }
 
-            $em->persist($slider);
-            $em->flush();
+            $uploadDir = $this->getParameter('kernel.project_dir') . self::UPLOAD_DIR;
+            if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+                $this->addFlash('danger', 'Impossible de créer le dossier d’upload.');
 
-            $this->addFlash('success', 'Slide ajoutée.');
+                return $this->redirectToRoute('admin_slider_new');
+            }
+
+            $baseTitle = trim((string) $form->get('title')->getData());
+            $isActive = (bool) $form->get('isActive')->getData();
+            $created = 0;
+
+            foreach ($files as $index => $file) {
+                if (!$file instanceof UploadedFile) {
+                    continue;
+                }
+
+                $mediaType = $this->resolveMediaType($file);
+                $ext = $file->guessExtension() ?: ($mediaType === Slider::TYPE_VIDEO ? 'mp4' : 'jpg');
+                $filename = uniqid('slider_', true) . '.' . $ext;
+                $file->move($uploadDir, $filename);
+
+                $slide = new Slider();
+                $slide->setImageName($filename);
+                $slide->setMediaType($mediaType);
+                $slide->setIsActive($isActive);
+                $title = $baseTitle !== ''
+                    ? ($created > 0 ? sprintf('%s (%d)', $baseTitle, $created + 1) : $baseTitle)
+                    : ($mediaType === Slider::TYPE_VIDEO ? 'Vidéo' : 'Image') . ' ' . ($index + 1);
+                $slide->setTitle($title);
+
+                $em->persist($slide);
+                ++$created;
+            }
+
+            if ($created === 0) {
+                $this->addFlash('danger', 'Aucun fichier valide n’a été uploadé.');
+
+                return $this->redirectToRoute('admin_slider_new');
+            }
+
+            $em->flush();
+            $this->addFlash('success', sprintf('%d média(s) ajouté(s) au slider.', $created));
+
             return $this->redirectToRoute('admin_slider_index');
         }
 
         return $this->render('admin/slider/new.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
     }
 
@@ -65,8 +99,8 @@ class AdminSliderController extends AbstractController
     public function delete(Request $request, Slider $slider, EntityManagerInterface $em): Response
     {
         if ($this->isCsrfTokenValid('delete' . $slider->getId(), $request->request->get('_token'))) {
-            $imagePath = $this->getParameter('kernel.project_dir') . '/public/uploads/sliders/' . $slider->getImageName();
-            if (file_exists($imagePath)) {
+            $imagePath = $this->getParameter('kernel.project_dir') . self::UPLOAD_DIR . '/' . $slider->getImageName();
+            if (is_file($imagePath)) {
                 unlink($imagePath);
             }
 
@@ -87,14 +121,22 @@ class AdminSliderController extends AbstractController
             return $this->redirectToRoute('admin_slider_index');
         }
 
-        // On inverse le statut actuel (si vrai devient faux, et inversement)
         $slider->setIsActive(!$slider->isActive());
-        
         $em->flush();
 
         $statusLabel = $slider->isActive() ? 'activé' : 'désactivé';
         $this->addFlash('success', "Le slide a été $statusLabel avec succès.");
 
         return $this->redirectToRoute('admin_slider_index');
+    }
+
+    private function resolveMediaType(UploadedFile $file): string
+    {
+        $mime = (string) $file->getMimeType();
+        if (str_starts_with($mime, 'video/')) {
+            return Slider::TYPE_VIDEO;
+        }
+
+        return Slider::TYPE_IMAGE;
     }
 }

@@ -7,16 +7,94 @@
     {{ include('admin/_page_header.html.twig', {
         eyebrow: 'Modération',
         title: 'Annonces validées',
-        lead: 'Triées des plus anciennes aux plus récentes — supprimez les annonces obsolètes si besoin.',
-        actions: '<span class="admin-badge">' ~ (annonces|length|cap999) ~ ' validée' ~ (annonces|length > 1 ? 's' : '') ~ '</span>'
+        lead: 'Supprimez les anciennes annonces déjà approuvées pour garder le catalogue à jour.',
+        actions: '<span class="admin-badge">' ~ (annonces|length|cap999) ~ ' affichée' ~ (annonces|length > 1 ? 's' : '') ~ '</span>'
     }) }}
+
+    <div class="admin-panel mb-3">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                <div>
+                    <h2 class="h6 fw-bold mb-1"><i class="bi bi-trash3 me-1 text-danger" aria-hidden="true"></i>Nettoyage des anciennes annonces</h2>
+                    <p class="small text-muted mb-0">Uniquement les annonces <strong>validées</strong> plus anciennes que la durée choisie. Saisissez un nombre de jours ou de mois.</p>
+                </div>
+                <form method="post" action="{{ path('admin_annonces_purge_old_approved') }}" class="d-flex flex-wrap align-items-end gap-2"
+                      onsubmit="var u=this.unit.value,v=this.value.value; return confirm('Supprimer définitivement toutes les annonces validées de plus de ' + v + ' ' + (u==='months'?'mois':'jours') + ' ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_purge_old_approved') }}">
+                    <div>
+                        <label class="form-label small text-muted mb-1" for="purge-value">Plus de</label>
+                        <input type="number" name="value" id="purge-value" class="form-control form-control-sm rounded-3" style="width:5.5rem"
+                               min="1" max="3650" value="{{ periodValue }}" required>
+                    </div>
+                    <div>
+                        <label class="form-label small text-muted mb-1" for="purge-unit">Unité</label>
+                        <select name="unit" id="purge-unit" class="form-select form-select-sm rounded-3">
+                            <option value="days" {{ periodUnit == 'days' ? 'selected' : '' }}>Jours</option>
+                            <option value="months" {{ periodUnit == 'months' ? 'selected' : '' }}>Mois</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">
+                        <i class="bi bi-trash3 me-1" aria-hidden="true"></i>Purger
+                    </button>
+                </form>
+            </div>
+
+            <form method="get" action="{{ path('admin_annonces_approved') }}" class="d-flex flex-wrap align-items-end gap-2 mt-3">
+                <div>
+                    <label class="form-label small text-muted mb-1" for="filter-value">Afficher plus de</label>
+                    <input type="number" name="value" id="filter-value" class="form-control form-control-sm rounded-3" style="width:5.5rem"
+                           min="1" max="3650" value="{{ periodValue }}" required>
+                </div>
+                <div>
+                    <label class="form-label small text-muted mb-1" for="filter-unit">Unité</label>
+                    <select name="unit" id="filter-unit" class="form-select form-select-sm rounded-3">
+                        <option value="days" {{ periodUnit == 'days' ? 'selected' : '' }}>Jours</option>
+                        <option value="months" {{ periodUnit == 'months' ? 'selected' : '' }}>Mois</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Filtrer</button>
+                {% if olderThanDays > 0 %}
+                    <span class="small text-muted align-self-center">≈ {{ olderThanDays }} j · {{ customCount|cap999 }} annonce(s)</span>
+                {% endif %}
+            </form>
+
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <a href="{{ path('admin_annonces_approved') }}" class="btn btn-sm rounded-pill {{ olderThanDays == 0 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">Toutes</a>
+                {% for days in [30, 60, 90, 180, 365] %}
+                    <a href="{{ path('admin_annonces_approved', { olderThan: days, unit: 'days', value: days }) }}"
+                       class="btn btn-sm rounded-pill {{ olderThanDays == days and periodUnit == 'days' ? 'btn-admin-primary' : 'btn-outline-secondary' }}">
+                        &gt; {{ days == 365 ? '1 an' : days ~ ' j' }}
+                        <span class="badge text-bg-light text-dark ms-1">{{ countsByAge[days]|cap999 }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {# Formulaire bulk hors tableau (évite formulaires imbriqués) #}
+    <form method="post" action="{{ path('admin_annonces_bulk_delete_approved') }}" id="bulk-delete-approved-form"
+          onsubmit="return confirm('Supprimer définitivement les annonces sélectionnées ?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin_bulk_delete_approved') }}">
+        <input type="hidden" name="olderThan" value="{{ olderThanDays }}">
+    </form>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+        <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" id="select-all-approved">
+            <label class="form-check-label small" for="select-all-approved">Tout sélectionner</label>
+        </div>
+        <button type="submit" form="bulk-delete-approved-form" class="btn btn-sm btn-outline-danger rounded-pill px-3" id="bulk-delete-btn" disabled>
+            <i class="bi bi-trash3 me-1" aria-hidden="true"></i>Supprimer la sélection
+        </button>
+    </div>
 
     <div class="admin-panel">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light text-muted small">
                     <tr>
-                        <th class="ps-3 py-3 border-0">Annonceur</th>
+                        <th class="ps-3 py-3 border-0" style="width: 2.5rem;"></th>
+                        <th class="py-3 border-0">Annonceur</th>
                         <th class="py-3 border-0">Titre</th>
                         <th class="py-3 border-0 d-none d-md-table-cell">Catégorie</th>
                         <th class="py-3 border-0">Prix</th>
@@ -27,7 +105,10 @@
                 <tbody>
                     {% for annonce in annonces %}
                         <tr>
-                            <td class="ps-3 small fw-semibold">{{ annonce.user.firstName }} {{ annonce.user.lastName }}</td>
+                            <td class="ps-3">
+                                <input class="form-check-input annonce-select" type="checkbox" name="ids[]" value="{{ annonce.id }}" form="bulk-delete-approved-form" aria-label="Sélectionner {{ annonce.title }}">
+                            </td>
+                            <td class="small fw-semibold">{{ annonce.user.firstName }} {{ annonce.user.lastName }}</td>
                             <td class="fw-bold">{{ annonce.title|u.truncate(40, '…') }}</td>
                             <td class="d-none d-md-table-cell"><span class="badge bg-soft-info text-dark">{{ annonce.category.name }}</span></td>
                             <td class="fw-semibold">{{ annonce.price|number_format(0, ',', ' ') }} MAD</td>
@@ -44,10 +125,41 @@
                             </td>
                         </tr>
                     {% else %}
-                        <tr><td colspan="6" class="text-center text-muted py-5">Aucune annonce validée.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted py-5">
+                            {% if olderThanDays > 0 %}
+                                Aucune annonce validée de plus de {{ olderThanDays == 365 ? '1 an' : olderThanDays ~ ' jours' }}.
+                            {% else %}
+                                Aucune annonce validée.
+                            {% endif %}
+                        </td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    <script>
+        (function () {
+            const selectAll = document.getElementById('select-all-approved');
+            const boxes = () => Array.from(document.querySelectorAll('.annonce-select'));
+            const bulkBtn = document.getElementById('bulk-delete-btn');
+            const sync = () => {
+                const list = boxes();
+                const checked = list.filter((b) => b.checked).length;
+                if (bulkBtn) bulkBtn.disabled = checked === 0;
+                if (selectAll && list.length) {
+                    selectAll.checked = checked === list.length;
+                    selectAll.indeterminate = checked > 0 && checked < list.length;
+                }
+            };
+            selectAll?.addEventListener('change', () => {
+                boxes().forEach((b) => { b.checked = selectAll.checked; });
+                sync();
+            });
+            document.addEventListener('change', (e) => {
+                if (e.target.classList?.contains('annonce-select')) sync();
+            });
+            sync();
+        })();
+    </script>
 {% endblock %}

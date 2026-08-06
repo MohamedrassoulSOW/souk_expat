@@ -83,4 +83,50 @@ final class MessageRetentionService
             'cutoff' => $cutoff,
         ];
     }
+
+    /**
+     * Compteurs pour l’UI admin (sans suppression).
+     *
+     * @return array<int, int> days => message count
+     */
+    public function countByAgeBuckets(array $daysList = [7, 14, 30, 60, 90]): array
+    {
+        $counts = [];
+        foreach ($daysList as $days) {
+            $days = (int) $days;
+            $cutoff = new \DateTimeImmutable(sprintf('-%d days', max(1, $days)));
+            $counts[$days] = $this->messageRepository->countCreatedBefore($cutoff);
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Supprime une conversation entière (messages + fichiers legacy + thread).
+     */
+    public function deleteThreadCompletely(\App\Entity\Thread $thread): int
+    {
+        $uploadRoot = $this->projectDir . '/public/uploads/messages';
+        $deleted = 0;
+
+        foreach ($thread->getMessagesAsThread()->toArray() as $message) {
+            if (!$message instanceof Message) {
+                continue;
+            }
+            $filename = $message->getImageFilename();
+            if ($filename) {
+                $path = $uploadRoot . '/' . $filename;
+                if (is_file($path)) {
+                    @unlink($path);
+                }
+            }
+            $this->em->remove($message);
+            ++$deleted;
+        }
+
+        $this->em->remove($thread);
+        $this->em->flush();
+
+        return $deleted;
+    }
 }

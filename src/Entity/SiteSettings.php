@@ -107,6 +107,9 @@ class SiteSettings
     private ?string $legalExtra = null;
 
     #[ORM\Column]
+    private bool $purgeMessagesEnabled = true;
+
+    #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
 
     public function __construct()
@@ -257,4 +260,7 @@ class SiteSettings
 
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
     public function touch(): self { $this->updatedAt = new \DateTimeImmutable(); return $this; }
+
+    public function isPurgeMessagesEnabled(): bool { return $this->purgeMessagesEnabled; }
+    public function setPurgeMessagesEnabled(bool $enabled): self { $this->purgeMessagesEnabled = $enabled; return $this; }
 }

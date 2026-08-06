@@ -15,7 +15,11 @@
                     <i class="bi bi-info-circle me-2"></i>
                     Vous êtes connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>. 
                     <br>
-                    <a href="{{ logout_path() }}" class="alert-link">Se déconnecter</a>
+                    <a href="{{ logout_path() }}" class="alert-link" data-turbo="false"
+                       onclick="event.preventDefault(); document.getElementById('logout-from-login').submit();">Se déconnecter</a>
+                    <form id="logout-from-login" action="{{ path('app_logout') }}" method="post" class="d-none" data-turbo="false">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                    </form>
                 </div>
             {% endif %}
 
@@ -23,7 +27,7 @@
                 {# Header de connexion #}
                 <div class="p-4 text-center text-white" style="background: linear-gradient(135deg, #4B79A1 0%, #1B2E4B 100%);">
                     <div class="d-inline-flex align-items-center justify-content-center mb-3">
-                        <img src="{{ asset('logo-souk-expat.png') }}" alt="SoukExpat" width="160" height="88" style="width: 160px; height: auto; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25));">
+                        <img src="{{ asset('logo-souk-expat-blanc.png') }}" alt="SoukExpat" width="160" height="88" style="width: 160px; height: auto; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25));">
                     </div>
                     <h4 class="fw-bold mb-0">Bon retour !</h4>
                     <p class="small mb-0 opacity-75">Connectez-vous à SoukExpat</p>
