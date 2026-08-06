@@ -1,0 +1,3 @@
+node_modules/
+package-lock.json
+# Garder les PDF / PPTX générés versionnés pour les présentations

@@ -1,0 +1,601 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espace partenaires — {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+{# Imprimer / PDF / PowerPoint — réservé back-office #}
+{% if can_export_docs|default(false) %}
+<aside class="partner-actions no-print" aria-label="Actions documents partenaires">
+    <div class="container">
+        <div class="partner-actions__inner">
+            <div class="partner-actions__label">
+                <i class="bi bi-briefcase-fill" aria-hidden="true"></i>
+                <span>Documents partenaires</span>
+            </div>
+            <div class="partner-actions__btns">
+                <button type="button" class="btn btn-partner btn-partner--print" onclick="window.print()">
+                    <i class="bi bi-printer" aria-hidden="true"></i> Imprimer
+                </button>
+                {% if has_pdf %}
+                    <a href="{{ path('app_partners_pdf') }}" class="btn btn-partner btn-partner--pdf" data-turbo="false">
+                        <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> PDF
+                    </a>
+                {% endif %}
+                {% if has_pptx %}
+                    <a href="{{ path('app_partners_pptx') }}" class="btn btn-partner btn-partner--pptx" data-turbo="false">
+                        <i class="bi bi-file-earmark-slides" aria-hidden="true"></i> PowerPoint
+                    </a>
+                {% endif %}
+                <a href="{{ path('app_dashboard') }}" class="btn btn-partner btn-partner--contact">
+                    <i class="bi bi-speedometer2" aria-hidden="true"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</aside>
+{% endif %}
+
+<article class="partner-doc" id="partner-doc">
+    <header class="partner-doc__cover">
+        <div class="container">
+            <img class="partner-doc__logo" src="{{ asset('logo-souk-expat-blanc.png') }}" alt="{{ site ? site.siteName : 'SoukExpat' }}" width="200" height="90" decoding="async">
+            <p class="partner-doc__eyebrow">Dossier partenaires</p>
+            <h1 class="partner-doc__title">{{ site ? site.siteName : 'SoukExpat' }}</h1>
+            <p class="partner-doc__tagline">{{ site ? site.tagline : 'Le Marché Mondial des Expatriés' }}</p>
+            <p class="partner-doc__hero">{{ site ? site.heroTitle : 'Trouvez tout, partout.' }}</p>
+            <p class="partner-doc__sub">Présentation complète de la plateforme web — fonctionnalités, parcours, confiance, technique et opportunités de collaboration.</p>
+            <p class="partner-doc__meta">soukexpat.com · Document confidentiel · {{ "now"|date("d/m/Y") }}</p>
+        </div>
+    </header>
+
+    <div class="container partner-doc__body">
+
+        <section class="partner-sec" id="resume">
+            <h2>1. Résumé exécutif</h2>
+            <p>
+                <strong>{{ site ? site.siteName : 'SoukExpat' }}</strong> est une marketplace communautaire dédiée aux
+                expatriés et résidents au Maroc. Elle permet d’acheter, vendre et échanger des biens ou services
+                via des annonces modérées, avec mise en relation directe entre membres (messagerie interne et WhatsApp).
+            </p>
+            <ul>
+                <li>Site public : <strong>https://soukexpat.com</strong></li>
+                <li>Modèle : <strong>mise en relation</strong> (pas de paiement ni livraison intégrés)</li>
+                <li>Expérience responsive + <strong>PWA installable</strong> (desktop / mobile)</li>
+                <li>API mobile <code>/api/v1</code> (JWT) pour clients futurs</li>
+                <li>Valeurs affichées : Sécurité · Communauté · Rapidité</li>
+            </ul>
+            {% if site and site.footerText %}
+                <blockquote class="partner-quote">{{ site.footerText }}</blockquote>
+            {% endif %}
+        </section>
+
+        <section class="partner-sec" id="vision">
+            <h2>2. Vision &amp; positionnement</h2>
+            <p>
+                Faciliter la vie des expatriés en centralisant les annonces dans un espace clair, modéré et pensé
+                pour le contexte marocain (villes, catégories, contact rapide).
+            </p>
+            <ul>
+                <li>Audience : expatriés et communauté locale intéressée</li>
+                <li>Promesse : simplicité, confiance et proximité</li>
+                <li>Différenciation : modération avant publication + messagerie + WhatsApp</li>
+            </ul>
+        </section>
+
+        <section class="partner-sec" id="probleme">
+            <h2>3. Problème &amp; solution</h2>
+            <div class="partner-grid-2">
+                <div class="partner-card partner-card--warn">
+                    <h3>Problème</h3>
+                    <ul>
+                        <li>Annonces dispersées (groupes, réseaux sociaux)</li>
+                        <li>Peu de confiance et peu de modération</li>
+                        <li>Contact difficile ou peu structuré</li>
+                        <li>Pas d’outil pensé pour les expatriés au Maroc</li>
+                    </ul>
+                </div>
+                <div class="partner-card partner-card--ok">
+                    <h3>Solution SoukExpat</h3>
+                    <ul>
+                        <li>Marketplace centralisée et claire</li>
+                        <li>Annonces validées avant mise en ligne</li>
+                        <li>Messagerie + WhatsApp intégrés</li>
+                        <li>Filtres par catégorie et ville</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="partner-sec" id="cibles">
+            <h2>4. Pour qui ?</h2>
+            <div class="partner-grid-3">
+                <div class="partner-card">
+                    <h3>Acheteurs</h3>
+                    <p>Recherchent un bien ou un service localement, filtrent par ville/catégorie, contactent le vendeur.</p>
+                </div>
+                <div class="partner-card">
+                    <h3>Vendeurs</h3>
+                    <p>Publient une annonce avec photos, suivent la validation, gèrent leurs offres et répondent aux messages.</p>
+                </div>
+                <div class="partner-card">
+                    <h3>Partenaires</h3>
+                    <p>Visibilité auprès d’une audience expatriée (sponsoring, campagnes, distribution co-brandée).</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="partner-sec" id="parcours">
+            <h2>5. Parcours utilisateurs</h2>
+            <h3>Acheteur</h3>
+            <ol class="partner-steps">
+                <li><strong>Découvrir</strong> — Accueil, recherche, filtres catégorie &amp; ville</li>
+                <li><strong>Consulter</strong> — Fiche annonce, photos, profil vendeur public</li>
+                <li><strong>Contacter</strong> — Messagerie SoukExpat et/ou WhatsApp</li>
+                <li><strong>Conclure</strong> — Échange hors plateforme, en personne</li>
+            </ol>
+            <h3>Vendeur</h3>
+            <ol class="partner-steps">
+                <li><strong>S’inscrire</strong> — Compte + profil (WhatsApp optionnel)</li>
+                <li><strong>Publier</strong> — Titre, prix MAD, photos, catégorie, ville</li>
+                <li><strong>Modération</strong> — pending → approved / rejected + notification</li>
+                <li><strong>Échanger</strong> — Messages / WhatsApp, suivi dans « Mes annonces »</li>
+            </ol>
+        </section>
+
+        <section class="partner-sec" id="pages">
+            <h2>6. Ce qui se trouve sur le site</h2>
+            <p>Cartographie des espaces publics et privés de la plateforme.</p>
+
+            <h3>Site public</h3>
+            <table class="partner-table">
+                <thead>
+                    <tr><th>Page / module</th><th>Contenu</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Accueil <code>/</code></td><td>Slider, catégories, recherche, grille d’annonces approuvées</td></tr>
+                    <tr><td>Annonces <code>/annonce</code></td><td>Catalogue, filtres (texte, catégorie, ville), pagination</td></tr>
+                    <tr><td>Fiche annonce</td><td>Détail, photos, prix MAD, contact messagerie / WhatsApp</td></tr>
+                    <tr><td>Profil vendeur <code>/vendeur/{id}</code></td><td>Vitrine publique des annonces du membre</td></tr>
+                    <tr><td>À propos</td><td>Présentation de la marque et valeurs</td></tr>
+                    <tr><td>Comment ça marche</td><td>Guide des étapes acheteur / vendeur</td></tr>
+                    <tr><td>FAQ</td><td>Questions fréquentes (contenu éditable)</td></tr>
+                    <tr><td>Blog &amp; conseils</td><td>Contenus éditoriaux</td></tr>
+                    <tr><td>Contact</td><td>Formulaire support + email / WhatsApp</td></tr>
+                    <tr><td>Mentions légales</td><td>Cadre juridique et responsabilités</td></tr>
+                    <tr><td>Inscription / Connexion</td><td>Compte membre, mot de passe oublié</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Espace membre (connecté)</h3>
+            <table class="partner-table">
+                <thead>
+                    <tr><th>Module</th><th>Capacités</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Publier une annonce</td><td>Création avec photos, catégorie, ville, prix</td></tr>
+                    <tr><td>Mes annonces</td><td>Suivi, édition, statut de modération</td></tr>
+                    <tr><td>Messagerie</td><td>Threads liés aux annonces (texte, photo, position)</td></tr>
+                    <tr><td>Profil</td><td>Infos personnelles, avatar, WhatsApp, mot de passe</td></tr>
+                    <tr><td>Notifications</td><td>Validation / refus d’annonces</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Back-office (éditeur / admin)</h3>
+            <table class="partner-table">
+                <thead>
+                    <tr><th>Module</th><th>Capacités</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Dashboard</td><td>Vue d’ensemble de l’activité</td></tr>
+                    <tr><td>Modération annonces</td><td>Pending / approved / rejected</td></tr>
+                    <tr><td>Analytics</td><td>KPIs + exports Excel / Word / PDF</td></tr>
+                    <tr><td>Catégories &amp; villes</td><td>Catalogue géographique et thématique</td></tr>
+                    <tr><td>Slider d’accueil</td><td>Bannières image / vidéo</td></tr>
+                    <tr><td>Contacts &amp; chats</td><td>Inbox support, supervision conversations</td></tr>
+                    <tr><td>Paramètres du site</td><td>Textes, FAQ, réseaux, WhatsApp public</td></tr>
+                    <tr><td>Utilisateurs (admin)</td><td>Rôles, blocage</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="partner-sec" id="catalogue">
+            <h2>7. Catalogue actuel</h2>
+            <div class="partner-grid-2">
+                <div>
+                    <h3>Catégories</h3>
+                    {% if categories|length > 0 %}
+                        <ul class="partner-chips">
+                            {% for cat in categories %}
+                                <li>{{ cat.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">Aucune catégorie configurée pour le moment.</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <h3>Villes</h3>
+                    {% if cities|length > 0 %}
+                        <ul class="partner-chips">
+                            {% for city in cities %}
+                                <li>{{ city.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">Aucune ville configurée pour le moment.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <p class="partner-note">Les catégories et villes sont gérées dynamiquement depuis le back-office et évoluent avec le catalogue.</p>
+        </section>
+
+        <section class="partner-sec" id="features">
+            <h2>8. Fonctionnalités détaillées</h2>
+            <ul>
+                <li><strong>Annonces</strong> — photos, prix en MAD, description, catégorie, ville, cycle draft → pending → approved / rejected</li>
+                <li><strong>Recherche</strong> — mots-clés, filtres catégorie &amp; ville, annonces approuvées uniquement en public</li>
+                <li><strong>Messagerie</strong> — conversations acheteur–vendeur liées à une annonce (texte, image, géolocalisation)</li>
+                <li><strong>WhatsApp</strong> — depuis le profil, l’annonce et le bouton flottant du site</li>
+                <li><strong>Sécurité utilisateur</strong> — popup rappelant de ne pas payer avant réception ; plateforme = mise en relation seulement</li>
+                <li><strong>PWA</strong> — installable sur desktop, Android et iOS</li>
+                <li><strong>API REST</strong> — <code>/api/v1</code> authentifiée JWT (annonces, catalogue, messagerie, média)</li>
+                <li><strong>Thème clair / sombre</strong> — bascule disponible dans la navigation</li>
+            </ul>
+        </section>
+
+        <section class="partner-sec" id="confiance">
+            <h2>9. Confiance &amp; responsabilité</h2>
+            <p>
+                SoukExpat n’est <strong>pas</strong> une marketplace de paiement. Elle ne gère ni les paiements,
+                ni les livraisons, ni les litiges entre particuliers. Son rôle est exclusivement de mettre les membres en contact.
+            </p>
+            <ul>
+                <li>Modération humaine des annonces avant publication</li>
+                <li>Disclaimer de sécurité affiché aux utilisateurs</li>
+                <li>Purge des messages de discussion après environ 30 jours</li>
+                <li>Signalement possible via le formulaire de contact</li>
+            </ul>
+        </section>
+
+        <section class="partner-sec" id="tech">
+            <h2>10. Architecture technique</h2>
+            <table class="partner-table">
+                <thead>
+                    <tr><th>Couche</th><th>Technologie</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Backend</td><td>Symfony 8 / PHP 8.4</td></tr>
+                    <tr><td>Base de données</td><td>MySQL / MariaDB (Doctrine ORM)</td></tr>
+                    <tr><td>Frontend</td><td>Twig, Bootstrap, CSS custom, Stimulus / Turbo</td></tr>
+                    <tr><td>Auth web</td><td>Session Symfony</td></tr>
+                    <tr><td>Auth API</td><td>JWT Bearer</td></tr>
+                    <tr><td>Mobile</td><td>PWA + API pour apps futures</td></tr>
+                    <tr><td>Production</td><td>HTTPS — soukexpat.com</td></tr>
+                </tbody>
+            </table>
+            <h3>Rôles</h3>
+            <ul>
+                <li><code>ROLE_USER</code> — membre (acheteur et vendeur)</li>
+                <li><code>ROLE_EDITOR</code> — modération et contenus</li>
+                <li><code>ROLE_ADMIN</code> — administration complète (+ utilisateurs)</li>
+            </ul>
+        </section>
+
+        <section class="partner-sec" id="partenariat">
+            <h2>11. Opportunités de partenariat</h2>
+            <ul>
+                <li>Visibilité / sponsoring (slider d’accueil, campagnes)</li>
+                <li>Opérations co-brandées vers l’audience expatriée au Maroc</li>
+                <li>Distribution digitale (web, PWA, apps via API)</li>
+                <li>Partenariats sectoriels : immobilier, mobilité, services, lifestyle</li>
+                <li>Reporting d’activité via analytics back-office (exports Excel / Word / PDF)</li>
+            </ul>
+        </section>
+
+        <section class="partner-sec" id="pourquoi">
+            <h2>12. Pourquoi collaborer maintenant ?</h2>
+            <ul>
+                <li>Produit déjà en ligne et utilisable</li>
+                <li>Positionnement de niche clair (expatriés au Maroc)</li>
+                <li>Expérience mobile-first + installable</li>
+                <li>Socle technique moderne et évolutif</li>
+                <li>Message de confiance transparent pour la communauté</li>
+            </ul>
+        </section>
+
+        <section class="partner-sec" id="suite">
+            <h2>13. Prochaines étapes</h2>
+            <ol class="partner-steps">
+                <li>Visite guidée de soukexpat.com</li>
+                <li>Démonstration des parcours acheteur / vendeur / admin</li>
+                <li>Atelier de définition du format de partenariat</li>
+                <li>Feuille de route et indicateurs de succès</li>
+            </ol>
+        </section>
+
+        <section class="partner-sec partner-sec--contact" id="contact">
+            <h2>Contact</h2>
+            <p>
+                <strong>Site :</strong> <a href="https://soukexpat.com">https://soukexpat.com</a><br>
+                {% if contact_email %}
+                    <strong>Email :</strong> <a href="mailto:{{ contact_email }}">{{ contact_email }}</a><br>
+                {% endif %}
+                <strong>Sur le site :</strong> formulaire Contact et WhatsApp
+            </p>
+            <p class="partner-doc__closing">{{ site ? site.siteName : 'SoukExpat' }} — {{ site ? site.tagline : 'Le Marché Mondial des Expatriés' }}</p>
+        </section>
+    </div>
+</article>
+
+{{ include('layouts/footer.html.twig') }}
+
+<style>
+    .partner-actions {
+        position: sticky;
+        top: var(--main-nav-height, 5.25rem);
+        z-index: 1020;
+        background: rgba(27, 46, 75, 0.96);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(75, 121, 161, 0.35);
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.18);
+    }
+    .partner-actions__inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem 1rem;
+        padding: 0.7rem 0;
+    }
+    .partner-actions__label {
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .partner-actions__btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .btn-partner {
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 0.45rem 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid transparent;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform .15s ease, background .15s ease;
+    }
+    .btn-partner:hover { transform: translateY(-1px); }
+    .btn-partner--print { background: #fff; color: #1B2E4B; }
+    .btn-partner--pdf { background: #b91c1c; color: #fff; }
+    .btn-partner--pptx { background: #c2410c; color: #fff; }
+    .btn-partner--contact { background: #4B79A1; color: #fff; }
+
+    .partner-doc__cover {
+        background: linear-gradient(145deg, #1B2E4B 0%, #2a4a6e 55%, #1A6F88 100%);
+        color: #fff;
+        padding: 3rem 0 2.5rem;
+    }
+    .partner-doc__logo {
+        height: 72px;
+        width: auto;
+        margin-bottom: 1.25rem;
+        filter: drop-shadow(0 2px 8px rgba(0,0,0,.25));
+    }
+    .partner-doc__eyebrow {
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        font-size: .75rem;
+        opacity: .85;
+        margin-bottom: .5rem;
+    }
+    .partner-doc__title {
+        font-size: clamp(2rem, 4vw, 2.75rem);
+        font-weight: 800;
+        margin-bottom: .35rem;
+    }
+    .partner-doc__tagline {
+        color: #93C5E4;
+        font-size: 1.15rem;
+        margin-bottom: .75rem;
+    }
+    .partner-doc__hero {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin-bottom: .75rem;
+    }
+    .partner-doc__sub {
+        max-width: 40rem;
+        opacity: .92;
+        margin-bottom: 1rem;
+    }
+    .partner-doc__meta {
+        font-size: .85rem;
+        opacity: .7;
+        margin: 0;
+    }
+
+    .partner-doc__body {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        max-width: 920px;
+    }
+    .partner-sec {
+        margin-bottom: 2.25rem;
+        break-inside: avoid;
+    }
+    .partner-sec h2 {
+        color: #1B2E4B;
+        font-size: 1.45rem;
+        font-weight: 800;
+        margin-bottom: .85rem;
+        padding-bottom: .4rem;
+        border-bottom: 3px solid #4B79A1;
+        display: inline-block;
+        min-width: 8rem;
+    }
+    .partner-sec h3 {
+        color: #4B79A1;
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin: 1rem 0 .5rem;
+    }
+    .partner-sec p, .partner-sec li {
+        color: var(--text-strong, #0f172a);
+        line-height: 1.55;
+    }
+    .partner-quote {
+        margin: 1rem 0 0;
+        padding: 1rem 1.15rem;
+        border-left: 4px solid #4B79A1;
+        background: rgba(75, 121, 161, 0.08);
+        border-radius: 0 12px 12px 0;
+        font-style: italic;
+    }
+    .partner-grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    .partner-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    @media (max-width: 768px) {
+        .partner-grid-2, .partner-grid-3 { grid-template-columns: 1fr; }
+    }
+    .partner-card {
+        background: var(--surface, #fff);
+        border: 1px solid rgba(75, 121, 161, 0.18);
+        border-radius: 14px;
+        padding: 1.1rem 1.2rem;
+    }
+    .partner-card h3 { margin-top: 0; }
+    .partner-card--warn { border-top: 3px solid #b45309; }
+    .partner-card--ok { border-top: 3px solid #4B79A1; }
+    .partner-steps { padding-left: 1.2rem; }
+    .partner-steps li { margin-bottom: .4rem; }
+    .partner-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .92rem;
+        margin: .5rem 0 1rem;
+    }
+    .partner-table th, .partner-table td {
+        border: 1px solid rgba(27, 46, 75, 0.12);
+        padding: .55rem .7rem;
+        text-align: left;
+        vertical-align: top;
+    }
+    .partner-table th {
+        background: #1B2E4B;
+        color: #fff;
+        font-weight: 600;
+    }
+    .partner-table tr:nth-child(even) td {
+        background: rgba(75, 121, 161, 0.06);
+    }
+    .partner-chips {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: .45rem;
+    }
+    .partner-chips li {
+        background: rgba(75, 121, 161, 0.12);
+        color: #1B2E4B;
+        font-weight: 600;
+        font-size: .85rem;
+        padding: .35rem .7rem;
+        border-radius: 999px;
+    }
+    .partner-note {
+        font-size: .9rem;
+        color: #64748b !important;
+        margin-top: .75rem;
+    }
+    .partner-doc__closing {
+        font-weight: 700;
+        color: #1B2E4B !important;
+        margin-top: 1rem;
+    }
+    .partner-sec code {
+        font-size: .85em;
+        background: rgba(27, 46, 75, 0.06);
+        padding: .1rem .35rem;
+        border-radius: 4px;
+    }
+
+    @media print {
+        .no-print,
+        .modern-nav,
+        .footer-modern,
+        .whatsapp-fab,
+        [data-whatsapp-fab],
+        .theme-toggle,
+        aside.partner-actions {
+            display: none !important;
+        }
+        body {
+            background: #fff !important;
+            padding-top: 0 !important;
+        }
+        .partner-doc__cover {
+            background: #1B2E4B !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            padding: 1.5rem 0;
+        }
+        .partner-doc__body {
+            max-width: 100%;
+            padding-top: 1rem;
+        }
+        .partner-sec {
+            page-break-inside: avoid;
+        }
+        .partner-table th {
+            background: #1B2E4B !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        a[href]::after { content: none !important; }
+    }
+</style>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% if auto_print %}
+    <script>
+        (function () {
+            var ran = false;
+            function go() {
+                if (ran) return;
+                ran = true;
+                setTimeout(function () { window.print(); }, 400);
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', go);
+            } else {
+                go();
+            }
+            document.addEventListener('turbo:load', go);
+        })();
+    </script>
+    {% endif %}
+{% endblock %}

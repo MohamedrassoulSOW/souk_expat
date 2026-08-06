@@ -57,6 +57,8 @@ security:
         - { path: ^/api/v1/cities, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/v1/me, roles: ROLE_USER }
         - { path: ^/api, roles: ROLE_USER }
+        # Espace partenaires (dossier / impression / PDF / PPTX) : back-office uniquement
+        - { path: ^/partenaires, roles: ROLE_EDITOR }
         # Réservé au super-admin : tout ce qui est sous /admin/user
         - { path: ^/admin/user, roles: ROLE_ADMIN }
         # Le reste du back-office (annonces, contacts, contenus…) : admin ou éditeur

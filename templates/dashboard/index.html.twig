@@ -5,20 +5,9 @@
 
 {% block admin_main %}
     {% set actions %}
-        <a href="{{ path('admin_analytics') }}" class="btn btn-admin-primary rounded-pill px-3">
-            <i class="bi bi-graph-up-arrow me-1" aria-hidden="true"></i>Rapport & analytics
-        </a>
         <button type="button" class="btn btn-warning rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalNotifAll">
             <i class="bi bi-megaphone me-1" aria-hidden="true"></i>Alerte globale
         </button>
-        <a href="{{ path('app_home') }}" class="btn btn-light border rounded-pill px-3 bg-white">
-            <i class="bi bi-eye me-1" aria-hidden="true"></i>Voir le site
-        </a>
-        {{ include('security/_logout_button.html.twig', {
-            variant: 'sidebar-footer',
-            form_class: 'd-inline-block m-0',
-            btn_class: 'px-3'
-        }) }}
     {% endset %}
 
     {{ include('admin/_page_header.html.twig', {
@@ -93,9 +82,6 @@
                     <h2 class="h6 fw-bold mb-0">Accès rapides</h2>
                 </div>
                 <div class="card-body p-3 d-grid gap-2">
-                    <a href="{{ path('admin_analytics') }}" class="btn btn-outline-primary rounded-pill text-start">
-                        <i class="bi bi-graph-up-arrow me-2" aria-hidden="true"></i>Rapport & analytics
-                    </a>
                     <a href="{{ path('admin_annonces_pending') }}" class="btn btn-outline-warning rounded-pill text-start">
                         <i class="bi bi-clock-history me-2" aria-hidden="true"></i>Modérer les annonces
                     </a>
@@ -104,18 +90,6 @@
                     </a>
                     <a href="{{ path('app_admin_chats_index') }}" class="btn btn-outline-danger rounded-pill text-start">
                         <i class="bi bi-chat-left-dots me-2" aria-hidden="true"></i>Nettoyer messages discussions
-                    </a>
-                    <a href="{{ path('app_admin_contact_index') }}" class="btn btn-outline-secondary rounded-pill text-start">
-                        <i class="bi bi-inbox me-2" aria-hidden="true"></i>Messages contact
-                    </a>
-                    <a href="{{ path('app_category') }}" class="btn btn-outline-secondary rounded-pill text-start">
-                        <i class="bi bi-tags me-2" aria-hidden="true"></i>Catégories
-                    </a>
-                    <a href="{{ path('admin_slider_index') }}" class="btn btn-outline-secondary rounded-pill text-start">
-                        <i class="bi bi-images me-2" aria-hidden="true"></i>Slider accueil
-                    </a>
-                    <a href="{{ path('admin_site_settings') }}" class="btn btn-outline-secondary rounded-pill text-start">
-                        <i class="bi bi-sliders me-2" aria-hidden="true"></i>Paramètres du site
                     </a>
                 </div>
             </div>
