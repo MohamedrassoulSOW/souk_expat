@@ -3754,6 +3754,10 @@ body.admin-mobile-menu-open {
     color: #b91c1c;
 }
 
+.user-listing-stats--compact {
+    flex-wrap: nowrap;
+}
+
 .user-listing-stats--compact .user-listing-stat {
     padding: 0.15rem 0.4rem;
     font-size: 0.68rem;

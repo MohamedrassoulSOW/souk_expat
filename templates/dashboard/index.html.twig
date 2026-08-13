@@ -78,7 +78,7 @@
     </div>
 
     <div class="row g-3 mb-4">
-        <div class="col-12 col-lg-4">
+        <div class="col-12 col-lg-3">
             <div class="admin-panel h-100">
                 <div class="card-header p-3">
                     <h2 class="h6 fw-bold mb-0">Accès rapides</h2>
@@ -99,7 +99,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-lg-9">
             {% if is_granted('ROLE_ADMIN') %}
                 <div class="admin-panel">
                     <div class="card-header p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
@@ -112,8 +112,8 @@
                                 <thead class="bg-light text-muted small">
                                     <tr>
                                         <th class="ps-3 py-3 border-0">Utilisateur</th>
-                                        <th class="py-3 border-0 d-none d-lg-table-cell">Email</th>
-                                        <th class="py-3 border-0">Annonces</th>
+                                        <th class="py-3 border-0 d-none d-xl-table-cell">Email</th>
+                                        <th class="py-3 border-0 text-nowrap">Annonces</th>
                                         <th class="py-3 border-0 text-end pe-3">Actions</th>
                                     </tr>
                                 </thead>
@@ -129,12 +129,12 @@
                                                     </div>
                                                     <div class="min-w-0">
                                                         <div class="fw-bold text-truncate">{{ user.firstName }} {{ user.lastName }}</div>
-                                                        <div class="small text-muted d-lg-none text-truncate">{{ user.email }}</div>
+                                                        <div class="small text-muted d-xl-none text-truncate">{{ user.email }}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="text-muted small d-none d-lg-table-cell">{{ user.email }}</td>
-                                            <td>
+                                            <td class="text-muted small d-none d-xl-table-cell">{{ user.email }}</td>
+                                            <td class="text-nowrap">
                                                 {{ include('admin/_user_listing_stats.html.twig', { stats: counts, compact: true }) }}
                                             </td>
                                             <td class="text-end pe-3">
