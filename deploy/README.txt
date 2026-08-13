@@ -30,6 +30,10 @@ SoukExpat — mise en production (Hostinger)
    - Google OAuth : deploy/GOOGLE_OAUTH.txt (+ GOOGLE_CLIENT_ID/SECRET dans .env.local)
    - Cron purge messages (optionnel) : voir deploy/cron.example
    - HTTPS obligatoire (PWA + cookies)
-   - Après chaque déploiement code : php bin/console cache:clear --env=prod
+   - Après chaque déploiement code :
+       php bin/console asset-map:compile --env=prod
+       php bin/console cache:clear --env=prod
+   - Si le site s’affiche sans CSS : le .htaccess racine ne doit PAS bloquer
+     /vendor/bootstrap/ (voir règle RewriteRule vendor/(bootstrap|…) → public/vendor/)
 
 Ne jamais committer / uploader un .env.local avec de vrais secrets dans Git.

@@ -1,0 +1,532 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Rapport des annonces | SoukExpat{% endblock %}
+{% block admin_mobile_title %}Rapport annonces{% endblock %}
+
+{% set k = report.kpis %}
+{% set c = report.charts %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .analytics-kpi {
+            background: var(--surface, #fff);
+            border: 1px solid var(--border-soft, rgba(15,23,42,.08));
+            border-radius: 1rem;
+            padding: 1rem 1.1rem;
+            height: 100%;
+        }
+        .analytics-kpi__label {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: .35rem;
+        }
+        .analytics-kpi__value {
+            font-size: 1.55rem;
+            font-weight: 800;
+            letter-spacing: -.03em;
+            color: #0f172a;
+            line-height: 1.1;
+        }
+        .analytics-kpi__hint {
+            font-size: .78rem;
+            color: #94a3b8;
+            margin-top: .25rem;
+        }
+        .analytics-chart-card {
+            background: var(--surface, #fff);
+            border: 1px solid var(--border-soft, rgba(15,23,42,.08));
+            border-radius: 1rem;
+            padding: 1.1rem 1.15rem 1.25rem;
+            height: 100%;
+        }
+        .analytics-chart-card h2 {
+            font-size: .95rem;
+            font-weight: 800;
+            margin: 0 0 .85rem;
+        }
+        .analytics-chart-wrap {
+            position: relative;
+            height: 260px;
+        }
+        .analytics-chart-wrap--lg { height: 300px; }
+        .analytics-section-note {
+            font-size: .82rem;
+            color: #64748b;
+            margin: -.35rem 0 .85rem;
+            line-height: 1.4;
+        }
+        [data-bs-theme="dark"] .analytics-kpi__value { color: #f8fafc; }
+        [data-bs-theme="dark"] .analytics-kpi,
+        [data-bs-theme="dark"] .analytics-chart-card {
+            background: var(--surface);
+            border-color: var(--border-soft);
+        }
+        [data-bs-theme="dark"] .analytics-section-note { color: #94a3b8; }
+        .analytics-insight {
+            background: rgba(75, 121, 161, 0.08);
+            border-radius: .85rem;
+            padding: .75rem 1rem;
+        }
+    </style>
+{% endblock %}
+
+{% block admin_main %}
+    {% set actions %}
+        <div class="d-flex flex-wrap align-items-end gap-2">
+            <form method="get" action="{{ path('admin_annonces_rapport') }}" class="d-flex flex-wrap align-items-end gap-2">
+                <div>
+                    <label class="form-label small text-muted mb-1" for="rapport-value">Période</label>
+                    <input type="number" class="form-control form-control-sm rounded-3" style="width: 5.5rem;"
+                           id="rapport-value" name="value" min="1"
+                           max="{{ periodUnit == 'days' ? 3650 : 60 }}"
+                           value="{{ periodValue }}" required>
+                </div>
+                <div>
+                    <label class="form-label small text-muted mb-1" for="rapport-unit">Unité</label>
+                    <select class="form-select form-select-sm rounded-3" id="rapport-unit" name="unit">
+                        <option value="days" {{ periodUnit == 'days' ? 'selected' : '' }}>Jours</option>
+                        <option value="months" {{ periodUnit == 'months' ? 'selected' : '' }}>Mois</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-sm btn-admin-primary rounded-pill px-3">
+                    <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>Appliquer
+                </button>
+            </form>
+            <a href="{{ path('admin_analytics') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                Rapport site
+            </a>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false" id="rapport-export-btn">
+                    <i class="bi bi-download me-1" aria-hidden="true"></i>Télécharger
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="rapport-export-btn">
+                    <li>
+                        <a class="dropdown-item" href="{{ path('admin_annonces_rapport_export', { format: 'excel', unit: periodUnit, value: periodValue }) }}">
+                            <i class="bi bi-file-earmark-excel me-2 text-success" aria-hidden="true"></i>Excel (.xlsx)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ path('admin_annonces_rapport_export', { format: 'word', unit: periodUnit, value: periodValue }) }}">
+                            <i class="bi bi-file-earmark-word me-2 text-primary" aria-hidden="true"></i>Word (.docx)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ path('admin_annonces_rapport_export', { format: 'powerpoint', unit: periodUnit, value: periodValue }) }}">
+                            <i class="bi bi-file-earmark-slides me-2 text-warning" aria-hidden="true"></i>PowerPoint (.pptx)
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    {% endset %}
+
+    {{ include('admin/_page_header.html.twig', {
+        eyebrow: 'Annonces',
+        title: 'Rapport des annonces',
+        lead: k.total ~ ' annonce(s) au total · généré le ' ~ report.generatedAt|date('d/m/Y à H:i') ~ ' · tendances sur ' ~ periodLabel,
+        actions: actions
+    }) }}
+
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="small text-muted align-self-center me-1">Raccourcis :</span>
+        <a href="{{ path('admin_annonces_rapport', { unit: 'days', value: 30 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'days' and periodValue == 30 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">30 j</a>
+        <a href="{{ path('admin_annonces_rapport', { unit: 'days', value: 90 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'days' and periodValue == 90 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">90 j</a>
+        <a href="{{ path('admin_annonces_rapport', { unit: 'months', value: 6 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'months' and periodValue == 6 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">6 mois</a>
+        <a href="{{ path('admin_annonces_rapport', { unit: 'months', value: 12 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'months' and periodValue == 12 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">12 mois</a>
+        <a href="{{ path('admin_annonces_rapport', { unit: 'months', value: 24 }) }}" class="btn btn-sm rounded-pill {{ periodUnit == 'months' and periodValue == 24 ? 'btn-admin-primary' : 'btn-outline-secondary' }}">24 mois</a>
+    </div>
+
+    {% if report.insights|default([])|length %}
+        <h2 class="h6 fw-bold mb-2">Points clés</h2>
+        <div class="row g-2 mb-4">
+            {% for insight in report.insights %}
+                <div class="col-12 col-md-6">
+                    <div class="analytics-insight small">
+                        <i class="bi bi-lightbulb me-1 text-brand" aria-hidden="true"></i>{{ insight }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3 mb-4">
+        {% set kpiCards = [
+            { label: 'Total annonces', value: k.total, hint: k.createdInPeriod ~ ' créées sur la période' },
+            { label: 'En ligne', value: k.approved, hint: k.pending ~ ' en attente' },
+            { label: 'Refusées', value: k.rejected, hint: k.draft ~ ' brouillon(s)' },
+            { label: 'Taux validation', value: (k.approvalRate is not null ? k.approvalRate ~ '%' : '—'), hint: 'hors file en attente' },
+            { label: 'Prix moyen', value: (k.avgPrice is not null ? k.avgPrice|number_format(0, ',', ' ') ~ ' MAD' : '—'), hint: k.minPrice is not null ? k.minPrice|number_format(0, ',', ' ') ~ '–' ~ k.maxPrice|number_format(0, ',', ' ') ~ ' MAD' : 'validées' },
+            { label: 'Avec photo', value: k.withPhotos, hint: k.withoutPhotos ~ ' sans photo' },
+            { label: 'Délai modération', value: (k.avgModerationHours is not null ? k.avgModerationHours ~ ' h' : '—'), hint: 'moyenne sur la période' }
+        ] %}
+        {% for card in kpiCards %}
+            <div class="col">
+                <div class="analytics-kpi">
+                    <div class="analytics-kpi__label">{{ card.label }}</div>
+                    <div class="analytics-kpi__value">{{ card.value }}</div>
+                    <div class="analytics-kpi__hint">{{ card.hint }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-xl-8">
+            <div class="analytics-chart-card">
+                <h2>Volume d’annonces ({{ periodLabel }})</h2>
+                <p class="analytics-section-note">Créations, validations et refus mois par mois — pour suivre la croissance du catalogue et la charge de modération.</p>
+                <div class="analytics-chart-wrap analytics-chart-wrap--lg">
+                    <canvas id="chartVolume" aria-label="Volume d’annonces"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="analytics-chart-card">
+                <h2>Répartition par statut</h2>
+                <p class="analytics-section-note">Stock actuel, tous statuts confondus.</p>
+                <div class="analytics-chart-wrap">
+                    <canvas id="chartStatus" aria-label="Statuts"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-lg-6">
+            <div class="analytics-chart-card">
+                <h2>Top catégories (validées)</h2>
+                <p class="analytics-section-note">Où se concentre l’offre en ligne — utile pour prioriser le contenu.</p>
+                <div class="analytics-chart-wrap">
+                    <canvas id="chartCategories" aria-label="Catégories"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="analytics-chart-card">
+                <h2>Top villes (validées)</h2>
+                <p class="analytics-section-note">Zones géographiques les plus actives.</p>
+                <div class="analytics-chart-wrap">
+                    <canvas id="chartCities" aria-label="Villes"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-7">
+            <div class="analytics-chart-card">
+                <h2>Fourchettes de prix (validées)</h2>
+                <p class="analytics-section-note">Positionnement tarifaire du catalogue, en MAD.</p>
+                <div class="analytics-chart-wrap">
+                    <canvas id="chartPrices" aria-label="Prix"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-5">
+            <div class="analytics-chart-card">
+                <h2>Photos</h2>
+                <p class="analytics-section-note">Qualité visuelle du catalogue (toutes annonces).</p>
+                <div class="analytics-chart-wrap">
+                    <canvas id="chartPhotos" aria-label="Photos"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-xl-7">
+            <div class="admin-panel h-100">
+                <div class="card-header p-3">
+                    <h2 class="h6 fw-bold mb-0">Catégories — détail</h2>
+                    <p class="small text-muted mb-0 mt-1">Tous statuts, pour voir où la modération se concentre.</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-3 py-2 border-0">Catégorie</th>
+                                <th class="py-2 border-0">Total</th>
+                                <th class="py-2 border-0">Validées</th>
+                                <th class="py-2 border-0">Attente</th>
+                                <th class="pe-3 py-2 border-0">Refusées</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in report.tables.categoriesBreakdown %}
+                                <tr>
+                                    <td class="ps-3 fw-semibold">{{ row.name }}</td>
+                                    <td>{{ row.total }}</td>
+                                    <td class="text-success">{{ row.approved }}</td>
+                                    <td class="text-warning">{{ row.pending }}</td>
+                                    <td class="pe-3 text-danger">{{ row.rejected }}</td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="5" class="text-center text-muted py-4">Pas encore de données.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-5">
+            <div class="admin-panel h-100">
+                <div class="card-header p-3">
+                    <h2 class="h6 fw-bold mb-0">Villes — détail</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-3 py-2 border-0">Ville</th>
+                                <th class="py-2 border-0">Total</th>
+                                <th class="pe-3 py-2 border-0 text-end">En ligne</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in report.tables.citiesBreakdown %}
+                                <tr>
+                                    <td class="ps-3 fw-semibold">{{ row.name }}</td>
+                                    <td>{{ row.total }}</td>
+                                    <td class="pe-3 text-end text-success">{{ row.approved }}</td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="3" class="text-center text-muted py-4">Pas encore de données.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-xl-7">
+            <div class="admin-panel h-100">
+                <div class="card-header p-3">
+                    <h2 class="h6 fw-bold mb-0">Vendeurs — activité</h2>
+                    <p class="small text-muted mb-0 mt-1">Publiées, validées, en attente et refusées par compte.</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-3 py-2 border-0">Vendeur</th>
+                                <th class="py-2 border-0">Publiées</th>
+                                <th class="py-2 border-0">Validées</th>
+                                <th class="py-2 border-0">Attente</th>
+                                <th class="pe-3 py-2 border-0">Refusées</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in report.tables.sellers|default([]) %}
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="fw-semibold">{{ row.name }}</div>
+                                        <div class="small text-muted">{{ row.email }}</div>
+                                    </td>
+                                    <td>{{ row.total }}</td>
+                                    <td class="text-success">{{ row.approved }}</td>
+                                    <td class="text-warning">{{ row.pending }}</td>
+                                    <td class="pe-3 text-danger">{{ row.rejected }}</td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="5" class="text-center text-muted py-4">Pas encore de vendeurs actifs.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-5">
+            <div class="admin-panel h-100">
+                <div class="card-header p-3">
+                    <h2 class="h6 fw-bold mb-0">Catégories — détail</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-3 py-2 border-0">Catégorie</th>
+                                <th class="py-2 border-0">Total</th>
+                                <th class="py-2 border-0">Validées</th>
+                                <th class="pe-3 py-2 border-0">Attente</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in report.tables.categoriesBreakdown|slice(0, 12) %}
+                                <tr>
+                                    <td class="ps-3 fw-semibold">{{ row.name }}</td>
+                                    <td>{{ row.total }}</td>
+                                    <td class="text-success">{{ row.approved }}</td>
+                                    <td class="pe-3 text-warning">{{ row.pending }}</td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="4" class="text-center text-muted py-4">Pas encore de données.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-panel mb-4">
+        <div class="card-header p-3 d-flex justify-content-between align-items-start gap-2">
+            <div>
+                <h2 class="h6 fw-bold mb-0">Dernières annonces</h2>
+                <p class="small text-muted mb-0 mt-1">Flux récent, tous statuts.</p>
+            </div>
+            <a href="{{ path('admin_annonces_pending') }}" class="btn btn-sm btn-outline-secondary rounded-pill">Modération</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small">
+                    <tr>
+                        <th class="ps-3 py-2 border-0">Titre</th>
+                        <th class="py-2 border-0">Catégorie</th>
+                        <th class="py-2 border-0">Ville</th>
+                        <th class="py-2 border-0">Statut</th>
+                        <th class="py-2 border-0">Prix</th>
+                        <th class="pe-3 py-2 border-0 text-end">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report.tables.recent %}
+                        <tr>
+                            <td class="ps-3 fw-semibold">
+                                <a href="{{ path('admin_annonce_show', { id: row.id }) }}" class="text-decoration-none text-dark">{{ row.title|u.truncate(42, '…') }}</a>
+                            </td>
+                            <td class="small">{{ row.category }}</td>
+                            <td class="small">{{ row.city }}</td>
+                            <td>
+                                {% if row.status == 'approved' %}
+                                    <span class="badge text-bg-success">Validée</span>
+                                {% elseif row.status == 'pending' %}
+                                    <span class="badge text-bg-warning">En attente</span>
+                                {% elseif row.status == 'rejected' %}
+                                    <span class="badge text-bg-danger">Refusée</span>
+                                {% else %}
+                                    <span class="badge text-bg-secondary">{{ row.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="small">{{ row.price|number_format(0, ',', ' ') }} MAD</td>
+                            <td class="pe-3 text-end small text-muted">{{ row.createdAt }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="6" class="text-center text-muted py-4">Aucune annonce.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script>
+    (function () {
+        const data = {{ {
+            labels: c.monthLabels,
+            created: c.createdByMonth,
+            approved: c.approvedByMonth,
+            rejected: c.rejectedByMonth,
+            statusLabels: c.statusLabels,
+            statusValues: c.statusValues,
+            catLabels: c.categories.labels,
+            catValues: c.categories.values,
+            cityLabels: c.cities.labels,
+            cityValues: c.cities.values,
+            priceLabels: c.priceBuckets.labels,
+            priceValues: c.priceBuckets.values,
+            photoLabels: c.photos.labels,
+            photoValues: c.photos.values
+        }|json_encode|raw }};
+
+        const brand = '#4B79A1';
+        const brandDark = '#1B2E4B';
+        const green = '#198754';
+        const orange = '#fd7e14';
+        const red = '#dc3545';
+        const teal = '#0d9488';
+        const gray = '#94a3b8';
+
+        const monthPretty = (ym) => {
+            const [y, m] = ym.split('-');
+            const names = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
+            return names[parseInt(m, 10) - 1] + ' ' + y.slice(2);
+        };
+
+        if (typeof Chart === 'undefined') return;
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
+        };
+
+        new Chart(document.getElementById('chartVolume'), {
+            type: 'line',
+            data: {
+                labels: data.labels.map(monthPretty),
+                datasets: [
+                    { label: 'Créées', data: data.created, borderColor: brand, backgroundColor: 'rgba(75,121,161,.15)', tension: .35, fill: true },
+                    { label: 'Validées', data: data.approved, borderColor: green, backgroundColor: 'transparent', tension: .35 },
+                    { label: 'Refusées', data: data.rejected, borderColor: red, backgroundColor: 'transparent', tension: .35 }
+                ]
+            },
+            options: { ...commonOptions, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+
+        new Chart(document.getElementById('chartStatus'), {
+            type: 'doughnut',
+            data: {
+                labels: data.statusLabels,
+                datasets: [{ data: data.statusValues, backgroundColor: [green, orange, red, gray], borderWidth: 0 }]
+            },
+            options: commonOptions
+        });
+
+        new Chart(document.getElementById('chartCategories'), {
+            type: 'bar',
+            data: {
+                labels: data.catLabels,
+                datasets: [{ label: 'Annonces', data: data.catValues, backgroundColor: brand, borderRadius: 6 }]
+            },
+            options: { ...commonOptions, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+
+        new Chart(document.getElementById('chartCities'), {
+            type: 'bar',
+            data: {
+                labels: data.cityLabels,
+                datasets: [{ label: 'Annonces', data: data.cityValues, backgroundColor: brandDark, borderRadius: 6 }]
+            },
+            options: { ...commonOptions, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+
+        new Chart(document.getElementById('chartPrices'), {
+            type: 'bar',
+            data: {
+                labels: data.priceLabels,
+                datasets: [{ label: 'Annonces', data: data.priceValues, backgroundColor: teal, borderRadius: 6 }]
+            },
+            options: { ...commonOptions, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+
+        new Chart(document.getElementById('chartPhotos'), {
+            type: 'doughnut',
+            data: {
+                labels: data.photoLabels,
+                datasets: [{ data: data.photoValues, backgroundColor: [brand, gray], borderWidth: 0 }]
+            },
+            options: commonOptions
+        });
+    })();
+    </script>
+{% endblock %}

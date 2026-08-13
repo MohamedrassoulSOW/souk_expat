@@ -18,12 +18,14 @@
                     <tr>
                         <th class="ps-3 py-3 border-0">Utilisateur</th>
                         <th class="py-3 border-0 d-none d-md-table-cell">Email</th>
+                        <th class="py-3 border-0">Annonces</th>
                         <th class="py-3 border-0 d-none d-lg-table-cell">Rôles</th>
                         <th class="pe-3 py-3 border-0 text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for u in users %}
+                        {% set counts = listingStats[u.id]|default({ total: 0, approved: 0, pending: 0, rejected: 0 }) %}
                         <tr>
                             <td class="ps-3">
                                 <div class="fw-bold text-dark">{{ u.firstName }} {{ u.lastName }}</div>
@@ -31,6 +33,9 @@
                                 <div class="text-muted small d-md-none text-truncate" style="max-width: 220px;">{{ u.email }}</div>
                             </td>
                             <td class="text-muted d-none d-md-table-cell">{{ u.email }}</td>
+                            <td>
+                                {{ include('admin/_user_listing_stats.html.twig', { stats: counts }) }}
+                            </td>
                             <td class="d-none d-lg-table-cell">
                                 {% for role in u.roles %}
                                     <span class="badge rounded-pill fw-normal px-2 py-1 {{ role == 'ROLE_ADMIN' ? 'bg-danger-subtle text-danger' : (role == 'ROLE_EDITOR' ? 'bg-info-subtle text-info' : 'bg-secondary-subtle text-secondary') }}" style="font-size: 0.7rem;">
@@ -50,7 +55,7 @@
                             </td>
                         </tr>
                     {% else %}
-                        <tr><td colspan="4" class="text-center text-muted py-5">Aucun utilisateur.</td></tr>
+                        <tr><td colspan="5" class="text-center text-muted py-5">Aucun utilisateur.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

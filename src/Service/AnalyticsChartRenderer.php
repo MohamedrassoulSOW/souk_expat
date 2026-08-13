@@ -107,6 +107,35 @@ final class AnalyticsChartRenderer
         return array_values(array_filter($charts, static fn (array $chart) => $chart['png'] !== ''));
     }
 
+    /**
+     * @param list<string> $labels
+     * @param list<array{label: string, values: list<int|float>, color: array{0:int,1:int,2:int}}> $series
+     */
+    public function renderLineChartPublic(array $labels, array $series, int $width, int $height): string
+    {
+        return $this->lineChart($labels, $series, $width, $height);
+    }
+
+    /**
+     * @param list<string> $labels
+     * @param list<int|float> $values
+     * @param array{0:int,1:int,2:int} $rgb
+     */
+    public function renderBarChartPublic(array $labels, array $values, array $rgb, int $width, int $height, bool $horizontal): string
+    {
+        return $this->barChart($labels, $values, $rgb, $width, $height, $horizontal);
+    }
+
+    /**
+     * @param list<string> $labels
+     * @param list<int|float> $values
+     * @param list<array{0:int,1:int,2:int}> $colors
+     */
+    public function renderPieChartPublic(array $labels, array $values, array $colors, int $width, int $height): string
+    {
+        return $this->pieChart($labels, $values, $colors, $width, $height);
+    }
+
     private static function monthPretty(string $ym): string
     {
         $parts = explode('-', $ym);

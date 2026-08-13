@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\AnnonceRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,19 +14,19 @@ use Symfony\Component\Routing\Attribute\Route;
 final class UserController extends AbstractController
 {
     #[Route('/admin/user', name: 'app_user', methods: ['GET'])]
-    public function index(UserRepository $userRepository): Response
+    public function index(UserRepository $userRepository, AnnonceRepository $annonceRepository): Response
     {
-        // Compter le nombre total d'utilisateurs
-        $userCount = $userRepository->count([]);
-        // Restreindre l'accès à cette page aux administrateurs uniquement
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        // Récupérer tous les utilisateurs
-        $users = $userRepository->findAll();
+
+        $users = $userRepository->findBy([], ['id' => 'DESC']);
+        $userCount = count($users);
+        $listingStats = $annonceRepository->countStatsIndexedByUserId();
 
         return $this->render('user/index.html.twig', [
             'controller_name' => 'UserController',
             'users' => $users,
             'userCount' => $userCount,
+            'listingStats' => $listingStats,
         ]);
     }
 

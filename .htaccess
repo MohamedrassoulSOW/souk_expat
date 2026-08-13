@@ -13,7 +13,11 @@ DirectoryIndex public/index.php index.php
     RewriteEngine On
     RewriteBase /
 
-    # Secrets / code source
+    # CSS/JS publics (Bootstrap, Icons, Tom Select) — AVANT le blocage de vendor/
+    # Sinon /vendor/bootstrap/... est en 403 et le site s’affiche sans style.
+    RewriteRule ^vendor/(bootstrap|bootstrap-icons|tom-select)/(.*)$ public/vendor/$1/$2 [L]
+
+    # Secrets / code source (vendor Composer, pas public/vendor)
     RewriteRule ^(config|src|var|vendor|bin|migrations|templates|composer\.(json|lock)|symfony\.lock|\.env)(/|$) - [F,L]
 
     # Déjà dans /public → ne pas réécrire

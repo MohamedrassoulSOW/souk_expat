@@ -1,0 +1,21 @@
+{# @var stats array{total: int, approved: int, pending: int, rejected: int} #}
+{% set stats = stats|default({ total: 0, approved: 0, pending: 0, rejected: 0 }) %}
+{% set compact = compact|default(false) %}
+<div class="user-listing-stats {{ compact ? 'user-listing-stats--compact' : '' }}" title="Annonces publiées par cet utilisateur">
+    <span class="user-listing-stat" title="Total publié">
+        <span class="user-listing-stat__n">{{ stats.total }}</span>
+        <span class="user-listing-stat__l">{{ compact ? 'pub.' : 'publiées' }}</span>
+    </span>
+    <span class="user-listing-stat user-listing-stat--ok" title="Validées">
+        <span class="user-listing-stat__n">{{ stats.approved }}</span>
+        <span class="user-listing-stat__l">validées</span>
+    </span>
+    <span class="user-listing-stat user-listing-stat--wait" title="En attente">
+        <span class="user-listing-stat__n">{{ stats.pending }}</span>
+        <span class="user-listing-stat__l">attente</span>
+    </span>
+    <span class="user-listing-stat user-listing-stat--ko" title="Refusées">
+        <span class="user-listing-stat__n">{{ stats.rejected }}</span>
+        <span class="user-listing-stat__l">refusées</span>
+    </span>
+</div>

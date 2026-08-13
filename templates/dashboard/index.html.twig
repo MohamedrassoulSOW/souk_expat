@@ -43,17 +43,19 @@
         </div>
     </div>
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 {{ is_granted('ROLE_ADMIN') ? 'row-cols-xl-5' : 'row-cols-xl-4' }} mb-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 {{ is_granted('ROLE_ADMIN') ? 'row-cols-xl-4' : 'row-cols-xl-3' }} mb-4">
         {% set stats = [
-            {'label': 'Contacts', 'val': messageCount|default(0), 'icon': 'bi-inbox', 'color': '#4B79A1', 'url': path('app_admin_contact_index')},
-            {'label': 'Conversations', 'val': chatThreadCount|default(0), 'icon': 'bi-chat-dots', 'color': '#0d9488', 'url': path('app_admin_chats_index')}
+            {'label': 'Annonces', 'val': annoncesTotalCount|default(0), 'icon': 'bi-grid-3x3-gap', 'color': '#4B79A1', 'cap': true, 'url': path('admin_annonces_rapport')},
+            {'label': 'En attente', 'val': pendingCount|default(0), 'icon': 'bi-hourglass-split', 'color': '#fd7e14', 'cap': true, 'url': path('admin_annonces_pending')},
+            {'label': 'Validées', 'val': approvedCount|default(0), 'icon': 'bi-check2-square', 'color': '#198754', 'cap': true, 'url': path('admin_annonces_approved')},
+            {'label': 'Refusées', 'val': rejectedCount|default(0), 'icon': 'bi-x-circle', 'color': '#dc3545', 'cap': true, 'url': path('admin_annonces_rejected')}
         ] %}
         {% if is_granted('ROLE_ADMIN') %}
             {% set stats = stats|merge([{ 'label': 'Utilisateurs', 'val': userCount|default(0), 'icon': 'bi-people', 'color': '#1B2E4B', 'cap': true, 'url': path('app_user') }]) %}
         {% endif %}
         {% set stats = stats|merge([
-            {'label': 'En attente', 'val': pendingCount|default(0), 'icon': 'bi-hourglass-split', 'color': '#fd7e14', 'cap': true, 'url': path('admin_annonces_pending')},
-            {'label': 'Validées', 'val': approvedCount|default(0), 'icon': 'bi-check2-square', 'color': '#198754', 'cap': true, 'url': path('admin_annonces_approved')}
+            {'label': 'Contacts', 'val': messageCount|default(0), 'icon': 'bi-inbox', 'color': '#4B79A1', 'url': path('app_admin_contact_index')},
+            {'label': 'Conversations', 'val': chatThreadCount|default(0), 'icon': 'bi-chat-dots', 'color': '#0d9488', 'url': path('app_admin_chats_index')}
         ]) %}
 
         {% for stat in stats %}
@@ -82,6 +84,9 @@
                     <h2 class="h6 fw-bold mb-0">Accès rapides</h2>
                 </div>
                 <div class="card-body p-3 d-grid gap-2">
+                    <a href="{{ path('admin_annonces_rapport') }}" class="btn btn-outline-primary rounded-pill text-start">
+                        <i class="bi bi-bar-chart-line me-2" aria-hidden="true"></i>Rapport des annonces
+                    </a>
                     <a href="{{ path('admin_annonces_pending') }}" class="btn btn-outline-warning rounded-pill text-start">
                         <i class="bi bi-clock-history me-2" aria-hidden="true"></i>Modérer les annonces
                     </a>
@@ -107,12 +112,14 @@
                                 <thead class="bg-light text-muted small">
                                     <tr>
                                         <th class="ps-3 py-3 border-0">Utilisateur</th>
-                                        <th class="py-3 border-0 d-none d-md-table-cell">Email</th>
+                                        <th class="py-3 border-0 d-none d-lg-table-cell">Email</th>
+                                        <th class="py-3 border-0">Annonces</th>
                                         <th class="py-3 border-0 text-end pe-3">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for user in utilisateurs|default([])|slice(0, 8) %}
+                                        {% set counts = listingStats[user.id]|default({ total: 0, approved: 0, pending: 0, rejected: 0 }) %}
                                         <tr>
                                             <td class="ps-3">
                                                 <div class="d-flex align-items-center gap-2">
@@ -122,11 +129,14 @@
                                                     </div>
                                                     <div class="min-w-0">
                                                         <div class="fw-bold text-truncate">{{ user.firstName }} {{ user.lastName }}</div>
-                                                        <div class="small text-muted d-md-none text-truncate">{{ user.email }}</div>
+                                                        <div class="small text-muted d-lg-none text-truncate">{{ user.email }}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="text-muted small d-none d-md-table-cell">{{ user.email }}</td>
+                                            <td class="text-muted small d-none d-lg-table-cell">{{ user.email }}</td>
+                                            <td>
+                                                {{ include('admin/_user_listing_stats.html.twig', { stats: counts, compact: true }) }}
+                                            </td>
                                             <td class="text-end pe-3">
                                                 <div class="dropdown js-smart-dropup">
                                                     <button class="btn btn-sm btn-light border btn-icon-action" type="button" data-bs-toggle="dropdown" data-bs-display="static" title="Actions" aria-label="Actions" aria-expanded="false">
@@ -139,7 +149,7 @@
                                             </td>
                                         </tr>
                                     {% else %}
-                                        <tr><td colspan="3" class="text-center text-muted py-4">Aucun utilisateur.</td></tr>
+                                        <tr><td colspan="4" class="text-center text-muted py-4">Aucun utilisateur.</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>

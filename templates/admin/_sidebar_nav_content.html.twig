@@ -52,6 +52,13 @@
                 <i class="bi bi-x-circle me-2 text-danger" aria-hidden="true"></i> Refusées
             </a>
         </li>
+        <li class="nav-item">
+            <a href="{{ path('admin_annonces_rapport') }}"
+               class="nav-link {{ _r == 'admin_annonces_rapport' ? 'active-cyan shadow-sm' : 'text-dark hover-light' }}"
+               {% if mobile %}data-admin-nav-link{% endif %}>
+                <i class="bi bi-bar-chart-line me-2" aria-hidden="true"></i> Rapport annonces
+            </a>
+        </li>
 
         <li class="admin-nav-section mt-3 mb-1 ms-1 small text-uppercase fw-bold text-muted" style="letter-spacing: 1px; font-size: 0.72rem; list-style: none;">
             Gestion

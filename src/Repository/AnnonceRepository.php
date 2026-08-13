@@ -268,4 +268,56 @@ class AnnonceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Compteurs d’annonces par utilisateur (une requête, indexés par user id).
+     *
+     * @return array<int, array{total: int, approved: int, pending: int, rejected: int}>
+     */
+    public function countStatsIndexedByUserId(): array
+    {
+        $rows = $this->createQueryBuilder('a')
+            ->select(
+                'IDENTITY(a.user) AS userId',
+                'COUNT(a.id) AS total',
+                'SUM(CASE WHEN a.status = :approved THEN 1 ELSE 0 END) AS approved',
+                'SUM(CASE WHEN a.status = :pending THEN 1 ELSE 0 END) AS pending',
+                'SUM(CASE WHEN a.status = :rejected THEN 1 ELSE 0 END) AS rejected'
+            )
+            ->setParameter('approved', Annonce::STATUS_APPROVED)
+            ->setParameter('pending', Annonce::STATUS_PENDING)
+            ->setParameter('rejected', Annonce::STATUS_REJECTED)
+            ->groupBy('a.user')
+            ->getQuery()
+            ->getArrayResult();
+
+        $out = [];
+        foreach ($rows as $row) {
+            $id = (int) ($row['userId'] ?? 0);
+            if ($id < 1) {
+                continue;
+            }
+            $out[$id] = [
+                'total' => (int) $row['total'],
+                'approved' => (int) $row['approved'],
+                'pending' => (int) $row['pending'],
+                'rejected' => (int) $row['rejected'],
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @return array{total: int, approved: int, pending: int, rejected: int}
+     */
+    public static function emptyUserListingStats(): array
+    {
+        return [
+            'total' => 0,
+            'approved' => 0,
+            'pending' => 0,
+            'rejected' => 0,
+        ];
+    }
 }

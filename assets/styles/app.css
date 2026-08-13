@@ -330,6 +330,26 @@
     color: #bfdbfe !important;
 }
 
+[data-bs-theme="dark"] body.dashboard-admin-page .user-listing-stat {
+    background: rgba(148, 163, 184, 0.16);
+    color: #e2e8f0;
+}
+
+[data-bs-theme="dark"] body.dashboard-admin-page .user-listing-stat--ok {
+    background: rgba(34, 197, 94, 0.18);
+    color: #86efac;
+}
+
+[data-bs-theme="dark"] body.dashboard-admin-page .user-listing-stat--wait {
+    background: rgba(249, 115, 22, 0.2);
+    color: #fdba74;
+}
+
+[data-bs-theme="dark"] body.dashboard-admin-page .user-listing-stat--ko {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+
 [data-bs-theme="dark"] body.dashboard-admin-page .text-danger {
     color: #f87171 !important;
 }
@@ -3689,6 +3709,54 @@ body.admin-mobile-menu-open {
     font-weight: 700;
     background: var(--cyan-soft);
     color: var(--cyan-hover);
+}
+
+.user-listing-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.user-listing-stat {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.user-listing-stat__n {
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.user-listing-stat__l {
+    font-weight: 600;
+    opacity: 0.75;
+}
+
+.user-listing-stat--ok {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.user-listing-stat--wait {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.user-listing-stat--ko {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.user-listing-stats--compact .user-listing-stat {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.68rem;
 }
 
 .btn-admin-primary {

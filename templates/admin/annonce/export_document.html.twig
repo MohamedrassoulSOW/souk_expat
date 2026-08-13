@@ -1,0 +1,140 @@
+{# Export Word — rapport annonces #}
+{% set k = report.kpis %}
+{% set c = report.charts %}
+{% set t = report.tables %}
+{% set x = report.explanations %}
+
+<h1>SoukExpat — Rapport des annonces</h1>
+<p>Période : {{ periodLabel }} · du {{ report.since|date('d/m/Y') }} · généré le {{ report.generatedAt|date('d/m/Y à H:i') }}</p>
+
+<h2>Comprendre ce rapport</h2>
+<p>{{ x.intro }}</p>
+<p>{{ x.howToRead }}</p>
+
+{% if report.insights|length %}
+    <h2>Points clés</h2>
+    <ul>
+        {% for insight in report.insights %}
+            <li>{{ insight }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<h2>Indicateurs clés</h2>
+<p>{{ x.kpis }}</p>
+<table>
+    <tr><th>Indicateur</th><th>Valeur</th><th>Détail</th></tr>
+    <tr><td>Total annonces</td><td>{{ k.total }}</td><td>tous statuts</td></tr>
+    <tr><td>Validées (en ligne)</td><td>{{ k.approved }}</td><td>{{ k.pending }} en attente</td></tr>
+    <tr><td>Refusées</td><td>{{ k.rejected }}</td><td>{{ k.draft }} brouillon(s)</td></tr>
+    <tr><td>Créées sur la période</td><td>{{ k.createdInPeriod }}</td><td></td></tr>
+    <tr><td>Taux validation</td><td>{{ k.approvalRate is not null ? k.approvalRate ~ ' %' : '—' }}</td><td></td></tr>
+    <tr><td>Avec photo</td><td>{{ k.withPhotos }}</td><td>{{ k.withoutPhotos }} sans photo</td></tr>
+    <tr><td>Prix moyen</td><td>{{ k.avgPrice is not null ? k.avgPrice|number_format(0, ',', ' ') ~ ' MAD' : '—' }}</td><td></td></tr>
+    <tr><td>Fourchette prix</td><td>{% if k.minPrice is not null %}{{ k.minPrice|number_format(0, ',', ' ') }} – {{ k.maxPrice|number_format(0, ',', ' ') }} MAD{% else %}—{% endif %}</td><td></td></tr>
+    <tr><td>Délai modération</td><td>{{ k.avgModerationHours is not null ? k.avgModerationHours ~ ' h' : '—' }}</td><td>moyenne période</td></tr>
+</table>
+
+<h2>Tendances mensuelles</h2>
+<p>{{ x.trends }}</p>
+<table>
+    <tr><th>Mois</th><th>Créées</th><th>Validées</th><th>Refusées</th></tr>
+    {% for label in c.monthLabels %}
+        <tr>
+            <td>{{ label }}</td>
+            <td>{{ c.createdByMonth[loop.index0]|default(0) }}</td>
+            <td>{{ c.approvedByMonth[loop.index0]|default(0) }}</td>
+            <td>{{ c.rejectedByMonth[loop.index0]|default(0) }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<h2>Statuts actuels</h2>
+<p>{{ x.status }}</p>
+<table>
+    <tr><th>Statut</th><th>Nombre</th></tr>
+    {% for label in c.statusLabels %}
+        <tr><td>{{ label }}</td><td>{{ c.statusValues[loop.index0]|default(0) }}</td></tr>
+    {% endfor %}
+</table>
+
+<h2>Fourchettes de prix (validées)</h2>
+<p>{{ x.prices }}</p>
+<table>
+    <tr><th>Fourchette MAD</th><th>Annonces</th></tr>
+    {% for label in c.priceBuckets.labels %}
+        <tr><td>{{ label }}</td><td>{{ c.priceBuckets.values[loop.index0]|default(0) }}</td></tr>
+    {% endfor %}
+</table>
+
+<h2>Catégories — détail</h2>
+<p>{{ x.categories }}</p>
+<table>
+    <tr><th>Catégorie</th><th>Total</th><th>Validées</th><th>Attente</th><th>Refusées</th></tr>
+    {% for row in t.categoriesBreakdown %}
+        <tr><td>{{ row.name }}</td><td>{{ row.total }}</td><td>{{ row.approved }}</td><td>{{ row.pending }}</td><td>{{ row.rejected }}</td></tr>
+    {% endfor %}
+</table>
+
+<h2>Villes</h2>
+<p>{{ x.cities }}</p>
+<table>
+    <tr><th>Ville</th><th>Total</th><th>En ligne</th></tr>
+    {% for row in t.citiesBreakdown %}
+        <tr><td>{{ row.name }}</td><td>{{ row.total }}</td><td>{{ row.approved }}</td></tr>
+    {% endfor %}
+</table>
+
+{% if t.sellers|default([])|length %}
+    <h2>Vendeurs — activité</h2>
+    <p>{{ x.sellers }}</p>
+    <table>
+        <tr><th>Vendeur</th><th>Email</th><th>Publiées</th><th>Validées</th><th>Attente</th><th>Refusées</th><th>Prix moy.</th></tr>
+        {% for row in t.sellers %}
+            <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.email }}</td>
+                <td>{{ row.total }}</td>
+                <td>{{ row.approved }}</td>
+                <td>{{ row.pending }}</td>
+                <td>{{ row.rejected }}</td>
+                <td>{{ row.avgPrice is not null ? row.avgPrice|number_format(0, ',', ' ') ~ ' MAD' : '—' }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+{% if t.pending|default([])|length %}
+    <h2>Annonces en attente de modération</h2>
+    <table>
+        <tr><th>ID</th><th>Titre</th><th>Prix</th><th>Ville</th><th>Vendeur</th><th>Date</th></tr>
+        {% for row in t.pending %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.title }}</td>
+                <td>{{ row.price|number_format(0, ',', ' ') }} MAD</td>
+                <td>{{ row.city }}</td>
+                <td>{{ row.seller }}</td>
+                <td>{{ row.createdAt }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+<h2>Liste complète des annonces (extrait)</h2>
+<table>
+    <tr><th>ID</th><th>Titre</th><th>Statut</th><th>Prix</th><th>Ville</th><th>Catégorie</th><th>Vendeur</th><th>Photo</th><th>Date</th></tr>
+    {% for row in t.recent %}
+        <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.title }}</td>
+            <td>{{ row.status }}</td>
+            <td>{{ row.price|number_format(0, ',', ' ') }}</td>
+            <td>{{ row.city }}</td>
+            <td>{{ row.category }}</td>
+            <td>{{ row.seller }}</td>
+            <td>{{ row.hasPhoto }}</td>
+            <td>{{ row.createdAt }}</td>
+        </tr>
+    {% endfor %}
+</table>
