@@ -1,0 +1,14 @@
+# Dev : e-mails écrits dans var/mail/ sans SMTP (voir app:mailer:show-inbox).
+services:
+    App\Mailer\DevFileTransport:
+        arguments:
+            $directory: '%kernel.project_dir%/var/mail'
+
+    Symfony\Component\Mailer\Transport\TransportInterface: '@App\Mailer\DevFileTransport'
+
+    Symfony\Component\Mailer\MailerInterface:
+        class: Symfony\Component\Mailer\Mailer
+        arguments:
+            $transport: '@App\Mailer\DevFileTransport'
+            $bus: null
+            $dispatcher: '@event_dispatcher'

@@ -13,7 +13,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class SiteSettingsType extends AbstractType
@@ -57,10 +56,10 @@ class SiteSettingsType extends AbstractType
                 'constraints' => [new NotBlank()],
             ])
             ->add('contactEmail', EmailType::class, [
-                'label' => 'E-mail de contact',
-                'help' => 'Affiché sur Contact & Mentions. Sert aussi d’expéditeur pour les e-mails automatiques.',
-                'attr' => ['placeholder' => 'contact@soukexpat.com'],
-                'constraints' => [new NotBlank(), new Email()],
+                'label' => 'E-mail de contact (fixe)',
+                'help' => 'Tous les e-mails du site partent de contact@soukexpat.com. Non modifiable.',
+                'disabled' => true,
+                'attr' => ['readonly' => true, 'placeholder' => 'contact@soukexpat.com'],
             ])
             ->add('contactPhone', TextType::class, [
                 'label' => 'WhatsApp (contact public)',

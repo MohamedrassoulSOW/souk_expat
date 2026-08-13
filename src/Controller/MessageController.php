@@ -57,6 +57,11 @@ class MessageController extends AbstractController
             return $this->redirectToRoute('app_annonce_index');
         }
 
+        if ($annonce->getStatus() !== Annonce::STATUS_APPROVED) {
+            $this->addFlash('warning', 'Cette annonce n’est pas encore disponible pour la messagerie.');
+            return $this->redirectToRoute('app_annonce_index');
+        }
+
         $thread = $threadRepo->findOneBy(['annonce' => $annonce, 'buyer' => $user]);
 
         if (!$thread) {

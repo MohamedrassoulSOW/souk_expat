@@ -24,10 +24,35 @@ final class ContactController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Bots : honeypot rempli → faux succès silencieux
+            $honeypot = trim((string) $form->get('website')->getData());
+            if ($honeypot !== '') {
+                $this->addFlash('success', 'Message envoyé ! Nous vous répondrons rapidement.');
+
+                return $this->redirectToRoute('app_contact');
+            }
+
+            // Anti-spam simple : max 3 envois / 10 min par session
+            $session = $request->getSession();
+            $bucket = $session->get('contact_submit_times', []);
+            $now = time();
+            $bucket = array_values(array_filter(
+                is_array($bucket) ? $bucket : [],
+                static fn ($t): bool => is_int($t) && ($now - $t) < 600
+            ));
+            if (\count($bucket) >= 3) {
+                $this->addFlash('warning', 'Trop de messages envoyés. Réessayez dans quelques minutes.');
+
+                return $this->redirectToRoute('app_contact');
+            }
+
             $contact->setCreatedAt(new \DateTimeImmutable());
             $contact->setIsProcessed(false);
             $entityManager->persist($contact);
             $entityManager->flush();
+
+            $bucket[] = $now;
+            $session->set('contact_submit_times', $bucket);
 
             $sent = $platformMailer->sendContactToInbox($contact);
             $from = $platformMailer->contactEmail();

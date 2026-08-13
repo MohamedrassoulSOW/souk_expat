@@ -1,0 +1,19 @@
+Bonjour {{ user.firstName|default('') }},
+
+{% if approved %}
+Bonne nouvelle : votre annonce a été validée et est maintenant visible sur SoukExpat.
+{% else %}
+Votre annonce a été refusée par notre équipe de modération.
+Vous pouvez la modifier puis la soumettre à nouveau depuis « Mes annonces ».
+{% endif %}
+
+Annonce : {{ annonce.title }}
+{% if annonce.price is defined %}Prix : {{ annonce.price|number_format(0, ',', ' ') }} MAD
+{% endif %}{% if annonce.city %}Ville : {{ annonce.city.name }}
+{% endif %}
+{% if approved and annonceUrl %}
+Voir l’annonce : {{ annonceUrl }}
+{% elseif not approved and mesAnnoncesUrl %}
+Mes annonces : {{ mesAnnoncesUrl }}
+{% endif %}
+Une question ? {{ siteContactEmail }}

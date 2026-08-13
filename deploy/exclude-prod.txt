@@ -33,9 +33,11 @@ package-lock.json
 README.md
 DEPLOY.md
 # Les uploads utilisateurs ne partent pas (dossiers vides recréés)
+# Garder public/uploads/.htaccess (anti-exécution PHP) via export-prod.php
 public/uploads/**
 !public/uploads/.gitkeep
 !public/uploads/*/.gitkeep
+!public/uploads/.htaccess
 # Cache / assets sources déjà compilés ailleurs
 assets/vendor/
 # Paquet export lui-même

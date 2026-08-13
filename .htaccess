@@ -3,9 +3,18 @@
 
 DirectoryIndex public/index.php index.php
 
+# Bloquer l’accès direct aux fichiers sensibles si le docroot n’est pas public/
+<IfModule mod_authz_core.c>
+    <FilesMatch "(?i)^\.(env|env\..*|git|gitignore|htaccess)">
+        Require all denied
+    </FilesMatch>
+</IfModule>
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
+
+    # Secrets / code source
+    RewriteRule ^(config|src|var|vendor|bin|migrations|templates|composer\.(json|lock)|symfony\.lock|\.env)(/|$) - [F,L]
 
     # Déjà dans /public → ne pas réécrire
     RewriteRule ^public/ - [L]

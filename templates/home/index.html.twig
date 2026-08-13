@@ -82,7 +82,7 @@
                         </div>
                         <div class="home-search__field home-search__field--select d-none d-md-flex">
                             <label class="visually-hidden" for="home-cat">Catégorie</label>
-                            <select id="home-cat" name="category" class="home-search__select">
+                            <select id="home-cat" name="category" class="home-search__select js-searchable-select" data-placeholder="Rechercher une catégorie…">
                                 <option value="">Toutes catégories</option>
                                 {% for cat in search_categories %}
                                     <option value="{{ cat.id }}" {{ sf.categoryId == cat.id ? 'selected' }}>{{ cat.name }}</option>
@@ -91,7 +91,7 @@
                         </div>
                         <div class="home-search__field home-search__field--select d-none d-md-flex">
                             <label class="visually-hidden" for="home-city">Ville</label>
-                            <select id="home-city" name="city" class="home-search__select">
+                            <select id="home-city" name="city" class="home-search__select js-searchable-select" data-placeholder="Rechercher une ville…">
                                 <option value="">Toutes villes</option>
                                 {% for city in cities %}
                                     <option value="{{ city.id }}" {{ sf.cityId == city.id ? 'selected' }}>{{ city.name }}</option>
@@ -109,13 +109,13 @@
                     </div>
                     <div class="collapse {{ has_filters ? 'show' : '' }} d-md-none" id="homeMobileFilters">
                         <div class="home-search__mobile-filters">
-                            <select id="home-cat-m" class="form-select form-select-sm rounded-3">
+                            <select id="home-cat-m" class="form-select form-select-sm rounded-3 js-searchable-select" data-placeholder="Rechercher une catégorie…">
                                 <option value="">Catégorie</option>
                                 {% for cat in search_categories %}
                                     <option value="{{ cat.id }}" {{ sf.categoryId == cat.id ? 'selected' }}>{{ cat.name }}</option>
                                 {% endfor %}
                             </select>
-                            <select id="home-city-m" class="form-select form-select-sm rounded-3">
+                            <select id="home-city-m" class="form-select form-select-sm rounded-3 js-searchable-select" data-placeholder="Rechercher une ville…">
                                 <option value="">Ville</option>
                                 {% for city in cities %}
                                     <option value="{{ city.id }}" {{ sf.cityId == city.id ? 'selected' }}>{{ city.name }}</option>
@@ -153,27 +153,25 @@
                         {% for item in popular_categories %}
                             {% set category = item.category %}
                             {% set total = item.total %}
-                            {% set icon = 'bi-tag-fill' %}
                             {% set tone = loop.index0 % 3 %}
-                            {% if 'meuble' in category.slug or 'meuble' in category.name|lower %}
-                                {% set icon = 'bi-lamp' %}
-                            {% elseif 'electro' in category.slug or 'électro' in category.name|lower %}
-                                {% set icon = 'bi-plug' %}
-                            {% elseif 'vehicule' in category.slug or 'véhicule' in category.name|lower or 'auto' in category.slug %}
-                                {% set icon = 'bi-bicycle' %}
-                            {% elseif category.icon %}
-                                {% set icon = category.icon %}
+                            {% set icon = category.icon|default('bi-tag-fill') %}
+                            {% if not category.icon %}
+                                {% if 'meuble' in category.slug or 'meuble' in category.name|lower %}
+                                    {% set icon = 'bi-lamp' %}
+                                {% elseif 'electro' in category.slug or 'électro' in category.name|lower %}
+                                    {% set icon = 'bi-plug' %}
+                                {% elseif 'vehicule' in category.slug or 'véhicule' in category.name|lower or 'voiture' in category.slug or 'auto' in category.slug %}
+                                    {% set icon = 'bi-car-front' %}
+                                {% else %}
+                                    {% set icon = 'bi-tag-fill' %}
+                                {% endif %}
                             {% endif %}
 
                             <a href="{{ path('app_annonce_category', { slug: category.slug }) }}"
                                class="home-cat-card home-cat-card--tone-{{ tone }}"
                                aria-label="{{ category.name }} — {{ total|cap999 }} annonce{{ total > 1 ? 's' : '' }}">
                                 <span class="home-cat-card__visual" aria-hidden="true">
-                                    {% if category.imageName %}
-                                        <img src="{{ asset('uploads/categories/' ~ category.imageName) }}" alt="" loading="lazy" decoding="async">
-                                    {% else %}
-                                        <i class="bi {{ icon }}"></i>
-                                    {% endif %}
+                                    <i class="bi {{ icon }}"></i>
                                 </span>
                                 <span class="home-cat-card__body">
                                     <span class="home-cat-card__name">{{ category.name }}</span>
@@ -292,8 +290,17 @@
                 var cityM = document.getElementById('home-city-m');
                 var catD = document.getElementById('home-cat');
                 var cityD = document.getElementById('home-city');
-                if (catM && catD) catD.value = catM.value;
-                if (cityM && cityD) cityD.value = cityM.value;
+                function syncSelect(from, to) {
+                    if (!from || !to) return;
+                    var val = from.value;
+                    if (to.tomselect) {
+                        to.tomselect.setValue(val, true);
+                    } else {
+                        to.value = val;
+                    }
+                }
+                syncSelect(catM, catD);
+                syncSelect(cityM, cityD);
             });
         })();
     </script>

@@ -14,6 +14,19 @@ server {
     root /var/www/souk_expat/public;
     index index.php;
 
+    # PWA — SW + manifest toujours revalidés
+    location = /sw.js {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        try_files $uri =404;
+    }
+
+    location = /manifest.webmanifest {
+        default_type application/manifest+json;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        try_files $uri =404;
+    }
+
     location / {
         try_files $uri /index.php$is_args$args;
     }

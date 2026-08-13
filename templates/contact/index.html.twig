@@ -131,6 +131,10 @@
                                     {{ form_widget(contactForm.message, {'attr': {'class': 'form-control contact-field contact-field-textarea', 'rows': 6, 'placeholder': 'Décrivez votre demande le plus précisément possible…'}}) }}
                                     {{ form_errors(contactForm.message) }}
                                 </div>
+                                {# Honeypot anti-bot — ne pas retirer #}
+                                <div class="contact-honeypot-wrap" aria-hidden="true">
+                                    {{ form_widget(contactForm.website) }}
+                                </div>
                             </div>
 
                             <div class="mt-4 pt-2">
@@ -152,6 +156,13 @@
 </section>
 
 <style>
+    .contact-honeypot-wrap {
+        position: absolute !important;
+        left: -10000px !important;
+        width: 1px !important;
+        height: 1px !important;
+        overflow: hidden !important;
+    }
     .contact-page-body {
         background: linear-gradient(180deg, color-mix(in srgb, var(--cyan-main) 8%, var(--page-bg)) 0%, var(--page-bg) 40%, var(--page-bg) 100%);
         padding-bottom: 3rem;

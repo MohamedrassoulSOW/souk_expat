@@ -59,10 +59,13 @@ foreach ($required as $key) {
         continue;
     }
     $val = trim($m[1], " \t\"'");
-    if ($val === '' || str_contains($val, 'USER:PASSWORD') || str_contains($val, 'ChangeMe')) {
+    if ($val === '' || str_contains($val, 'USER:PASSWORD') || str_contains($val, 'ChangeMe') || str_contains($val, 'MOT_DE_PASSE')) {
         if (in_array($key, ['APP_SECRET', 'DATABASE_URL', 'MAILER_DSN', 'JWT_SECRET'], true)) {
             $missing[] = $key . ' (vide ou placeholder)';
         }
+    }
+    if ($key === 'MAILER_DSN' && (str_contains(strtolower($val), 'mailtrap') || str_starts_with($val, 'null://'))) {
+        $missing[] = 'MAILER_DSN (encore Mailtrap/null — utilisez smtp.hostinger.com)';
     }
 }
 

@@ -12,31 +12,29 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordToken;
 
 /**
- * E-mails transactionnels — adresse depuis les paramètres du site (fallback SiteContact).
+ * Tous les e-mails du site partent de contact@soukexpat.com (SiteContact::EMAIL).
  */
 final class PlatformMailer
 {
     public function __construct(
         private readonly MailerInterface $mailer,
+        private readonly TransportInterface $transport,
         private readonly LoggerInterface $logger,
         private readonly SiteSettingsService $siteSettings,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
+    /** Adresse unique d’envoi / contact plateforme. */
     public function contactEmail(): string
     {
-        try {
-            $email = trim($this->siteSettings->get()->getContactEmail());
-            if ($email !== '') {
-                return $email;
-            }
-        } catch (\Throwable) {
-        }
-
         return SiteContact::EMAIL;
     }
 
@@ -55,7 +53,7 @@ final class PlatformMailer
 
     public function fromAddress(): Address
     {
-        return new Address($this->contactEmail(), $this->fromName());
+        return new Address(SiteContact::EMAIL, $this->fromName());
     }
 
     public function sendPasswordReset(User $user, ResetPasswordToken $resetToken): bool
@@ -111,59 +109,84 @@ final class PlatformMailer
 
     public function sendAnnonceApproved(Annonce $annonce): bool
     {
-        $user = $annonce->getUser();
-        if ($user === null || !$user->getEmail()) {
-            return false;
-        }
-
-        $email = (new TemplatedEmail())
-            ->from($this->fromAddress())
-            ->replyTo($this->fromAddress())
-            ->to((string) $user->getEmail())
-            ->subject($this->fromName() . ' — Votre annonce a été validée')
-            ->htmlTemplate('emails/annonce_status.html.twig')
-            ->context([
-                'annonce' => $annonce,
-                'user' => $user,
-                'approved' => true,
-                'siteContactEmail' => $this->contactEmail(),
-            ]);
-
-        return $this->dispatch($email);
+        return $this->sendAnnonceStatus($annonce, true);
     }
 
     public function sendAnnonceRejected(Annonce $annonce): bool
     {
+        return $this->sendAnnonceStatus($annonce, false);
+    }
+
+    private function sendAnnonceStatus(Annonce $annonce, bool $approved): bool
+    {
         $user = $annonce->getUser();
-        if ($user === null || !$user->getEmail()) {
+        $to = $user?->getEmail();
+        if ($user === null || $to === null || trim($to) === '') {
+            $this->logger->warning('E-mail statut annonce ignoré : annonceur sans e-mail', [
+                'annonceId' => $annonce->getId(),
+            ]);
+
             return false;
         }
+
+        $subject = $approved
+            ? $this->fromName() . ' — Votre annonce a été validée'
+            : $this->fromName() . ' — Votre annonce a été refusée';
 
         $email = (new TemplatedEmail())
             ->from($this->fromAddress())
             ->replyTo($this->fromAddress())
-            ->to((string) $user->getEmail())
-            ->subject($this->fromName() . ' — Votre annonce a été refusée')
+            ->to(new Address($to, (string) ($user->getFirstName() ?: $to)))
+            ->subject($subject)
             ->htmlTemplate('emails/annonce_status.html.twig')
+            ->textTemplate('emails/annonce_status.txt.twig')
             ->context([
                 'annonce' => $annonce,
                 'user' => $user,
-                'approved' => false,
+                'approved' => $approved,
                 'siteContactEmail' => $this->contactEmail(),
+                'annonceUrl' => $this->absoluteUrl('app_annonce_show', ['id' => $annonce->getId()]),
+                'mesAnnoncesUrl' => $this->absoluteUrl('app_mes_annonces'),
             ]);
 
-        return $this->dispatch($email);
+        return $this->dispatch($email, $to);
     }
 
-    private function dispatch(TemplatedEmail $email): bool
+    private function absoluteUrl(string $route, array $params = []): string
     {
+        try {
+            return $this->urlGenerator->generate($route, $params, UrlGeneratorInterface::ABSOLUTE_URL);
+        } catch (\Throwable $e) {
+            $this->logger->warning('URL e-mail non générée', [
+                'route' => $route,
+                'error' => $e->getMessage(),
+            ]);
+
+            return '';
+        }
+    }
+
+    private function dispatch(TemplatedEmail $email, ?string $to = null): bool
+    {
+        if ($this->transport instanceof NullTransport) {
+            $this->logger->error('Échec d’envoi e-mail SoukExpat : MAILER_DSN non configuré (null://)', [
+                'subject' => $email->getSubject(),
+                'from' => SiteContact::EMAIL,
+                'to' => $to,
+            ]);
+
+            return false;
+        }
+
         try {
             $this->mailer->send($email);
 
             return true;
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface|\Throwable $e) {
             $this->logger->error('Échec d’envoi e-mail SoukExpat', [
                 'subject' => $email->getSubject(),
+                'from' => SiteContact::EMAIL,
+                'to' => $to,
                 'error' => $e->getMessage(),
             ]);
 

@@ -18,8 +18,25 @@
     }) }}
 
     <div class="admin-panel">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-3 border-bottom">
+            <div class="admin-table-search flex-grow-1" style="max-width: 22rem;">
+                <label class="visually-hidden" for="admin-city-search">Rechercher une ville</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted" aria-hidden="true"></i></span>
+                    <input id="admin-city-search"
+                           type="search"
+                           class="form-control border-start-0 js-admin-table-search"
+                           placeholder="Rechercher une ville…"
+                           data-table-target="#admin-cities-table"
+                           data-empty-target="#admin-cities-empty"
+                           data-count-target="#admin-cities-count"
+                           autocomplete="off">
+                </div>
+            </div>
+            <span class="admin-badge"><span id="admin-cities-count">{{ cities|length|cap999 }}</span> ville{{ cities|length > 1 ? 's' : '' }}</span>
+        </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table id="admin-cities-table" class="table table-hover align-middle mb-0">
                 <thead class="bg-light text-muted small">
                     <tr>
                         <th class="ps-3 py-3 border-0">ID</th>
@@ -29,7 +46,7 @@
                 </thead>
                 <tbody>
                     {% for city in cities %}
-                        <tr>
+                        <tr data-search="{{ (city.name ~ ' ' ~ city.id)|lower }}">
                             <td class="ps-3"><span class="admin-badge">#{{ city.id }}</span></td>
                             <td class="fw-semibold">{{ city.name }}</td>
                             <td class="pe-3 text-end">
@@ -50,11 +67,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div id="admin-cities-empty" class="text-center text-muted py-4 d-none">Aucune ville ne correspond à la recherche.</div>
         </div>
-        {% if cities|length > 0 %}
-            <div class="px-3 py-2 border-top small text-muted">
-                {{ cities|length }} ville{{ cities|length > 1 ? 's' : '' }}
-            </div>
-        {% endif %}
     </div>
 {% endblock %}

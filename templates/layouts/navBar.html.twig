@@ -1,152 +1,188 @@
 <nav class="navbar navbar-expand-lg fixed-top modern-nav">
     <div class="container">
-        {# 1. LOGO & BRAND #}
         <a class="navbar-brand brand-logo-link d-flex align-items-center text-decoration-none" href="{{ path('app_home') }}" title="SoukExpat — Accueil">
             <img class="brand-logo-img" src="{{ asset('logo-souk-expat-nav.png') }}" alt="SoukExpat — Le Marché Mondial des Expatriés" width="170" height="52" decoding="async" fetchpriority="high">
         </a>
 
-        {# BOUTON MOBILE #}
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        {% set route = app.request.attributes.get('_route') %}
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            {# 2. LIENS CENTRAUX #}
-            <ul class="navbar-nav mx-auto nav-links-container">
-                {% set route = app.request.attributes.get('_route') %}
-                <li class="nav-item">
-                    <a class="nav-link {{ route == 'app_home' ? 'active' : '' }}" href="{{ path('app_home') }}">Accueil</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ route == 'app_annonce_index' or route == 'app_annonce_category' ? 'active' : '' }}" href="{{ path('app_annonce_index') }}">Annonces</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ route == 'app_about' ? 'active' : '' }}" href="{{ path('app_about') }}">À propos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ route == 'app_contact' ? 'active' : '' }}" href="{{ path('app_contact') }}">Contact</a>
-                </li>
-            </ul>
+        <div class="nav-quick-actions d-flex align-items-center gap-1">
+            {{ include('layouts/_theme_toggle.html.twig') }}
 
-            {# 3. ACTIONS UTILISATEUR #}
-            <div class="d-flex align-items-center gap-2 gap-lg-3 actions-container">
-                {{ include('layouts/_theme_toggle.html.twig') }}
-
-                {% if app.user %}
-                    
-                    {# --- DROPDOWN NOTIFICATIONS --- #}
-                    {% set unreadNotifsCount = unread_notifications_count() %}
-                    {% set latestNotifs = latest_notifications(8) %}
-                    <div class="dropdown">
-                        <a href="#" class="nav-icon-link position-relative d-flex align-items-center justify-content-center" 
-                           id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-bell fs-5"></i>
-                            {% if unreadNotifsCount > 0 %}
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.6rem; transform: translate(-45%, 15%) !important;">
-                                    {{ unreadNotifsCount }}
-                                </span>
-                            {% endif %}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-3 p-2 rounded-4 animate slideIn" style="width: 320px;">
-                            <li class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="mb-0 fw-bold">Notifications</h6>
-                                {% if latestNotifs|length > 0 %}
-                                    <a href="{{ path('app_notification_delete_all') }}" class="text-danger small text-decoration-none" title="Tout supprimer">
+            {% if app.user %}
+                {% set unreadNotifsCount = unread_notifications_count() %}
+                {% set latestNotifs = latest_notifications(8) %}
+                <div class="dropdown nav-notif-dropdown">
+                    <a href="#"
+                       class="nav-icon-link position-relative d-flex align-items-center justify-content-center"
+                       id="notifDropdown"
+                       data-bs-toggle="dropdown"
+                       data-bs-display="static"
+                       aria-expanded="false"
+                       aria-label="Notifications">
+                        <i class="bi bi-bell fs-5"></i>
+                        {% if unreadNotifsCount > 0 %}
+                            <span class="nav-icon-badge">{{ unreadNotifsCount > 9 ? '9+' : unreadNotifsCount }}</span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2 p-2 rounded-4 animate slideIn nav-notif-menu">
+                        <li class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0 fw-bold">Notifications</h6>
+                            {% if latestNotifs|length > 0 %}
+                                <form method="post" action="{{ path('app_notification_delete_all') }}" class="m-0" onsubmit="return confirm('Supprimer toutes les notifications ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('notif_delete_all') }}">
+                                    <button type="submit" class="btn btn-link text-danger small text-decoration-none p-0" title="Tout supprimer">
                                         <i class="bi bi-trash3"></i>
-                                    </a>
-                                {% endif %}
-                            </li>
-                            
-                            <div class="notif-scroll" style="max-height: 350px; overflow-y: auto;">
-                                {% for notification in latestNotifs %}
-                                    <li class="px-2">
-                                        <a href="{{ path('app_notification_read', {id: notification.id}) }}" 
-                                           class="dropdown-item rounded-3 py-3 mb-1 {{ not notification.isRead ? 'bg-light border-start border-info border-3' : 'opacity-75' }}" 
-                                           style="white-space: normal;">
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </li>
+                        <div class="notif-scroll">
+                            {% for notification in latestNotifs %}
+                                <li class="px-2">
+                                    <form method="post" action="{{ path('app_notification_read', {id: notification.id}) }}" class="m-0">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('notif_read' ~ notification.id) }}">
+                                        <button type="submit"
+                                                class="dropdown-item rounded-3 py-3 mb-1 text-start w-100 border-0 {{ not notification.isRead ? 'bg-body-tertiary border-start border-info border-3' : 'opacity-75' }}"
+                                                style="white-space: normal;">
                                             <div class="d-flex gap-2">
                                                 <div class="flex-grow-1">
-                                                    <div class="small text-dark mb-1 fw-medium">
-                                                        {{ notification.message|default('Nouvelle notification') }}
-                                                    </div>
+                                                    <div class="small text-body mb-1 fw-medium">{{ notification.message|default('Nouvelle notification') }}</div>
                                                     <div class="text-muted d-flex align-items-center" style="font-size: 0.7rem;">
-                                                        <i class="bi bi-clock me-1"></i>
-                                                        {{ notification.createdAt|date('d/m à H:i') }}
+                                                        <i class="bi bi-clock me-1"></i>{{ notification.createdAt|date('d/m à H:i') }}
                                                     </div>
                                                 </div>
                                                 {% if not notification.isRead %}
                                                     <div class="bg-info rounded-circle" style="width: 8px; height: 8px; flex-shrink: 0; margin-top: 5px;"></div>
                                                 {% endif %}
                                             </div>
-                                        </a>
-                                    </li>
-                                {% else %}
-                                    <li class="text-center py-5 text-muted">
-                                        <i class="bi bi-bell-slash fs-2 d-block mb-2 opacity-25"></i>
-                                        <span class="small">Aucune notification</span>
-                                    </li>
-                                {% endfor %}
-                            </div>
-
-                            {% if unreadNotifsCount > 0 %}
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item text-center small text-cyan fw-bold py-2" href="{{ path('app_notification_read_all') }}">
-                                        Tout marquer comme lu
-                                    </a>
+                                        </button>
+                                    </form>
                                 </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-
-                    {# --- MESSAGES --- #}
-                    <a href="{{ path('app_messages_list') }}" class="nav-icon-link position-relative d-flex align-items-center justify-content-center" title="Mes messages">
-                        <i class="bi bi-chat-dots fs-5"></i>
-                        {% set msgCount = unread_messages_count() %}
-                        {% if msgCount > 0 %}
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill shadow-sm" style="font-size: 0.6rem; background-color: var(--cyan-main) !important; transform: translate(-45%, 15%) !important;">
-                                {{ msgCount }}
-                            </span>
-                        {% endif %}
-                    </a>
-
-                    {# --- BOUTON VENDRE --- #}
-                    <a href="{{ path('app_annonce_new') }}" class="btn btn-custom-cyan rounded-pill px-3 px-lg-4 d-flex align-items-center gap-2 shadow-sm hover-up">
-                        <i class="bi bi-plus-lg"></i> <span class="d-none d-lg-inline">Vendre</span>
-                    </a>
-
-                    {# --- PROFIL --- #}
-                    <div class="dropdown">
-                        <a class="user-pill d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
-                            <div class="avatar-container">
-                                {% if app.user.avatar %}
-                                    <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="Avatar">
-                                {% else %}
-                                    <div class="avatar-placeholder"><i class="bi bi-person"></i></div>
-                                {% endif %}
-                            </div>
-                            <span class="ms-2 d-none d-xl-inline fw-semibold user-pill__name small">{{ app.user.firstName }}</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-3 p-2 rounded-4 animate slideIn">
-                            <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_mes_annonces') }}"><i class="bi bi-stack me-2 opacity-50"></i>Mes annonces</a></li>
-                            <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_profile') }}"><i class="bi bi-person-gear me-2 opacity-50"></i>Paramètres</a></li>
-                            {% if is_granted('ROLE_EDITOR') %}
-                                <li><hr class="dropdown-divider opacity-50"></li>
-                                <li><a class="dropdown-item rounded-3 py-2 fw-medium text-cyan" href="{{ path('app_dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Tableau de bord</a></li>
-                            {% endif %}
-                            <li><hr class="dropdown-divider opacity-50"></li>
+                            {% else %}
+                                <li class="text-center py-5 text-muted">
+                                    <i class="bi bi-bell-slash fs-2 d-block mb-2 opacity-25"></i>
+                                    <span class="small">Aucune notification</span>
+                                </li>
+                            {% endfor %}
+                        </div>
+                        {% if unreadNotifsCount > 0 %}
+                            <li><hr class="dropdown-divider"></li>
                             <li>
-                                {{ include('security/_logout_button.html.twig', {
-                                    variant: 'dropdown',
-                                    form_class: 'd-block m-0'
-                                }) }}
+                                <form method="post" action="{{ path('app_notification_read_all') }}" class="m-0">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('notif_read_all') }}">
+                                    <button type="submit" class="dropdown-item text-center small text-cyan fw-bold py-2 border-0 w-100 bg-transparent">Tout marquer comme lu</button>
+                                </form>
                             </li>
-                        </ul>
-                    </div>
+                        {% endif %}
+                    </ul>
+                </div>
 
-                {% else %}
-                    <a href="{{ path('app_login') }}" class="btn btn-link text-dark text-decoration-none fw-semibold">Connexion</a>
-                    <a href="{{ path('app_register') }}" class="btn btn-custom-cyan rounded-pill px-4 shadow-sm hover-up">Inscription</a>
-                {% endif %}
+                <a href="{{ path('app_messages_list') }}"
+                   class="nav-icon-link position-relative d-flex align-items-center justify-content-center"
+                   title="Mes messages"
+                   aria-label="Mes messages">
+                    <i class="bi bi-chat-dots fs-5"></i>
+                    {% set msgCount = unread_messages_count() %}
+                    {% if msgCount > 0 %}
+                        <span class="nav-icon-badge nav-icon-badge--cyan">{{ msgCount > 9 ? '9+' : msgCount }}</span>
+                    {% endif %}
+                </a>
+            {% endif %}
+
+            <a href="{{ path('app_annonce_index') }}"
+               class="nav-quick-annonces d-lg-none {{ route in ['app_annonce_index', 'app_annonce_category'] ? 'is-active' : '' }}"
+               title="Voir les annonces"
+               aria-label="Annonces">
+                <i class="bi bi-grid-3x3-gap-fill" aria-hidden="true"></i>
+            </a>
+
+            <button class="navbar-toggler nav-menu-toggler border-0 shadow-none ms-1"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Ouvrir le menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="nav-mobile-panel w-100">
+                <ul class="navbar-nav mx-auto nav-links-container">
+                    <li class="nav-item">
+                        <a class="nav-link {{ route == 'app_home' ? 'active' : '' }}" href="{{ path('app_home') }}">
+                            <i class="bi bi-house-door nav-link-ic" aria-hidden="true"></i><span>Accueil</span>
+                        </a>
+                    </li>
+                    <li class="nav-item d-none d-lg-block">
+                        <a class="nav-link {{ route in ['app_annonce_index', 'app_annonce_category'] ? 'active' : '' }}" href="{{ path('app_annonce_index') }}">
+                            <i class="bi bi-grid-3x3-gap nav-link-ic" aria-hidden="true"></i><span>Annonces</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ route == 'app_how_it_works' ? 'active' : '' }}" href="{{ path('app_how_it_works') }}">
+                            <i class="bi bi-compass nav-link-ic" aria-hidden="true"></i><span>Guide</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ route == 'app_about' ? 'active' : '' }}" href="{{ path('app_about') }}">
+                            <i class="bi bi-info-circle nav-link-ic" aria-hidden="true"></i><span>À propos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ route == 'app_contact' ? 'active' : '' }}" href="{{ path('app_contact') }}">
+                            <i class="bi bi-envelope nav-link-ic" aria-hidden="true"></i><span>Contact</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="actions-container">
+                    {% if app.user %}
+                        <div class="nav-account-card dropdown">
+                            <a class="nav-account-trigger dropdown-toggle text-decoration-none"
+                               href="#"
+                               id="userDropdown"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                <div class="avatar-container">
+                                    {% if app.user.avatar %}
+                                        <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="">
+                                    {% else %}
+                                        <div class="avatar-placeholder"><i class="bi bi-person"></i></div>
+                                    {% endif %}
+                                </div>
+                                <span class="nav-account-meta">
+                                    <span class="nav-account-name">{{ app.user.firstName }}</span>
+                                    <span class="nav-account-hint">Mon compte</span>
+                                </span>
+                                <i class="bi bi-chevron-down nav-account-chevron" aria-hidden="true"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2 p-2 rounded-4 animate slideIn">
+                                <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_annonce_new') }}"><i class="bi bi-plus-lg me-2 opacity-50"></i>Vendre</a></li>
+                                <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_mes_annonces') }}"><i class="bi bi-stack me-2 opacity-50"></i>Mes annonces</a></li>
+                                <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_profile') }}"><i class="bi bi-person-gear me-2 opacity-50"></i>Paramètres</a></li>
+                                {% if is_granted('ROLE_EDITOR') %}
+                                    <li><hr class="dropdown-divider opacity-50"></li>
+                                    <li><a class="dropdown-item rounded-3 py-2 fw-medium text-cyan" href="{{ path('app_dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Tableau de bord</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider opacity-50"></li>
+                                <li>
+                                    {{ include('security/_logout_button.html.twig', {
+                                        variant: 'dropdown',
+                                        form_class: 'd-block m-0'
+                                    }) }}
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <div class="nav-auth-actions">
+                            <a href="{{ path('app_login') }}" class="btn nav-auth-login">Connexion</a>
+                            <a href="{{ path('app_register') }}" class="btn btn-custom-cyan rounded-pill px-4 shadow-sm">Inscription</a>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -156,44 +192,71 @@
     :root {
         --cyan-main: #4B79A1;
         --cyan-hover: #1B2E4B;
-        /* Hauteur réservée sous la navbar fixe (logo + padding — évite chevauchement du slider / héros) */
         --main-nav-height: 5.25rem;
     }
-    body {
-        padding-top: var(--main-nav-height);
-    }
-    html {
-        scroll-padding-top: calc(var(--main-nav-height) + 0.5rem);
-    }
+    body { padding-top: var(--main-nav-height); }
+    html { scroll-padding-top: calc(var(--main-nav-height) + 0.5rem); }
     @media (max-width: 991.98px) {
         :root { --main-nav-height: 4.75rem; }
     }
+
     .modern-nav {
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(27, 46, 75, 0.08);
         padding: 0.55rem 0;
         z-index: 1030;
-        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
     }
-    .modern-nav > .container {
+    .modern-nav > .container,
+    .modern-nav > .container-fluid {
         max-width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+        column-gap: 0.35rem;
+        row-gap: 0;
     }
     .modern-nav .navbar-brand {
         min-width: 0;
-        margin-right: 0.75rem;
+        margin-right: auto;
+        order: 0;
+        flex: 0 1 auto;
+        padding-top: 0.15rem;
+        padding-bottom: 0.15rem;
+    }
+    .nav-quick-actions {
+        order: 1;
+        margin-left: 0;
+        flex: 0 0 auto;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 2;
     }
     .modern-nav .navbar-collapse {
+        order: 2;
         flex-grow: 1;
+        flex-basis: 100%;
         min-width: 0;
     }
-    .modern-nav .actions-container {
-        flex-shrink: 0;
+    .nav-menu-toggler {
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--cyan-soft, rgba(75, 121, 161, 0.08));
     }
-    .brand-logo-link {
-        line-height: 0;
-        padding: 0.1rem 0;
+    .nav-menu-toggler .navbar-toggler-icon {
+        width: 1.15rem;
+        height: 1.15rem;
     }
+
+    .brand-logo-link { line-height: 0; padding: 0.1rem 0; }
     .brand-logo-img {
         display: block;
         height: 52px;
@@ -202,20 +265,82 @@
         object-fit: contain;
         object-position: left center;
     }
-    @media (max-width: 991.98px) {
-        .brand-logo-img {
-            height: 44px;
-            max-width: min(148px, 48vw);
-        }
+
+    .nav-icon-link {
+        color: var(--text-muted-custom, #475569);
+        width: 40px;
+        height: 40px;
+        text-decoration: none;
+        border-radius: 50%;
+        transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+        background: var(--cyan-soft, rgba(75, 121, 161, 0.08));
+        border: none;
     }
-    .text-cyan-nav { color: var(--cyan-main); }
+    .nav-icon-link:hover {
+        color: var(--cyan-main);
+        background: rgba(75, 121, 161, 0.16);
+        transform: translateY(-1px);
+    }
+    .nav-icon-badge {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        min-width: 1rem;
+        height: 1rem;
+        padding: 0 0.25rem;
+        border-radius: 999px;
+        background: #dc3545;
+        color: #fff;
+        font-size: 0.62rem;
+        font-weight: 700;
+        line-height: 1rem;
+        text-align: center;
+        box-shadow: 0 0 0 2px var(--surface, #fff);
+    }
+    .nav-icon-badge--cyan { background: var(--cyan-main); }
+
+    .nav-quick-annonces {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 1.05rem;
+        text-decoration: none;
+        color: #fff;
+        background: linear-gradient(135deg, #4B79A1, #1B2E4B);
+        box-shadow: 0 6px 14px rgba(27, 46, 75, 0.22);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .nav-quick-annonces:hover,
+    .nav-quick-annonces.is-active {
+        color: #fff;
+        transform: translateY(-1px) scale(1.04);
+        box-shadow: 0 8px 18px rgba(27, 46, 75, 0.28);
+    }
+
+    .nav-notif-menu {
+        width: min(320px, calc(100vw - 1.5rem));
+        max-width: calc(100vw - 1.5rem);
+    }
+    .notif-scroll { max-height: 350px; overflow-y: auto; }
+
     .nav-links-container .nav-link {
-        color: #636e72;
-        font-weight: 600;
+        color: var(--text-muted-custom, #475569);
+        font-weight: 650;
         margin: 0 8px;
         padding: 0.45rem 0.35rem;
         transition: color 0.2s ease;
         position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+    }
+    .nav-link-ic {
+        display: none;
+        font-size: 1.05rem;
+        opacity: 0.85;
     }
     .nav-links-container .nav-link::after {
         content: '';
@@ -230,32 +355,188 @@
         transition: width 0.2s ease;
     }
     .nav-links-container .nav-link:hover,
-    .nav-links-container .nav-link.active {
-        color: var(--cyan-main);
-    }
+    .nav-links-container .nav-link.active { color: var(--cyan-main); }
     .nav-links-container .nav-link:hover::after,
-    .nav-links-container .nav-link.active::after {
-        width: 70%;
-    }
-    .nav-icon-link { color: #636e72; width: 42px; height: 42px; text-decoration: none; border-radius: 50%; transition: 0.2s; }
-    .nav-icon-link:hover { color: var(--cyan-main); background: #f8f9fa; }
+    .nav-links-container .nav-link.active::after { width: 70%; }
+
     .btn-custom-cyan { background-color: var(--cyan-main); color: white !important; border: none; transition: 0.3s; }
     .btn-custom-cyan:hover { background-color: var(--cyan-hover); transform: translateY(-2px); }
-    .user-pill {
-        background: var(--surface-2, #f8f9fa);
-        color: var(--text-strong, #1e293b);
-        padding: 4px 12px 4px 4px;
-        border-radius: 50px;
-        border: 1px solid var(--border-soft, rgba(15, 23, 42, 0.08));
-    }
-    .user-pill__name { color: inherit; }
-    .user-pill.dropdown-toggle::after { color: inherit; opacity: 0.7; }
+
     .avatar-container img, .avatar-placeholder {
-        width: 32px; height: 32px; border-radius: 50%;
+        width: 36px; height: 36px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         background: var(--surface, #fff);
         border: 1px solid var(--border-soft, #eee);
         color: var(--cyan-main);
+        object-fit: cover;
+    }
+
+    .nav-account-card { width: auto; }
+    .nav-account-trigger {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.3rem 0.7rem 0.3rem 0.3rem;
+        border-radius: 999px;
+        background: var(--cyan-soft, rgba(75, 121, 161, 0.08));
+        border: 1px solid var(--border-soft, rgba(75, 121, 161, 0.14));
+        color: var(--text-strong, #1e293b);
+        transition: background 0.18s ease, transform 0.18s ease;
+    }
+    .nav-account-trigger:hover {
+        background: rgba(75, 121, 161, 0.14);
+        transform: translateY(-1px);
+    }
+    .nav-account-meta {
+        display: none;
+        flex-direction: column;
+        line-height: 1.15;
+        text-align: left;
+    }
+    .nav-account-name { font-size: 0.88rem; font-weight: 700; color: inherit; }
+    .nav-account-hint { font-size: 0.68rem; color: var(--text-muted-custom, #64748b); font-weight: 500; }
+    .nav-account-chevron { font-size: 0.75rem; opacity: 0.55; }
+    .nav-account-trigger.dropdown-toggle::after { display: none; }
+
+    .nav-auth-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .nav-auth-login {
+        color: var(--text-strong, #1e293b);
+        font-weight: 650;
+        text-decoration: none;
+        padding: 0.45rem 0.8rem;
+    }
+
+    @media (max-width: 991.98px) {
+        .brand-logo-img {
+            height: 44px;
+            max-width: min(120px, 36vw);
+        }
+        .modern-nav .navbar-collapse {
+            flex-basis: 100%;
+            order: 2;
+        }
+        .nav-quick-actions {
+            order: 1;
+        }
+        .nav-mobile-panel {
+            margin-top: 0.75rem;
+            padding: 0.85rem;
+            border-radius: 1.15rem;
+            background: linear-gradient(180deg, var(--surface-2, rgba(244, 247, 251, 0.95)) 0%, var(--surface, rgba(255, 255, 255, 0.98)) 100%);
+            border: 1px solid var(--border-soft, rgba(75, 121, 161, 0.12));
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+            animation: navPanelIn 0.28s ease;
+        }
+        .nav-links-container {
+            gap: 0.4rem;
+            margin-bottom: 0.85rem !important;
+        }
+        .nav-links-container .nav-item { width: 100%; }
+        .nav-links-container .nav-link {
+            width: 100%;
+            margin: 0;
+            padding: 0.85rem 0.95rem;
+            border-radius: 0.9rem;
+            background: var(--surface, #fff);
+            border: 1px solid var(--border-soft, rgba(75, 121, 161, 0.1));
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+            justify-content: flex-start;
+        }
+        .nav-links-container .nav-link::after { display: none; }
+        .nav-link-ic { display: inline-flex; color: var(--cyan-main); }
+        .nav-links-container .nav-link.active,
+        .nav-links-container .nav-link:hover {
+            background: linear-gradient(135deg, rgba(75, 121, 161, 0.12), rgba(27, 46, 75, 0.06));
+            border-color: rgba(75, 121, 161, 0.22);
+            color: var(--cyan-hover);
+            transform: translateX(2px);
+        }
+        .modern-nav .actions-container {
+            width: 100%;
+            justify-content: stretch;
+            margin: 0;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(15, 23, 42, 0.06);
+        }
+        .nav-account-card { width: 100%; }
+        .nav-account-trigger {
+            width: 100%;
+            padding: 0.65rem 0.85rem 0.65rem 0.65rem;
+            border-radius: 1rem;
+            background: var(--surface, #fff);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+        }
+        .nav-account-meta { display: flex; flex: 1; min-width: 0; }
+        .nav-account-chevron { margin-left: auto; }
+        .nav-auth-actions {
+            width: 100%;
+            flex-direction: column;
+        }
+        .nav-auth-actions .btn { width: 100%; border-radius: 999px; padding: 0.7rem 1rem; }
+        .nav-quick-actions .nav-notif-dropdown { position: static; }
+        .nav-quick-actions .nav-notif-menu {
+            --bs-dropdown-min-width: 0;
+            position: fixed !important;
+            top: calc(var(--main-nav-height, 4.75rem) + 0.35rem) !important;
+            left: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: translate3d(-50%, 0, 0) !important;
+            width: min(20rem, calc(100vw - 1.5rem)) !important;
+            max-width: calc(100vw - 1.5rem) !important;
+            margin: 0 !important;
+            z-index: 1055;
+            animation: none !important;
+        }
+        .nav-quick-actions .nav-notif-menu.show {
+            transform: translate3d(-50%, 0, 0) !important;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .modern-nav > .container,
+        .modern-nav > .container-fluid {
+            flex-wrap: nowrap;
+        }
+        .modern-nav .navbar-brand {
+            margin-right: 0.75rem;
+            flex: 0 0 auto;
+        }
+        .modern-nav .navbar-collapse {
+            order: 1;
+            display: flex !important;
+            flex-basis: auto;
+            flex-grow: 1;
+            align-items: center;
+            min-width: 0;
+        }
+        .nav-quick-actions {
+            order: 2;
+            margin-left: 0.75rem;
+        }
+        .nav-quick-actions .navbar-toggler { display: none !important; }
+        .nav-mobile-panel {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 0.75rem;
+        }
+        .nav-links-container { margin-bottom: 0 !important; }
+        .actions-container { margin-left: auto; }
+        .nav-account-meta { display: none; }
+    }
+
+    @media (min-width: 1200px) {
+        .nav-account-meta { display: flex; }
+    }
+
+    @keyframes navPanelIn {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     .notif-scroll::-webkit-scrollbar { width: 4px; }
     .notif-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
@@ -263,5 +544,15 @@
     @keyframes slideIn { 0% { transform: translateY(10px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
     .slideIn { animation-name: slideIn; }
     .text-cyan { color: var(--cyan-main) !important; }
-    .hover-up:hover { transform: translateY(-2px); }
+
+    @media (prefers-reduced-motion: reduce) {
+        .nav-mobile-panel,
+        .nav-icon-link,
+        .nav-quick-annonces,
+        .nav-account-trigger,
+        .nav-links-container .nav-link {
+            animation: none !important;
+            transition: none !important;
+        }
+    }
 </style>

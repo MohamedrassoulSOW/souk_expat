@@ -1,36 +1,293 @@
 {% extends 'page/static_base.html.twig' %}
 
-{% block title %}Comment ça marche ? — {{ site ? site.siteName : 'SoukExpat' }}{% endblock %}
+{% block title %}Comment utiliser {{ site ? site.siteName : 'SoukExpat' }} — Guide{% endblock %}
 
-{% block page_badge %}Guide{% endblock %}
-{% block page_heading %}Comment ça marche ?{% endblock %}
-{% block page_lead %}{{ site ? site.howItWorksLead : 'Étapes simples pour vendre ou acheter entre expatriés.' }}{% endblock %}
+{% block page_badge %}Guide d’utilisation{% endblock %}
+{% block page_heading %}Comment utiliser la plateforme{% endblock %}
+{% block page_lead %}{{ site ? site.howItWorksLead : 'Achetez et vendez entre expatriés au Maroc, en quelques étapes simples.' }}{% endblock %}
 
 {% block static_body %}
 {% set steps = site ? site.howItWorksSteps : [] %}
-<div class="row g-4 mb-5">
-    {% for s in steps %}
-        <div class="col-12 col-md-6">
-            <div class="p-4 p-md-4 h-100 static-card-soft">
-                <div class="d-flex align-items-start gap-3">
-                    <div class="static-icon-circle flex-shrink-0">
-                        <i class="bi {{ s.icon|default('bi-circle') }}"></i>
-                    </div>
-                    <div>
-                        <span class="badge rounded-pill mb-2" style="background: var(--cyan-soft); color: var(--cyan-hover);">Étape {{ loop.index }}</span>
-                        <h2 class="h5 fw-bold text-dark mb-2">{{ s.title }}</h2>
-                        <p class="text-secondary mb-0 small">{{ s.text }}</p>
+{% set brand = site ? site.siteName : 'SoukExpat' %}
+
+{# Sommaire rapide #}
+<nav class="guide-toc mb-5" aria-label="Sommaire du guide">
+    <a href="#vue-ensemble" class="guide-toc__link">Vue d’ensemble</a>
+    <a href="#acheter" class="guide-toc__link">Acheter</a>
+    <a href="#vendre" class="guide-toc__link">Vendre</a>
+    <a href="#messagerie" class="guide-toc__link">Messagerie</a>
+    <a href="#securite" class="guide-toc__link">Sécurité</a>
+</nav>
+
+<section id="vue-ensemble" class="mb-5">
+    <h2 class="guide-section-title">Vue d’ensemble</h2>
+    <p class="text-secondary mb-4">
+        {{ brand }} est une marketplace communautaire : vous publiez ou consultez des annonces,
+        puis vous contactez l’autre membre. La plateforme met en relation — elle ne gère ni paiement ni livraison.
+    </p>
+    <div class="row g-3 g-md-4">
+        {% for s in steps %}
+            <div class="col-12 col-md-6">
+                <div class="p-4 h-100 static-card-soft">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="static-icon-circle flex-shrink-0">
+                            <i class="bi {{ s.icon|default('bi-circle') }}" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <span class="badge rounded-pill mb-2 guide-step-badge">Étape {{ loop.index }}</span>
+                            <h3 class="h5 fw-bold mb-2">{{ s.title }}</h3>
+                            <p class="text-secondary mb-0 small">{{ s.text }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
+        {% else %}
+            <div class="col-12">
+                <p class="text-muted">Les étapes seront bientôt disponibles.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="acheter" class="mb-5">
+    <h2 class="guide-section-title">Comment acheter</h2>
+    <ol class="guide-steps list-unstyled mb-0">
+        <li class="guide-steps__item">
+            <span class="guide-steps__num" aria-hidden="true">1</span>
+            <div>
+                <h3 class="h6 fw-bold mb-1">Parcourir les annonces</h3>
+                <p class="text-secondary small mb-0">
+                    Depuis l’accueil ou <a href="{{ path('app_annonce_index') }}">Annonces</a>, filtrez par catégorie, ville ou mots-clés.
+                </p>
+            </div>
+        </li>
+        <li class="guide-steps__item">
+            <span class="guide-steps__num" aria-hidden="true">2</span>
+            <div>
+                <h3 class="h6 fw-bold mb-1">Ouvrir une fiche</h3>
+                <p class="text-secondary small mb-0">
+                    Consultez photos, prix (MAD), description et le profil public du vendeur.
+                </p>
+            </div>
+        </li>
+        <li class="guide-steps__item">
+            <span class="guide-steps__num" aria-hidden="true">3</span>
+            <div>
+                <h3 class="h6 fw-bold mb-1">Contacter le vendeur</h3>
+                <p class="text-secondary small mb-0">
+                    Connectez-vous, puis utilisez la messagerie {{ brand }} et/ou WhatsApp si le vendeur l’a renseigné.
+                </p>
+            </div>
+        </li>
+        <li class="guide-steps__item">
+            <span class="guide-steps__num" aria-hidden="true">4</span>
+            <div>
+                <h3 class="h6 fw-bold mb-1">Conclure en personne</h3>
+                <p class="text-secondary small mb-0">
+                    Convenez d’un lieu sûr, vérifiez le bien, puis payez uniquement après réception.
+                </p>
+            </div>
+        </li>
+    </ol>
+</section>
+
+<section id="vendre" class="mb-5">
+    <h2 class="guide-section-title">Comment vendre</h2>
+    <ol class="guide-steps list-unstyled mb-0">
+        <li class="guide-steps__item">
+            <span class="guide-steps__num" aria-hidden="true">1</span>
+            <div>
+                <h3 class="h6 fw-bold mb-1">Créer un compte</h3>
+                <p class="text-secondary small mb-0">
+                    <a href="{{ path('app_register') }}">Inscrivez-vous</a>, complétez votre profil (photo, WhatsApp optionnel) pour rassurer les acheteurs.
+                </p>
+            </div>
+        </li>
+        <li class="guide-steps__item">
+            <span class="guide-steps__num" aria-hidden="true">2</span>
+            <div>
+                <h3 class="h6 fw-bold mb-1">Publier une annonce</h3>
+                <p class="text-secondary small mb-0">
+                    Cliquez sur <strong>Vendre</strong> : titre, description, prix, photos, catégorie et ville.
+                </p>
+            </div>
+        </li>
+        <li class="guide-steps__item">
+            <span class="guide-steps__num" aria-hidden="true">3</span>
+            <div>
+                <h3 class="h6 fw-bold mb-1">Attendre la validation</h3>
+                <p class="text-secondary small mb-0">
+                    L’annonce passe en modération. Vous recevez une notification dès qu’elle est approuvée ou refusée.
+                    Suivez l’état dans <a href="{{ path('app_mes_annonces') }}">Mes annonces</a>.
+                </p>
+            </div>
+        </li>
+        <li class="guide-steps__item">
+            <span class="guide-steps__num" aria-hidden="true">4</span>
+            <div>
+                <h3 class="h6 fw-bold mb-1">Répondre aux messages</h3>
+                <p class="text-secondary small mb-0">
+                    Répondez vite, précisez l’état du bien et organisez la remise en personne.
+                </p>
+            </div>
+        </li>
+    </ol>
+</section>
+
+<section id="messagerie" class="mb-5">
+    <h2 class="guide-section-title">Messagerie &amp; contact</h2>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="p-4 h-100 static-card-soft text-center">
+                <div class="static-icon-circle mx-auto mb-3"><i class="bi bi-chat-dots" aria-hidden="true"></i></div>
+                <h3 class="h6 fw-bold">Messagerie {{ brand }}</h3>
+                <p class="text-secondary small mb-0">Texte, photos et partage de position dans une conversation liée à l’annonce.</p>
+            </div>
         </div>
-    {% endfor %}
+        <div class="col-md-4">
+            <div class="p-4 h-100 static-card-soft text-center">
+                <div class="static-icon-circle mx-auto mb-3"><i class="bi bi-whatsapp" aria-hidden="true"></i></div>
+                <h3 class="h6 fw-bold">WhatsApp</h3>
+                <p class="text-secondary small mb-0">Si le vendeur l’a ajouté à son profil, contactez-le aussi via WhatsApp.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 h-100 static-card-soft text-center">
+                <div class="static-icon-circle mx-auto mb-3"><i class="bi bi-bell" aria-hidden="true"></i></div>
+                <h3 class="h6 fw-bold">Notifications</h3>
+                <p class="text-secondary small mb-0">Soyez informé de la validation de vos annonces et des échanges importants.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="securite" class="mb-5">
+    <h2 class="guide-section-title">Conseils de sécurité</h2>
+    <ul class="guide-safety list-unstyled mb-0">
+        <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Ne payez jamais avant d’avoir reçu et vérifié le produit.</li>
+        <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Rencontrez-vous dans un lieu public et fréquenté.</li>
+        <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Méfiez-vous des prix trop bas ou des demandes de paiement anticipé.</li>
+        <li><i class="bi bi-check2-circle" aria-hidden="true"></i> {{ brand }} ne gère pas les paiements, livraisons ni litiges entre particuliers.</li>
+        <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Signalez une annonce douteuse via le <a href="{{ path('app_contact') }}">formulaire de contact</a>.</li>
+    </ul>
+</section>
+
+<div class="text-center p-4 p-md-5 rounded-4 border guide-cta">
+    <h3 class="h5 fw-bold mb-2">Prêt à commencer ?</h3>
+    <p class="text-secondary mb-4">Rejoignez la communauté {{ brand }} ou consultez la FAQ.</p>
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+        <a href="{{ path('app_annonce_index') }}" class="btn btn-lg text-white border-0 px-4 rounded-pill about-btn-brand">Voir les annonces</a>
+        {% if not app.user %}
+            <a href="{{ path('app_register') }}" class="btn btn-lg btn-outline-secondary rounded-pill px-4">Créer un compte</a>
+        {% else %}
+            <a href="{{ path('app_annonce_new') }}" class="btn btn-lg btn-outline-secondary rounded-pill px-4">Publier une annonce</a>
+        {% endif %}
+        <a href="{{ path('app_faq') }}" class="btn btn-lg btn-outline-secondary rounded-pill px-4">FAQ</a>
+    </div>
 </div>
 
-<div class="text-center p-4 p-md-5 rounded-4 border how-it-works-cta" style="border-color: rgba(66, 177, 206, 0.2) !important; background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);">
-    <h3 class="h5 fw-bold text-dark mb-3">Prêt à commencer ?</h3>
-    <p class="text-secondary mb-4">Rejoignez la communauté {{ site ? site.siteName : 'SoukExpat' }}.</p>
-    <a href="{{ path('app_annonce_index') }}" class="btn btn-lg me-2 mb-2 btn-custom-cyan" style="color: #fff;">Voir les annonces</a>
-    <a href="{{ path('app_register') }}" class="btn btn-lg btn-outline-secondary mb-2">Créer un compte</a>
-</div>
+<style>
+    .guide-toc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .guide-toc__link {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        color: var(--cyan-hover, #1B2E4B);
+        background: rgba(75, 121, 161, 0.1);
+        border: 1px solid rgba(75, 121, 161, 0.18);
+        transition: background .15s ease, color .15s ease;
+    }
+    .guide-toc__link:hover {
+        background: var(--cyan-main, #4B79A1);
+        color: #fff;
+        border-color: transparent;
+    }
+    .guide-section-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-strong, #1B2E4B);
+        margin-bottom: 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 3px solid var(--cyan-main, #4B79A1);
+        display: inline-block;
+        min-width: 6rem;
+    }
+    .guide-step-badge {
+        background: var(--cyan-soft, rgba(75, 121, 161, 0.14));
+        color: var(--cyan-hover, #1B2E4B);
+    }
+
+    /* Mode sombre : contraste lisible (pills + badges) */
+    [data-bs-theme="dark"] .guide-toc__link,
+    html.theme-dark .guide-toc__link {
+        color: #f8fafc !important;
+        background: rgba(148, 163, 184, 0.22) !important;
+        border-color: rgba(186, 230, 253, 0.35) !important;
+    }
+    [data-bs-theme="dark"] .guide-toc__link:hover,
+    html.theme-dark .guide-toc__link:hover {
+        background: #4B79A1 !important;
+        color: #fff !important;
+        border-color: transparent !important;
+    }
+    [data-bs-theme="dark"] .guide-step-badge,
+    html.theme-dark .guide-step-badge {
+        background: #4B79A1 !important;
+        color: #fff !important;
+    }
+    [data-bs-theme="dark"] .guide-section-title,
+    html.theme-dark .guide-section-title {
+        color: #f8fafc !important;
+    }
+    [data-bs-theme="dark"] .static-card-soft .text-secondary,
+    html.theme-dark .static-card-soft .text-secondary {
+        color: #cbd5e1 !important;
+    }
+    .guide-steps__item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(75, 121, 161, 0.12);
+    }
+    .guide-steps__item:last-child { border-bottom: 0; }
+    .guide-steps__num {
+        flex-shrink: 0;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.9rem;
+        background: #1B2E4B;
+        color: #fff;
+    }
+    .guide-safety li {
+        display: flex;
+        gap: 0.65rem;
+        align-items: flex-start;
+        padding: 0.55rem 0;
+        color: var(--text-strong, #0f172a);
+        font-size: 0.95rem;
+    }
+    .guide-safety .bi {
+        color: #198754;
+        font-size: 1.15rem;
+        margin-top: 0.1rem;
+    }
+    .guide-cta {
+        border-color: rgba(66, 177, 206, 0.2) !important;
+        background: linear-gradient(180deg, var(--surface-2, #f4f7fb) 0%, var(--surface, #fff) 100%);
+    }
+</style>
 {% endblock %}

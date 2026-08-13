@@ -54,7 +54,8 @@ class AnnonceType extends AbstractType
                 'label' => 'Catégorie',
                 'placeholder' => 'Choisir une catégorie',
                 'attr' => [
-                    'class' => 'form-select',
+                    'class' => 'form-select js-searchable-select',
+                    'data-placeholder' => 'Rechercher une catégorie…',
                 ],
             ])
 
@@ -64,7 +65,8 @@ class AnnonceType extends AbstractType
                 'label' => 'Ville',
                 'placeholder' => 'Choisir une ville',
                 'attr' => [
-                    'class' => 'form-select',
+                    'class' => 'form-select js-searchable-select',
+                    'data-placeholder' => 'Rechercher une ville…',
                 ],
             ])
 

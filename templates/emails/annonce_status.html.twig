@@ -6,10 +6,11 @@
     <h2>Bonjour {{ user.firstName|default('') }},</h2>
 
     {% if approved %}
-        <p>Bonne nouvelle : votre annonce a été <strong>validée</strong> et est maintenant visible sur {{ site ? site.siteName : 'SoukExpat' }}.</p>
+        <p>Bonne nouvelle : votre annonce a été <strong>validée</strong> par notre équipe.</p>
+        <p>Elle est maintenant visible par tous les visiteurs de {{ site ? site.siteName : 'SoukExpat' }}.</p>
     {% else %}
         <p>Votre annonce a été <strong>refusée</strong> par notre équipe de modération.</p>
-        <p>Vous pouvez la modifier puis la soumettre à nouveau, ou nous contacter si besoin.</p>
+        <p>Vous pouvez la modifier, puis la soumettre à nouveau depuis votre espace « Mes annonces ».</p>
     {% endif %}
 
     <div class="meta">
@@ -22,13 +23,15 @@
         {% endif %}
     </div>
 
-    {% if approved %}
+    {% if approved and annonceUrl %}
         <div class="button-wrapper">
-            <a class="button" href="{{ url('app_annonce_show', { id: annonce.id }) }}">Voir mon annonce</a>
+            <a class="button" href="{{ annonceUrl }}">Voir mon annonce en ligne</a>
         </div>
-    {% else %}
+    {% elseif not approved and mesAnnoncesUrl %}
         <div class="button-wrapper">
-            <a class="button" href="{{ url('app_mes_annonces') }}">Mes annonces</a>
+            <a class="button" href="{{ mesAnnoncesUrl }}">Modifier mon annonce</a>
         </div>
     {% endif %}
+
+    <p>Cet e-mail a été envoyé depuis <strong>{{ siteContactEmail }}</strong>. Vous pouvez répondre directement si besoin.</p>
 {% endblock %}

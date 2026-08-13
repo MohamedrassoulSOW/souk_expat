@@ -38,7 +38,7 @@ class ResetPasswordController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $email = $form->get('email')->getData();
 
-            return $this->processSendingPasswordResetEmail($email, $platformMailer);
+            return $this->processSendingPasswordResetEmail($request, $email, $platformMailer);
         }
 
         return $this->render('reset_password/request.html.twig', [
@@ -47,14 +47,18 @@ class ResetPasswordController extends AbstractController
     }
 
     #[Route('/check-email', name: 'app_check_email')]
-    public function checkEmail(): Response
+    public function checkEmail(Request $request): Response
     {
         if (null === ($resetToken = $this->getTokenObjectFromSession())) {
             $resetToken = $this->resetPasswordHelper->generateFakeResetToken();
         }
 
+        $mailFailed = (bool) $request->getSession()->get('_password_reset_mail_failed', false);
+        $request->getSession()->remove('_password_reset_mail_failed');
+
         return $this->render('reset_password/check_email.html.twig', [
             'resetToken' => $resetToken,
+            'mailFailed' => $mailFailed,
         ]);
     }
 
@@ -97,7 +101,7 @@ class ResetPasswordController extends AbstractController
         ]);
     }
 
-    private function processSendingPasswordResetEmail(string $emailFormData, PlatformMailer $platformMailer): RedirectResponse
+    private function processSendingPasswordResetEmail(Request $request, string $emailFormData, PlatformMailer $platformMailer): RedirectResponse
     {
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $emailFormData]);
 
@@ -111,8 +115,12 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('app_check_email');
         }
 
-        $platformMailer->sendPasswordReset($user, $resetToken);
+        $mailSent = $platformMailer->sendPasswordReset($user, $resetToken);
         $this->setTokenObjectInSession($resetToken);
+
+        if (!$mailSent) {
+            $request->getSession()->set('_password_reset_mail_failed', true);
+        }
 
         return $this->redirectToRoute('app_check_email');
     }

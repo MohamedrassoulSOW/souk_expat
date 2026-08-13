@@ -117,7 +117,7 @@
                             {% if category is not defined %}
                                 <div class="col-12 col-sm-6 col-md-3">
                                     <label class="form-label small text-muted mb-1" for="annonce-cat">Catégorie</label>
-                                    <select id="annonce-cat" name="category" class="form-select bg-white border">
+                                    <select id="annonce-cat" name="category" class="form-select bg-white border js-searchable-select" data-placeholder="Rechercher une catégorie…">
                                         <option value="">Toutes les catégories</option>
                                         {% for cat in search_categories %}
                                             <option value="{{ cat.id }}" {{ sf.categoryId == cat.id ? 'selected' }}>{{ cat.name }}</option>
@@ -127,7 +127,7 @@
                             {% endif %}
                             <div class="col-12 {{ category is defined ? 'col-sm-6 col-md-4' : 'col-sm-6 col-md-3' }}">
                                 <label class="form-label small text-muted mb-1" for="annonce-city">Ville</label>
-                                <select id="annonce-city" name="city" class="form-select bg-white border">
+                                <select id="annonce-city" name="city" class="form-select bg-white border js-searchable-select" data-placeholder="Rechercher une ville…">
                                     <option value="">Toutes les villes</option>
                                     {% for city in cities %}
                                         <option value="{{ city.id }}" {{ sf.cityId == city.id ? 'selected' }}>{{ city.name }}</option>

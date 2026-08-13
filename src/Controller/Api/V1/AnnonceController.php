@@ -222,6 +222,12 @@ final class AnnonceController extends AbstractController
 
         $annonce->setUpdatedAt(new \DateTimeImmutable());
 
+        // Modification utilisateur → retour en attente de modération
+        if (!$this->isGranted('ROLE_EDITOR')) {
+            $annonce->setStatus(Annonce::STATUS_PENDING);
+            $annonce->setApprovedAt(null);
+        }
+
         $images = $this->writer->attachUploadedImages($annonce, $this->writer->collectImageFiles($request));
         $images = array_merge(
             $images,
@@ -235,7 +241,9 @@ final class AnnonceController extends AbstractController
 
         return $this->json([
             'item' => $this->resources->annonce($annonce, true),
-            'message' => 'Annonce mise à jour.',
+            'message' => !$this->isGranted('ROLE_EDITOR')
+                ? 'Annonce mise à jour — en attente de validation.'
+                : 'Annonce mise à jour.',
         ]);
     }
 

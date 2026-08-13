@@ -95,7 +95,8 @@ function shouldKeepUploadPlaceholder(string $relative): bool
 {
     $relative = str_replace('\\', '/', $relative);
     return (bool) preg_match('#^public/uploads(/.+)?/\.gitkeep$#', $relative)
-        || $relative === 'public/uploads/.gitkeep';
+        || $relative === 'public/uploads/.gitkeep'
+        || $relative === 'public/uploads/.htaccess';
 }
 
 echo "=== Export production SoukExpat ===\n";
@@ -195,6 +196,13 @@ foreach ($uploadDirs as $dir) {
     if (!is_file($keep)) {
         file_put_contents($keep, '');
     }
+}
+
+// Sécurité uploads : toujours emporter .htaccess
+$uploadsHtaccessSrc = $root . '/public/uploads/.htaccess';
+$uploadsHtaccessDest = $out . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . '.htaccess';
+if (is_file($uploadsHtaccessSrc)) {
+    copy($uploadsHtaccessSrc, $uploadsHtaccessDest);
 }
 
 // Copier le template env uploadable

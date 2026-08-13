@@ -10,15 +10,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/city')]
+#[IsGranted('ROLE_EDITOR')]
 final class CityController extends AbstractController
 {
     #[Route(name: 'app_city_index', methods: ['GET'])]
     public function index(CityRepository $cityRepository): Response
     {
         return $this->render('city/index.html.twig', [
-            'cities' => $cityRepository->findAll(),
+            'cities' => $cityRepository->findAllOrderedByName(),
         ]);
     }
 

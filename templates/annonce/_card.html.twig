@@ -71,15 +71,16 @@
                 </a>
                 {% if card_wa and card_wa_href != '#' and (not app.user or app.user.id != annonce.user.id) %}
                     <a href="{{ card_wa_href }}"
-                       class="annonce-listing-card__wa d-inline-flex align-items-center gap-1 text-decoration-none"
+                       class="annonce-wa-btn"
                        target="_blank"
                        rel="noopener noreferrer"
-                       title="WhatsApp"
+                       title="Contacter sur WhatsApp"
                        aria-label="Contacter {{ annonce.user.firstName }} sur WhatsApp"
                        data-require-safety-ack="1"
                        data-safety-context="annonce">
-                        <i class="bi bi-whatsapp" aria-hidden="true"></i>
-                        <span class="d-none d-md-inline small text-success">WhatsApp</span>
+                        <span class="annonce-wa-btn__icon" aria-hidden="true">
+                            <i class="bi bi-whatsapp"></i>
+                        </span>
                     </a>
                 {% endif %}
             </div>

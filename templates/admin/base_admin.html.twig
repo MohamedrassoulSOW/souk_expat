@@ -76,31 +76,123 @@
 (function () {
     var menu = document.getElementById('adminMobileDropdown');
     var btn = document.getElementById('adminMenuToggleBtn');
-    if (!menu || !btn) return;
+    if (menu && btn) {
+        var iconOpen = btn.querySelector('.admin-menu-toggle__icon-open');
+        var iconClose = btn.querySelector('.admin-menu-toggle__icon-close');
+        var label = btn.querySelector('.admin-menu-toggle__label');
 
-    var iconOpen = btn.querySelector('.admin-menu-toggle__icon-open');
-    var iconClose = btn.querySelector('.admin-menu-toggle__icon-close');
-    var label = btn.querySelector('.admin-menu-toggle__label');
+        function setOpen(open) {
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            btn.classList.toggle('is-open', open);
+            if (iconOpen) iconOpen.classList.toggle('d-none', open);
+            if (iconClose) iconClose.classList.toggle('d-none', !open);
+            if (label) label.textContent = open ? 'Fermer' : 'Menu';
+            document.body.classList.toggle('admin-mobile-menu-open', open);
+        }
 
-    function setOpen(open) {
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.classList.toggle('is-open', open);
-        if (iconOpen) iconOpen.classList.toggle('d-none', open);
-        if (iconClose) iconClose.classList.toggle('d-none', !open);
-        if (label) label.textContent = open ? 'Fermer' : 'Menu';
-        document.body.classList.toggle('admin-mobile-menu-open', open);
+        menu.addEventListener('show.bs.collapse', function () { setOpen(true); });
+        menu.addEventListener('hide.bs.collapse', function () { setOpen(false); });
+
+        menu.querySelectorAll('[data-admin-nav-link]').forEach(function (link) {
+            link.addEventListener('click', function () {
+                if (window.bootstrap && bootstrap.Collapse) {
+                    var instance = bootstrap.Collapse.getInstance(menu);
+                    if (instance) instance.hide();
+                }
+            });
+        });
+    }
+})();
+
+/* Recherche tableaux admin (catégories / villes) — autonome, sans asset mapper */
+(function () {
+    function stripAccents(str) {
+        return String(str || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
     }
 
-    menu.addEventListener('show.bs.collapse', function () { setOpen(true); });
-    menu.addEventListener('hide.bs.collapse', function () { setOpen(false); });
+    function bindAdminTableSearch() {
+        document.querySelectorAll('input.js-admin-table-search').forEach(function (input) {
+            if (input.dataset.boundAdminSearch === '1') return;
+            input.dataset.boundAdminSearch = '1';
 
-    menu.querySelectorAll('[data-admin-nav-link]').forEach(function (link) {
-        link.addEventListener('click', function () {
-            if (window.bootstrap && bootstrap.Collapse) {
-                var instance = bootstrap.Collapse.getInstance(menu);
-                if (instance) instance.hide();
+            var table = document.querySelector(input.getAttribute('data-table-target') || '');
+            if (!table) return;
+
+            var emptyEl = document.querySelector(input.getAttribute('data-empty-target') || '');
+            var countEl = document.querySelector(input.getAttribute('data-count-target') || '');
+            var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr[data-search]'));
+
+            function apply() {
+                var q = stripAccents((input.value || '').trim());
+                var visible = 0;
+                rows.forEach(function (row) {
+                    var hay = stripAccents(row.getAttribute('data-search') || '');
+                    var match = !q || hay.indexOf(q) !== -1;
+                    row.classList.toggle('d-none', !match);
+                    if (match) visible += 1;
+                });
+                if (emptyEl) {
+                    emptyEl.classList.toggle('d-none', visible > 0 || rows.length === 0);
+                }
+                if (countEl) {
+                    countEl.textContent = String(visible);
+                }
             }
+
+            input.addEventListener('input', apply);
+            input.addEventListener('search', apply);
+            apply();
         });
+    }
+
+    document.addEventListener('DOMContentLoaded', bindAdminTableSearch);
+    document.addEventListener('turbo:load', bindAdminTableSearch);
+})();
+
+/* Menus Actions : ouverture vers le haut si pas assez de place en bas */
+(function () {
+    if (window.__soukSmartDropupBoundInline) return;
+    window.__soukSmartDropupBoundInline = true;
+
+    document.addEventListener('show.bs.dropdown', function (event) {
+        var toggle = event.target;
+        if (!toggle || !toggle.closest) return;
+
+        var dropdown = toggle.closest('.dropdown, .dropup');
+        if (!dropdown) return;
+        if (dropdown.closest('.modern-nav, .navbar, .nav-quick-actions, .nav-account-card, .nav-notif-dropdown')) {
+            return;
+        }
+
+        var menu = dropdown.querySelector('.dropdown-menu');
+        if (!menu) return;
+
+        var rect = toggle.getBoundingClientRect();
+        var spaceBelow = window.innerHeight - rect.bottom;
+        var spaceAbove = rect.top;
+
+        var prevDisplay = menu.style.display;
+        var prevVisibility = menu.style.visibility;
+        menu.style.visibility = 'hidden';
+        menu.style.display = 'block';
+        var menuHeight = Math.max(menu.offsetHeight, 180);
+        menu.style.display = prevDisplay;
+        menu.style.visibility = prevVisibility;
+
+        var needUp = spaceBelow < menuHeight + 12 && spaceAbove > spaceBelow;
+        dropdown.classList.toggle('dropup', needUp);
+    });
+
+    document.addEventListener('hidden.bs.dropdown', function (event) {
+        var toggle = event.target;
+        if (!toggle || !toggle.closest) return;
+        var dropdown = toggle.closest('.dropdown, .dropup');
+        if (dropdown && !dropdown.classList.contains('js-keep-dropup')) {
+            dropdown.classList.remove('dropup');
+        }
     });
 })();
 </script>

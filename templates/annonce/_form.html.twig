@@ -5,8 +5,8 @@
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                 {# Header de la carte #}
                 <div class="p-4 text-white text-center" style="background-color: #42B1CE;">
-                    <h3 class="fw-bold mb-1">Créer une annonce</h3>
-                    <p class="mb-0 opacity-75 small">Remplissez les détails pour attirer les acheteurs</p>
+                    <h3 class="fw-bold mb-1">CrÃ©er une annonce</h3>
+                    <p class="mb-0 opacity-75 small">Remplissez les dÃ©tails pour attirer les acheteurs</p>
                 </div>
 
                 <div class="card-body p-4 p-md-5 bg-white">
@@ -32,12 +32,12 @@
                             {{ form_errors(form.price) }}
                         </div>
 
-                        {# CATÉGORIE #}
+                        {# CATEGORIE #}
                         <div class="col-6 col-md-6">
-                            <label class="form-label fw-bold small text-uppercase text-muted">Catégorie</label>
+                            <label class="form-label fw-bold small text-uppercase text-muted">CatÃ©gorie</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-grid text-muted"></i></span>
-                                {{ form_widget(form.category, {'attr': {'class': 'form-select border-start-0 ps-0'}}) }}
+                                {{ form_widget(form.category, {'attr': {'class': 'form-select border-start-0 ps-0 js-searchable-select', 'data-placeholder': 'Rechercher une catÃ©gorieâ€¦'}}) }}
                             </div>
                             {{ form_errors(form.category) }}
                         </div>
@@ -47,7 +47,7 @@
                             <label class="form-label fw-bold small text-uppercase text-muted">Ville / Quartier</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-geo-alt text-muted"></i></span>
-                                {{ form_widget(form.city, {'attr': {'class': 'form-control border-start-0 ps-0'}}) }}
+                                {{ form_widget(form.city, {'attr': {'class': 'form-select border-start-0 ps-0 js-searchable-select', 'data-placeholder': 'Rechercher une villeâ€¦'}}) }}
                             </div>
                             {{ form_errors(form.city) }}
                         </div>
@@ -59,14 +59,14 @@
                                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-whatsapp text-success"></i></span>
                                 {{ form_widget(form.phone, {'attr': {'class': 'form-control border-start-0 ps-0', 'placeholder': '+212 6XX XXX XXX'}}) }}
                             </div>
-                            <div class="form-text small">Prérempli depuis votre profil si disponible. Les acheteurs pourront vous écrire directement sur WhatsApp (même sans compte).</div>
+                            <div class="form-text small">PrÃ©rempli depuis votre profil si disponible. Les acheteurs pourront vous Ã©crire directement sur WhatsApp (mÃªme sans compte).</div>
                             {{ form_errors(form.phone) }}
                         </div>
 
                         {# DESCRIPTION #}
                         <div class="col-12">
-                            <label class="form-label fw-bold small text-uppercase text-muted">Description détaillée</label>
-                            {{ form_widget(form.description, {'attr': {'class': 'form-control rounded-3', 'rows': 5, 'placeholder': 'Décrivez votre objet, son état, etc.'}}) }}
+                            <label class="form-label fw-bold small text-uppercase text-muted">Description dÃ©taillÃ©e</label>
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control rounded-3', 'rows': 5, 'placeholder': 'DÃ©crivez votre objet, son Ã©tat, etc.'}}) }}
                             {{ form_errors(form.description) }}
                         </div>
 
@@ -74,7 +74,7 @@
                             <div class="alert alert-light border rounded-4 small mb-0">
                                 <i class="bi bi-shield-check me-1 text-brand" aria-hidden="true"></i>
                                 Les acheteurs peuvent vous contacter via la <strong>messagerie SoukExpat</strong>
-                                {% if form.phone is defined %} et, si vous renseignez un numéro, via <strong>WhatsApp</strong>{% endif %}.
+                                {% if form.phone is defined %} et, si vous renseignez un numÃ©ro, via <strong>WhatsApp</strong>{% endif %}.
                             </div>
                         </div>
 
@@ -112,11 +112,11 @@
                             <div class="upload-zone p-4 rounded-4 border-dashed text-center position-relative bg-light">
                                 <i class="bi bi-cloud-arrow-up display-5 text-muted mb-2 d-block"></i>
                                 <label class="form-label fw-bold mb-1" for="{{ form.images.vars.id }}">
-                                    {{ existingCount > 0 ? 'Ajouter d?autres photos' : 'Images de l?annonce' }}
+                                    {{ existingCount > 0 ? 'Ajouter dâ€™autres photos' : 'Images de lâ€™annonce' }}
                                 </label>
                                 <p class="small text-muted mb-3">
-                                    Sélectionnez <strong>plusieurs fichiers</strong> à la fois (Ctrl ou Cmd).
-                                    {{ existingCount > 0 ? (8 - existingCount) ~ ' place(s) restante(s).' : 'Jusqu?à 8 photos · JPG, PNG, WEBP.' }}
+                                    SÃ©lectionnez <strong>plusieurs fichiers</strong> Ã  la fois (Ctrl ou Cmd).
+                                    {{ existingCount > 0 ? (8 - existingCount) ~ ' place(s) restante(s).' : 'Jusquâ€™Ã  8 photos â€” JPG, PNG, WEBP.' }}
                                 </p>
                                 {{ form_widget(form.images, {'attr': {
                                     'class': 'form-control form-control-sm',
@@ -144,7 +144,7 @@
 </main>
 
 <style>
-    /* --- Couleur Thème --- */
+    /* --- Couleur thÃ¨me --- */
     .btn-custom-cyan {
         background-color: #42B1CE;
         border-color: #42B1CE;
@@ -208,7 +208,7 @@
         if (files.length) {
             var hint = document.createElement('div');
             hint.className = 'col-12 small text-muted';
-            hint.textContent = files.length + ' photo(s) selectionnee(s)';
+            hint.textContent = files.length + ' photo(s) sÃ©lectionnÃ©e(s)';
             preview.appendChild(hint);
         }
     });

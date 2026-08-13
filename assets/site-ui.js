@@ -193,9 +193,176 @@ export function initSafetyDisclaimer() {
     });
 }
 
+/**
+ * Select catégorie / ville : saisie pour filtrer (Tom Select).
+ * Compatible Turbo (évite le double init).
+ */
+export function initSearchableSelects() {
+    if (typeof TomSelect === 'undefined') {
+        if (!window.__soukTomSelectRetry) {
+            window.__soukTomSelectRetry = 0;
+        }
+        if (window.__soukTomSelectRetry < 20) {
+            window.__soukTomSelectRetry += 1;
+            window.setTimeout(initSearchableSelects, 75);
+        }
+        return;
+    }
+    window.__soukTomSelectRetry = 0;
+
+    document.querySelectorAll('select.js-searchable-select').forEach((el) => {
+        if (!(el instanceof HTMLSelectElement)) {
+            return;
+        }
+        // Déjà initialisé, ou déjà encapsulé (évite flèches / wrappers multiples)
+        if (el.tomselect || el.classList.contains('tomselected') || el.closest('.ts-wrapper')) {
+            return;
+        }
+
+        const placeholder =
+            el.dataset.placeholder ||
+            el.querySelector('option[value=""]')?.textContent?.trim() ||
+            'Rechercher…';
+
+        // eslint-disable-next-line no-new
+        new TomSelect(el, {
+            allowEmptyOption: true,
+            create: false,
+            maxOptions: null,
+            sortField: { field: 'text', direction: 'asc' },
+            placeholder,
+            openOnFocus: true,
+            closeAfterSelect: true,
+            hideSelected: false,
+            dropdownParent: 'body',
+            controlInput: null,
+            plugins: ['dropdown_input'],
+            render: {
+                no_results() {
+                    return '<div class="no-results">Aucun résultat</div>';
+                },
+            },
+            onInitialize() {
+                this.wrapper.classList.add('js-searchable-select');
+                this.wrapper.classList.remove('form-select', 'form-select-sm');
+            },
+        });
+    });
+}
+
+export function initAdminTableSearch() {
+    document.querySelectorAll('input.js-admin-table-search').forEach((input) => {
+        if (input.dataset.bound === '1') {
+            return;
+        }
+        input.dataset.bound = '1';
+
+        const table = document.querySelector(input.dataset.tableTarget || '');
+        if (!table) {
+            return;
+        }
+        const emptyEl = document.querySelector(input.dataset.emptyTarget || '');
+        const countEl = document.querySelector(input.dataset.countTarget || '');
+        const rows = Array.from(table.querySelectorAll('tbody tr[data-search]'));
+
+        const apply = () => {
+            const strip = (s) =>
+                String(s || '')
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '');
+            const q = strip((input.value || '').trim());
+            let visible = 0;
+            rows.forEach((row) => {
+                const hay = strip(row.dataset.search || '');
+                const match = q === '' || hay.includes(q);
+                row.classList.toggle('d-none', !match);
+                if (match) {
+                    visible += 1;
+                }
+            });
+            if (emptyEl) {
+                emptyEl.classList.toggle('d-none', visible > 0 || rows.length === 0);
+            }
+            if (countEl) {
+                countEl.textContent = String(visible);
+            }
+        };
+
+        input.addEventListener('input', apply);
+        input.addEventListener('search', apply);
+    });
+}
+
+export function initSmartDropups() {
+    if (window.__soukSmartDropupBound) {
+        return;
+    }
+    window.__soukSmartDropupBound = true;
+
+    document.addEventListener('show.bs.dropdown', (event) => {
+        const toggle = event.target;
+        if (!(toggle instanceof Element)) {
+            return;
+        }
+
+        const dropdown = toggle.closest('.dropdown, .dropup');
+        if (!dropdown) {
+            return;
+        }
+
+        // Ne pas toucher à la navbar / menus déjà en haut
+        if (dropdown.closest('.modern-nav, .navbar, .nav-quick-actions, .nav-account-card, .nav-notif-dropdown')) {
+            return;
+        }
+
+        const menu = dropdown.querySelector('.dropdown-menu');
+        if (!menu) {
+            return;
+        }
+
+        const rect = toggle.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceAbove = rect.top;
+
+        // Estimer la hauteur du menu (peut être caché)
+        const prevDisplay = menu.style.display;
+        const prevVisibility = menu.style.visibility;
+        menu.style.visibility = 'hidden';
+        menu.style.display = 'block';
+        const menuHeight = Math.max(menu.offsetHeight, 180);
+        menu.style.display = prevDisplay;
+        menu.style.visibility = prevVisibility;
+
+        const needUp = spaceBelow < menuHeight + 12 && spaceAbove > spaceBelow;
+        dropdown.classList.toggle('dropup', needUp);
+    });
+
+    document.addEventListener('hidden.bs.dropdown', (event) => {
+        const toggle = event.target;
+        if (!(toggle instanceof Element)) {
+            return;
+        }
+        const dropdown = toggle.closest('.dropdown, .dropup');
+        if (!dropdown || !dropdown.classList.contains('js-smart-dropup')) {
+            // Keep dropup class only cleared for measured ones; always reset non-forced
+        }
+        if (dropdown && !dropdown.classList.contains('js-keep-dropup')) {
+            dropdown.classList.remove('dropup');
+        }
+    });
+}
+
 export function initSiteUi() {
     document.documentElement.classList.add('site-loaded');
     initFlashToasts();
     initRevealOnScroll();
     initSafetyDisclaimer();
+    initSearchableSelects();
+    initAdminTableSearch();
+    initSmartDropups();
+}
+
+if (typeof window !== 'undefined') {
+    window.initSiteUi = initSiteUi;
 }

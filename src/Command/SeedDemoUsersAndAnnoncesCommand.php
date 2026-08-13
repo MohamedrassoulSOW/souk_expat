@@ -352,7 +352,7 @@ final class SeedDemoUsersAndAnnoncesCommand extends Command
         }
 
         $defs = [
-            ['name' => 'Meubles', 'slug' => 'meubles'],
+            ['name' => 'Meubles salon', 'slug' => 'meubles-salon'],
             ['name' => 'Électroménager', 'slug' => 'electromenager'],
             ['name' => 'Véhicules & accessoires', 'slug' => 'vehicules-accessoires'],
         ];

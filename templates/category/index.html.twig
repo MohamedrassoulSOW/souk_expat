@@ -19,11 +19,24 @@
 
     <div class="admin-panel">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-3 border-bottom">
-            <span class="fw-semibold small">Liste des enregistrements</span>
-            <span class="admin-badge">{{ categories|length|cap999 }} catégorie{{ categories|length > 1 ? 's' : '' }}</span>
+            <div class="admin-table-search flex-grow-1" style="max-width: 22rem;">
+                <label class="visually-hidden" for="admin-cat-search">Rechercher une catégorie</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted" aria-hidden="true"></i></span>
+                    <input id="admin-cat-search"
+                           type="search"
+                           class="form-control border-start-0 js-admin-table-search"
+                           placeholder="Rechercher une catégorie…"
+                           data-table-target="#admin-categories-table"
+                           data-empty-target="#admin-categories-empty"
+                           data-count-target="#admin-categories-count"
+                           autocomplete="off">
+                </div>
+            </div>
+            <span class="admin-badge"><span id="admin-categories-count">{{ categories|length|cap999 }}</span> catégorie{{ categories|length > 1 ? 's' : '' }}</span>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table id="admin-categories-table" class="table table-hover align-middle mb-0">
                 <thead class="bg-light text-muted small">
                     <tr>
                         <th class="ps-3 py-3 border-0">ID</th>
@@ -36,7 +49,7 @@
                 </thead>
                 <tbody>
                     {% for category in categories %}
-                        <tr>
+                        <tr data-search="{{ (category.name ~ ' ' ~ category.slug ~ ' ' ~ category.id)|lower }}">
                             <td class="ps-3"><span class="text-muted font-monospace small">#{{ category.id }}</span></td>
                             <td>
                                 {% if category.imageName %}
@@ -47,7 +60,7 @@
                             </td>
                             <td class="d-none d-md-table-cell">
                                 {% if category.icon %}
-                                    <i class="{{ category.icon }} fs-5" style="color: var(--cyan-main);" aria-hidden="true"></i>
+                                    <i class="bi {{ category.icon }} fs-5" style="color: var(--cyan-main);" aria-hidden="true"></i>
                                 {% else %}
                                     <span class="text-muted small">—</span>
                                 {% endif %}
@@ -78,6 +91,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div id="admin-categories-empty" class="text-center text-muted py-4 d-none">Aucune catégorie ne correspond à la recherche.</div>
         </div>
     </div>
 {% endblock %}

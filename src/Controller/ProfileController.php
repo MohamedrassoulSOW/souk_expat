@@ -162,31 +162,45 @@ final class ProfileController extends AbstractController
 
         /** @var User $user */
         $user = $this->getUser();
-        $form = $this->createForm(ChangePasswordType::class);
+        $form = $this->createForm(ChangePasswordType::class, null, [
+            'require_current_password' => $user->hasPassword(),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $oldPassword = $form->get('oldPassword')->getData();
             $newPassword = $form->get('newPassword')->getData();
+
+            // Compte Google sans mot de passe : on autorise la création d’un mot de passe local
+            if (!$user->hasPassword()) {
+                $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
+                $user->setPassword($hashedPassword);
+                $entityManager->flush();
+                $this->addFlash('success', 'Mot de passe créé. Vous pouvez aussi vous connecter par e-mail.');
+
+                return $this->redirectToRoute('app_profile_password');
+            }
+
+            $oldPassword = $form->get('oldPassword')->getData();
 
             // Vérification de l'ancien mot de passe
             if (!$passwordHasher->isPasswordValid($user, $oldPassword)) {
                 $this->addFlash('danger', 'Votre mot de passe actuel est incorrect.');
                 // On redirige pour "fixer" le flash en session
                 return $this->redirectToRoute('app_profile_password');
-            } else {
-                // Hashage et sauvegarde
-                $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
-                $user->setPassword($hashedPassword);
-                $entityManager->flush();
-
-                $this->addFlash('success', 'Votre mot de passe a été modifié avec succès.');
-                return $this->redirectToRoute('app_profile_password');
             }
+
+            $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
+            $user->setPassword($hashedPassword);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre mot de passe a été modifié avec succès.');
+
+            return $this->redirectToRoute('app_profile_password');
         }
 
         return $this->render('profile/password.html.twig', [
             'passwordForm' => $form->createView(),
+            'isGoogleOnly' => !$user->hasPassword() && $user->isGoogleAccount(),
         ]);
     }
 

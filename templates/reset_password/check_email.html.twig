@@ -20,6 +20,15 @@
                     </div>
                     
                     <h2 class="fw-bold h3 mb-3">Vérifiez vos emails</h2>
+
+                    {% if mailFailed|default(false) %}
+                    <div class="alert alert-danger border-0 rounded-3 text-start mb-4 py-3">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>L’e-mail n’a pas pu être envoyé.</strong>
+                        Le serveur mail n’est pas configuré (MAILER_DSN). Contactez le support ou réessayez plus tard.
+                        En local : vérifiez <code>var/mail/</code> ou configurez SMTP dans <code>.env.local</code>.
+                    </div>
+                    {% endif %}
                     
                     <p class="text-muted mb-3 lead fs-6">
                         Si un compte existe pour l’adresse indiquée, un lien de réinitialisation

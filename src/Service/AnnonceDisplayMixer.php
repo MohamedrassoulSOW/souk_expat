@@ -5,8 +5,8 @@ namespace App\Service;
 final class AnnonceDisplayMixer
 {
     /**
-     * Réordonne les annonces pour les mélanger et éviter de voir plus de
-     * $maxSameUserInRow annonces successives d'un même utilisateur.
+     * Mélange les annonces (aléatoire) en évitant plus de $maxSameUserInRow
+     * annonces successives du même utilisateur.
      *
      * @param list<object> $annonces
      * @return list<object>
@@ -17,10 +17,14 @@ final class AnnonceDisplayMixer
             return [];
         }
 
+        if ($maxSameUserInRow < 1) {
+            $maxSameUserInRow = 1;
+        }
+
         $groups = [];
         foreach ($annonces as $annonce) {
             $userId = $this->getUserId($annonce);
-            $groupKey = $userId !== null ? 'user:' . $userId : 'guest';
+            $groupKey = $userId !== null ? 'user:'.$userId : 'guest:'.$this->getAnnonceId($annonce);
 
             if (!isset($groups[$groupKey])) {
                 $groups[$groupKey] = [];
@@ -28,6 +32,12 @@ final class AnnonceDisplayMixer
 
             $groups[$groupKey][] = $annonce;
         }
+
+        // Aléatoire au sein de chaque vendeur
+        foreach ($groups as &$groupItems) {
+            shuffle($groupItems);
+        }
+        unset($groupItems);
 
         $result = [];
         $lastUserKey = null;
@@ -40,31 +50,39 @@ final class AnnonceDisplayMixer
                     continue;
                 }
 
-                $groupUserKey = $groupKey;
-                $isSameUserAsLast = $groupUserKey === $lastUserKey;
-
+                $isSameUserAsLast = $groupKey === $lastUserKey;
                 if (!$isSameUserAsLast || $sameUserStreak < $maxSameUserInRow) {
                     $availableGroups[] = $groupKey;
                 }
             }
 
+            // Plus d'autre vendeur disponible : on continue avec le même (inévitable)
             if ($availableGroups === []) {
-                $availableGroups = array_keys(array_filter($groups, static fn (array $items): bool => $items !== []));
+                $availableGroups = array_keys(array_filter(
+                    $groups,
+                    static fn (array $items): bool => $items !== []
+                ));
             }
 
             if ($availableGroups === []) {
                 break;
             }
 
-            shuffle($availableGroups);
-            $groupKey = $availableGroups[0];
+            // Préférer un autre vendeur quand c'est possible (diversité)
+            $differentGroups = array_values(array_filter(
+                $availableGroups,
+                static fn (string $key): bool => $key !== $lastUserKey
+            ));
+            $pickFrom = $differentGroups !== [] ? $differentGroups : $availableGroups;
+
+            shuffle($pickFrom);
+            $groupKey = $pickFrom[0];
             $result[] = array_shift($groups[$groupKey]);
 
-            $groupUserKey = $groupKey;
-            if ($groupUserKey === $lastUserKey) {
+            if ($groupKey === $lastUserKey) {
                 ++$sameUserStreak;
             } else {
-                $lastUserKey = $groupUserKey;
+                $lastUserKey = $groupKey;
                 $sameUserStreak = 1;
             }
 
@@ -88,5 +106,14 @@ final class AnnonceDisplayMixer
         }
 
         return $user->getId();
+    }
+
+    private function getAnnonceId(object $annonce): string
+    {
+        if (method_exists($annonce, 'getId') && $annonce->getId() !== null) {
+            return (string) $annonce->getId();
+        }
+
+        return spl_object_hash($annonce);
     }
 }

@@ -30,25 +30,24 @@ final class HomeController extends AbstractController
         $categories = $categoryRepository->findAllOrderedByName();
         $categoriesWithCounts = $categoryRepository->findWithApprovedCounts();
 
-        // Accueil : récupérer un pool plus large, mélanger puis paginer
+        // Accueil : dernières annonces (pool), mélange aléatoire, max 3 d’affilée / vendeur
         $page = $request->query->getInt('page', 1);
         $perPage = 12;
-        $poolSize = $perPage * 5; // prendre un pool plus large pour permettre l'alternance
+        $poolSize = max(60, $perPage * 8);
 
         $qb = $annonceRepository->createApprovedSearchQueryBuilder(
             $filters->q,
             $filters->categoryId,
             $filters->cityId,
-            true,
+            false, // ordre chronologique (récentes d’abord) pour constituer le pool
         );
 
         $itemsPool = $qb->setMaxResults($poolSize)
             ->getQuery()
             ->getResult();
 
-        $mixedItems = $displayMixer->mix($itemsPool);
+        $mixedItems = $displayMixer->mix($itemsPool, 3);
 
-        // Paginer à partir du tableau mélangé
         $annoncesPaginees = $paginator->paginate(
             $mixedItems,
             $page,

@@ -67,6 +67,12 @@ $pwaFiles = [
     'public/icons/icon-192.png',
     'public/icons/icon-512.png',
     'public/icons/apple-touch-icon.png',
+    'public/vendor/bootstrap/css/bootstrap.min.css',
+    'public/vendor/bootstrap/js/bootstrap.bundle.min.js',
+    'public/vendor/bootstrap-icons/css/bootstrap-icons.min.css',
+    'public/vendor/tom-select/tom-select.complete.min.js',
+    'public/vendor/tom-select/tom-select.bootstrap5.min.css',
+    'public/uploads/.htaccess',
 ];
 $missingIcons = false;
 foreach ($pwaFiles as $file) {
@@ -75,7 +81,35 @@ foreach ($pwaFiles as $file) {
             $missingIcons = true;
             continue;
         }
-        fail("Fichier PWA manquant : {$file}");
+        if ($file === 'public/uploads/.htaccess') {
+            $src = $root . '/public/uploads/.htaccess';
+            // already missing — try recreate from known template next
+            $htaccess = <<<'HTA'
+# Empêche l’exécution de scripts dans les uploads (Apache / Hostinger)
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(?i:php|phtml|phar|php\d+|cgi|pl|py|asp|aspx|sh)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.(?i:php|phtml|phar|php\d+|cgi|pl|py|asp|aspx|sh)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+Options -Indexes -ExecCGI
+HTA;
+            if (!is_dir(dirname($src))) {
+                mkdir(dirname($src), 0775, true);
+            }
+            file_put_contents($src, $htaccess);
+            echo "[OK] public/uploads/.htaccess (créé)\n";
+            continue;
+        }
+        fail("Fichier PWA/vendor manquant : {$file}");
     }
     echo "[OK] {$file}\n";
 }

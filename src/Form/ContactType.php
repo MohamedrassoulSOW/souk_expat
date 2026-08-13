@@ -40,6 +40,18 @@ class ContactType extends AbstractType
                 'label' => 'Message',
                 'attr' => ['rows' => 5, 'placeholder' => 'Comment pouvons-nous vous aider ?', 'class' => 'bg-light border-0 shadow-none']
             ])
+            // Honeypot anti-spam (doit rester vide)
+            ->add('website', TextType::class, [
+                'mapped' => false,
+                'required' => false,
+                'label' => false,
+                'attr' => [
+                    'autocomplete' => 'off',
+                    'tabindex' => '-1',
+                    'aria-hidden' => 'true',
+                    'class' => 'contact-honeypot',
+                ],
+            ])
         ;
     }
 

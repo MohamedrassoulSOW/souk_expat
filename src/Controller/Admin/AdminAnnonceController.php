@@ -151,11 +151,14 @@ class AdminAnnonceController extends AbstractController
 
         if ($mailSent) {
             $this->addFlash('success', sprintf(
-                'Annonce validée — e-mail envoyé depuis %s.',
+                'Annonce validée — e-mail envoyé à %s depuis %s.',
+                $owner->getEmail(),
                 $platformMailer->contactEmail()
             ));
+        } elseif ($owner) {
+            $this->addFlash('warning', 'Annonce validée, mais l’e-mail à l’annonceur n’a pas pu être envoyé. Vérifiez MAILER_DSN.');
         } else {
-            $this->addFlash('success', 'Annonce validée.' . ($owner ? ' (e-mail non envoyé — vérifiez MAILER_DSN)' : ''));
+            $this->addFlash('success', 'Annonce validée.');
         }
 
         return $this->redirectToRoute('admin_annonces_pending');
@@ -182,6 +185,7 @@ class AdminAnnonceController extends AbstractController
         }
 
         $annonce->setStatus(Annonce::STATUS_REJECTED);
+        $annonce->setApprovedAt(null);
         $em->flush();
 
         $owner = $annonce->getUser();
@@ -197,11 +201,14 @@ class AdminAnnonceController extends AbstractController
 
         if ($mailSent) {
             $this->addFlash('warning', sprintf(
-                'Annonce refusée — e-mail envoyé depuis %s.',
+                'Annonce refusée — e-mail envoyé à %s depuis %s.',
+                $owner->getEmail(),
                 $platformMailer->contactEmail()
             ));
+        } elseif ($owner) {
+            $this->addFlash('danger', 'Annonce refusée, mais l’e-mail à l’annonceur n’a pas pu être envoyé. Vérifiez MAILER_DSN.');
         } else {
-            $this->addFlash('warning', 'Annonce refusée.' . ($owner ? ' (e-mail non envoyé — vérifiez MAILER_DSN)' : ''));
+            $this->addFlash('warning', 'Annonce refusée.');
         }
 
         return $this->redirectToRoute('admin_annonces_pending');

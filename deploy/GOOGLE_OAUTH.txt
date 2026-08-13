@@ -1,0 +1,30 @@
+Google OAuth — activation SoukExpat
+===================================
+
+1) Google Cloud Console
+   https://console.cloud.google.com/apis/credentials
+   → Créer des identifiants → ID client OAuth → Application Web
+
+2) URI de redirection autorisées (ajouter toutes celles utilisées) :
+   http://127.0.0.1:8001/connect/google/check
+   http://localhost:8001/connect/google/check
+   https://soukexpat.com/connect/google/check
+   https://www.soukexpat.com/connect/google/check
+
+3) Origines JavaScript autorisées :
+   http://127.0.0.1:8001
+   https://soukexpat.com
+
+4) Enregistrer Client ID + Secret en local :
+   php bin/console app:google-oauth:configure --env=prod ^
+     --client-id=VOTRE_ID.apps.googleusercontent.com ^
+     --client-secret=VOTRE_SECRET
+   php bin/console cache:clear --env=prod
+
+5) Vérifier :
+   php bin/console app:google-oauth:configure --env=prod --check
+   Ouvrir /login → bouton « Continuer avec Google »
+
+Routes :
+  /connect/google       → démarre OAuth
+  /connect/google/check → callback Google

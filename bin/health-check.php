@@ -64,6 +64,10 @@ $pages = [
     'À propos' => '/about',
     'Login' => '/login',
     'API index' => '/api/v1',
+    'PWA manifest' => '/manifest.webmanifest',
+    'PWA service worker' => '/sw.js',
+    'PWA offline' => '/offline.html',
+    'PWA icon 192' => '/icons/icon-192.png',
 ];
 
 foreach ($pages as $label => $path) {

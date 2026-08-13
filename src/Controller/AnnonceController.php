@@ -10,6 +10,7 @@ use App\Repository\AnnonceRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\CityRepository;
 use App\Service\AnnonceDeletionService;
+use App\Service\AnnonceDisplayMixer;
 use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -32,19 +33,30 @@ final class AnnonceController extends AbstractController
         CityRepository $cityRepository,
         PaginatorInterface $paginator,
         Request $request,
+        AnnonceDisplayMixer $displayMixer,
     ): Response {
         $filters = AnnonceSearchFilters::fromRequest($request);
+        $page = $request->query->getInt('page', 1);
+        $perPage = 12;
+        $poolSize = max(60, $perPage * 8);
 
-        $query = $annonceRepository->createApprovedSearchQueryBuilder(
+        $qb = $annonceRepository->createApprovedSearchQueryBuilder(
             $filters->q,
             $filters->categoryId,
             $filters->cityId,
-        )->getQuery();
+            false,
+        );
+
+        $itemsPool = $qb->setMaxResults($poolSize)
+            ->getQuery()
+            ->getResult();
+
+        $mixedItems = $displayMixer->mix($itemsPool, 3);
 
         $annonces = $paginator->paginate(
-            $query,
-            $request->query->getInt('page', 1),
-            12,
+            $mixedItems,
+            $page,
+            $perPage,
         );
 
         $annonceRepository->prefetchImages(iterator_to_array($annonces->getItems()));
@@ -92,6 +104,7 @@ final class AnnonceController extends AbstractController
         AnnonceRepository $annonceRepository,
         PaginatorInterface $paginator,
         Request $request,
+        AnnonceDisplayMixer $displayMixer,
     ): Response {
         $category = $categoryRepository->findOneBy(['slug' => $slug]);
 
@@ -100,17 +113,27 @@ final class AnnonceController extends AbstractController
         }
 
         $filters = AnnonceSearchFilters::fromRequest($request);
+        $page = $request->query->getInt('page', 1);
+        $perPage = 12;
+        $poolSize = max(60, $perPage * 8);
 
-        $query = $annonceRepository->createApprovedSearchQueryBuilder(
+        $qb = $annonceRepository->createApprovedSearchQueryBuilder(
             $filters->q,
             $category->getId(),
             $filters->cityId,
-        )->getQuery();
+            false,
+        );
+
+        $itemsPool = $qb->setMaxResults($poolSize)
+            ->getQuery()
+            ->getResult();
+
+        $mixedItems = $displayMixer->mix($itemsPool, 3);
 
         $annonces = $paginator->paginate(
-            $query,
-            $request->query->getInt('page', 1),
-            12,
+            $mixedItems,
+            $page,
+            $perPage,
         );
 
         $annonceRepository->prefetchImages(iterator_to_array($annonces->getItems()));
@@ -294,9 +317,19 @@ final class AnnonceController extends AbstractController
                 $entityManager->persist($annonceImage);
             }
 
+            // Toute modification remet l’annonce en modération (sauf actions admin)
+            if (!$this->isGranted('ROLE_EDITOR')) {
+                $annonce->setStatus(Annonce::STATUS_PENDING);
+                $annonce->setApprovedAt(null);
+            }
+
             $entityManager->flush();
-            $this->addFlash('success', 'Annonce mise à jour');
-            return $this->redirectToRoute('app_annonce_index');
+            if (!$this->isGranted('ROLE_EDITOR') && $annonce->getStatus() === Annonce::STATUS_PENDING) {
+                $this->addFlash('success', 'Annonce mise à jour — elle sera de nouveau visible après validation.');
+            } else {
+                $this->addFlash('success', 'Annonce mise à jour');
+            }
+            return $this->redirectToRoute('app_mes_annonces');
         }
 
         return $this->render('annonce/edit.html.twig', [

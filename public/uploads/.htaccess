@@ -1,0 +1,16 @@
+# Empêche l’exécution de scripts dans les uploads (Apache / Hostinger)
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(?i:php|phtml|phar|php\d+|cgi|pl|py|asp|aspx|sh)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.(?i:php|phtml|phar|php\d+|cgi|pl|py|asp|aspx|sh)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+Options -Indexes -ExecCGI

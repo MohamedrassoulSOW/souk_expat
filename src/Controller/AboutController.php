@@ -15,4 +15,10 @@ final class AboutController extends AbstractController
             'controller_name' => 'AboutController',
         ]);
     }
+
+    #[Route('/a-propos', name: 'app_about_legacy')]
+    public function legacyRedirect(): Response
+    {
+        return $this->redirectToRoute('app_about', [], Response::HTTP_MOVED_PERMANENTLY);
+    }
 }
