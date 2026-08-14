@@ -12,12 +12,102 @@
 
 {# Sommaire rapide #}
 <nav class="guide-toc mb-5" aria-label="Sommaire du guide">
+    <a href="#videos" class="guide-toc__link">Vidéos</a>
     <a href="#vue-ensemble" class="guide-toc__link">Vue d’ensemble</a>
     <a href="#acheter" class="guide-toc__link">Acheter</a>
     <a href="#vendre" class="guide-toc__link">Vendre</a>
     <a href="#messagerie" class="guide-toc__link">Messagerie</a>
     <a href="#securite" class="guide-toc__link">Sécurité</a>
 </nav>
+
+{% set guideVideos = [
+    {
+        id: 'video-mobile',
+        file: 'soukexpat-tutoriel-mobile.mp4',
+        title: 'Tutoriel mobile — démarrer sur SoukExpat',
+        audience: 'Tous les membres',
+        duration: '≈ 3 min',
+        text: 'Découvrez la plateforme sur smartphone : page d’accueil, recherche, fiche annonce, contact vendeur, dépôt d’annonce et conseils de sécurité. Idéal pour une première visite.'
+    },
+    {
+        id: 'video-user',
+        file: 'soukexpat-guide-user.mp4',
+        title: 'Guide utilisateur — acheter et vendre',
+        audience: 'Membres (USER)',
+        duration: 'Tutoriel',
+        text: 'Parcours complet du membre : connexion, menu, recherche et catégories, consultation d’une annonce, contact, publication, suivi dans Mes annonces, et rappels de sécurité.'
+    },
+    {
+        id: 'video-messaging',
+        file: 'soukexpat-guide-messaging.mp4',
+        title: 'Validation, notifications et messagerie',
+        audience: 'Acheteurs & vendeurs',
+        duration: 'Tutoriel',
+        text: 'Comprenez le cycle d’une annonce (en attente → validée ou refusée), les notifications et e-mails associés, puis la messagerie interne liée à l’annonce (texte, photos, position).'
+    },
+    {
+        id: 'video-profile',
+        file: 'soukexpat-guide-profile.mp4',
+        title: 'Profil et mot de passe',
+        audience: 'Tous les comptes',
+        duration: 'Tutoriel',
+        text: 'Mettez à jour votre profil (photo, WhatsApp, infos) et récupérez un accès perdu : « mot de passe oublié », e-mail de réinitialisation, puis changement de mot de passe depuis Mon profil.'
+    },
+    {
+        id: 'video-editor',
+        file: 'soukexpat-guide-editor.mp4',
+        title: 'Guide éditeur — modération & contenu',
+        audience: 'Éditeurs (EDITOR)',
+        duration: 'Tutoriel',
+        text: 'Espace de gestion pour l’équipe : tableau de bord, file d’annonces en attente (valider / refuser), catégories et villes, contacts, conversations, slider, analytics et paramètres — sans gestion des comptes utilisateurs.'
+    },
+    {
+        id: 'video-admin',
+        file: 'soukexpat-guide-admin.mp4',
+        title: 'Guide administrateur — piloter la plateforme',
+        audience: 'Administrateurs (ADMIN)',
+        duration: 'Tutoriel',
+        text: 'Vue complète du rôle admin : tout ce que fait un éditeur, plus la gestion des utilisateurs (rôles, blocage), le suivi global et le pilotage de la communauté. Souvenez-vous : la plateforme ne gère ni paiement ni livraison.'
+    }
+] %}
+
+<section id="videos" class="mb-5">
+    <h2 class="guide-section-title">Vidéos tutoriels</h2>
+    <p class="text-secondary mb-4">
+        Regardez ces tutoriels filmés sur mobile pour comprendre {{ brand }} en quelques minutes.
+        Chaque vidéo est autonome : lancez celle qui correspond à votre besoin.
+    </p>
+    <div class="row g-4">
+        {% for video in guideVideos %}
+            <div class="col-12 col-lg-6" id="{{ video.id }}">
+                <article class="guide-video-card h-100">
+                    <div class="guide-video-card__player">
+                        <video
+                            class="guide-video-card__media"
+                            controls
+                            playsinline
+                            preload="metadata"
+                            controlslist="nodownload"
+                            aria-label="{{ video.title }}"
+                        >
+                            <source src="{{ asset('videos/guide/' ~ video.file) }}" type="video/mp4">
+                            Votre navigateur ne prend pas en charge la lecture vidéo.
+                            <a href="{{ asset('videos/guide/' ~ video.file) }}">Télécharger la vidéo</a>
+                        </video>
+                    </div>
+                    <div class="guide-video-card__body">
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <span class="badge rounded-pill guide-step-badge">{{ video.audience }}</span>
+                            <span class="badge rounded-pill text-bg-light border">{{ video.duration }}</span>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">{{ video.title }}</h3>
+                        <p class="text-secondary small mb-0">{{ video.text }}</p>
+                    </div>
+                </article>
+            </div>
+        {% endfor %}
+    </div>
+</section>
 
 <section id="vue-ensemble" class="mb-5">
     <h2 class="guide-section-title">Vue d’ensemble</h2>
@@ -288,6 +378,48 @@
     .guide-cta {
         border-color: rgba(66, 177, 206, 0.2) !important;
         background: linear-gradient(180deg, var(--surface-2, #f4f7fb) 0%, var(--surface, #fff) 100%);
+    }
+    .guide-video-card {
+        display: flex;
+        flex-direction: column;
+        border-radius: 16px;
+        border: 1px solid rgba(66, 177, 206, 0.14);
+        background: var(--surface, #fff);
+        overflow: hidden;
+        box-shadow: 0 4px 18px rgba(27, 46, 75, 0.05);
+    }
+    .guide-video-card__player {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.85rem 0.85rem 0;
+        background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    }
+    .guide-video-card__media {
+        width: min(100%, 280px);
+        max-height: min(72vh, 520px);
+        aspect-ratio: 9 / 16;
+        object-fit: contain;
+        border-radius: 14px;
+        background: #000;
+        vertical-align: middle;
+    }
+    .guide-video-card__body {
+        padding: 1rem 1.15rem 1.25rem;
+    }
+    [data-bs-theme="dark"] .guide-video-card,
+    html.theme-dark .guide-video-card {
+        background: #0f172a;
+        border-color: rgba(148, 163, 184, 0.25);
+    }
+    [data-bs-theme="dark"] .guide-video-card__body .text-secondary,
+    html.theme-dark .guide-video-card__body .text-secondary {
+        color: #cbd5e1 !important;
+    }
+    @media (min-width: 992px) {
+        .guide-video-card__media {
+            width: min(100%, 300px);
+        }
     }
 </style>
 {% endblock %}
