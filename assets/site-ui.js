@@ -194,6 +194,129 @@ export function initSafetyDisclaimer() {
 }
 
 /**
+ * Vignettes du guide : clic → lecture agrandie dans une modale.
+ */
+export function initGuideVideos() {
+    const list = document.querySelector('[data-guide-video-list]');
+    if (!list) {
+        return;
+    }
+
+    const modalEl = document.getElementById('guideVideoModal');
+    const player = document.getElementById('guideVideoModalPlayer');
+    const downloadLink = document.getElementById('guideVideoModalDownload');
+    const hasModal =
+        modalEl && player && typeof bootstrap !== 'undefined' && Boolean(bootstrap.Modal);
+
+    if (hasModal && modalEl.dataset.guideVideoBound !== '1') {
+        modalEl.dataset.guideVideoBound = '1';
+        modalEl.addEventListener('shown.bs.modal', () => {
+            player.play().catch(() => {
+                /* lecture auto refusée : contrôles natifs disponibles */
+            });
+        });
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            player.pause();
+            player.removeAttribute('src');
+            player.removeAttribute('poster');
+            player.load();
+            if (downloadLink) {
+                downloadLink.setAttribute('href', '#');
+                downloadLink.removeAttribute('download');
+            }
+        });
+    }
+
+    if (list.dataset.guideVideoBound === '1') {
+        return;
+    }
+    list.dataset.guideVideoBound = '1';
+
+    list.addEventListener('click', (event) => {
+        const trigger = event.target.closest('[data-guide-video]');
+        if (!trigger) return;
+
+        const src = trigger.dataset.videoSrc;
+        if (!src) return;
+
+        event.preventDefault();
+
+        // Sans Bootstrap : lecture directe dans un nouvel onglet
+        if (!hasModal) {
+            window.open(src, '_blank', 'noopener');
+            return;
+        }
+
+        const titleEl = modalEl.querySelector('#guideVideoModalTitle');
+        const title = trigger.dataset.videoTitle || 'Vidéo-Tuto';
+        if (titleEl) {
+            titleEl.textContent = title;
+        }
+        if (trigger.dataset.videoPoster) {
+            player.poster = trigger.dataset.videoPoster;
+        }
+        if (downloadLink) {
+            downloadLink.setAttribute('href', src);
+            const fileName = src.split('/').pop() || 'soukexpat-video.mp4';
+            downloadLink.setAttribute('download', fileName);
+        }
+        player.src = src;
+        player.load();
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    });
+}
+
+/**
+ * Invitation à regarder les tutoriels : affichée lors des 2 premières visites.
+ */
+export function initGuideVideosHint() {
+    const modalEl = document.getElementById('guideVideosHintModal');
+    if (!modalEl || typeof bootstrap === 'undefined' || !bootstrap.Modal) {
+        return;
+    }
+    // Pas sur la page guide elle-même, ni quand la modale sécurité est prioritaire
+    if (document.querySelector('[data-guide-page]') || document.querySelector('[data-safety-context]')) {
+        return;
+    }
+
+    const COUNT_KEY = 'soukexpat-guide-hint-count';
+    const DONE_KEY = 'soukexpat-guide-hint-done';
+    const SESSION_KEY = 'soukexpat-guide-hint-seen-session';
+    const MAX_VIEWS = 2;
+
+    let seenCount = 0;
+    try {
+        if (localStorage.getItem(DONE_KEY) === '1') return;
+        if (sessionStorage.getItem(SESSION_KEY) === '1') return;
+        seenCount = Number(localStorage.getItem(COUNT_KEY)) || 0;
+    } catch {
+        return;
+    }
+
+    if (seenCount >= MAX_VIEWS) return;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+    modalEl.querySelector('#guideVideosHintNever')?.addEventListener('click', () => {
+        try {
+            localStorage.setItem(DONE_KEY, '1');
+        } catch {
+            /* ignore */
+        }
+    });
+
+    window.setTimeout(() => {
+        modal.show();
+        try {
+            localStorage.setItem(COUNT_KEY, String(seenCount + 1));
+            sessionStorage.setItem(SESSION_KEY, '1');
+        } catch {
+            /* ignore */
+        }
+    }, 1500);
+}
+
+/**
  * Select catégorie / ville : saisie pour filtrer (Tom Select).
  * Compatible Turbo (évite le double init).
  */
@@ -358,6 +481,8 @@ export function initSiteUi() {
     initFlashToasts();
     initRevealOnScroll();
     initSafetyDisclaimer();
+    initGuideVideos();
+    initGuideVideosHint();
     initSearchableSelects();
     initAdminTableSearch();
     initSmartDropups();

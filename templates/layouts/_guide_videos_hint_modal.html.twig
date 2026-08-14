@@ -1,0 +1,77 @@
+{# Invitation aux tutoriels vidéo — affichée lors des 2 premières visites #}
+<div class="modal fade" id="guideVideosHintModal" tabindex="-1" aria-labelledby="guideVideosHintTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden guide-hint-modal">
+            <div class="guide-hint-modal__head px-4 pt-4 pb-2 text-center">
+                <div class="guide-hint-modal__icon mx-auto mb-3" aria-hidden="true">
+                    <i class="bi bi-play-btn"></i>
+                </div>
+                <h2 class="h5 fw-bold mb-1" id="guideVideosHintTitle">Découvrez les Vidéo-Tuto</h2>
+                <p class="small text-muted mb-0">
+                    Quelques minutes suffisent pour mieux exploiter {{ site ? site.siteName : 'SoukExpat' }}.
+                </p>
+            </div>
+            <div class="modal-body px-4 pb-2">
+                <ul class="list-unstyled guide-hint-modal__list mb-0">
+                    <li class="d-flex gap-3 mb-3">
+                        <span class="guide-hint-modal__bullet" aria-hidden="true"><i class="bi bi-search"></i></span>
+                        <div>
+                            <strong class="d-block">Trouver ce que vous cherchez</strong>
+                            <span class="small text-muted">Recherche, catégories et lecture d’une fiche annonce.</span>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-3 mb-3">
+                        <span class="guide-hint-modal__bullet" aria-hidden="true"><i class="bi bi-megaphone"></i></span>
+                        <div>
+                            <strong class="d-block">Publier et suivre vos annonces</strong>
+                            <span class="small text-muted">Dépôt, validation, notifications et messagerie.</span>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-3">
+                        <span class="guide-hint-modal__bullet" aria-hidden="true"><i class="bi bi-phone"></i></span>
+                        <div>
+                            <strong class="d-block">Installer l’application</strong>
+                            <span class="small text-muted">Sur Android, iPhone, iPad ou ordinateur.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer border-0 px-4 pb-4 pt-2 flex-column">
+                <a href="{{ path('app_how_it_works') }}#videos" class="btn btn-custom-cyan rounded-pill w-100 fw-bold py-2">
+                    <i class="bi bi-play-circle me-1" aria-hidden="true"></i>Voir les Vidéo-Tuto
+                </a>
+                <button type="button" class="btn btn-link text-muted btn-sm mt-1" data-bs-dismiss="modal">
+                    Plus tard
+                </button>
+                <button type="button" class="btn btn-link text-muted btn-sm p-0" id="guideVideosHintNever" data-bs-dismiss="modal">
+                    Ne plus afficher
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .guide-hint-modal__icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.9rem;
+        background: rgba(75, 121, 161, 0.12);
+        color: var(--cyan-main, #4B79A1);
+    }
+    .guide-hint-modal__bullet {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(75, 121, 161, 0.1);
+        color: var(--cyan-main, #4B79A1);
+    }
+</style>
