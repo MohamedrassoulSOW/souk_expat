@@ -1603,6 +1603,23 @@ body {
     }
 }
 
+/* Mobile : bouton plus discret pour laisser la place au nom du vendeur */
+@media (max-width: 575.98px) {
+    .annonce-wa-btn {
+        width: 2rem;
+        height: 2rem;
+        box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+    }
+
+    .annonce-wa-btn__icon {
+        animation: none;
+    }
+
+    .annonce-wa-btn__icon i {
+        font-size: 1rem;
+    }
+}
+
 .annonce-listing-card__avatar {
     width: 32px;
     height: 32px;

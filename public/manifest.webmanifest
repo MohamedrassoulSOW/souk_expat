@@ -10,7 +10,7 @@
     "display": "standalone",
     "display_override": ["standalone", "minimal-ui"],
     "orientation": "any",
-    "background_color": "#4B79A1",
+    "background_color": "#FFFFFF",
     "theme_color": "#4B79A1",
     "categories": ["shopping", "lifestyle"],
     "prefer_related_applications": false,
@@ -28,13 +28,13 @@
             "purpose": "any"
         },
         {
-            "src": "/icons/icon-192.png",
+            "src": "/icons/icon-maskable-192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "/icons/icon-512.png",
+            "src": "/icons/icon-maskable-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"

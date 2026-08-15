@@ -1,5 +1,5 @@
 /* SoukExpat PWA — cache shell + fallback hors ligne */
-const CACHE_VERSION = 'soukexpat-v4';
+const CACHE_VERSION = 'soukexpat-v6';
 const SHELL_URLS = [
   '/offline.html',
   '/manifest.webmanifest',
