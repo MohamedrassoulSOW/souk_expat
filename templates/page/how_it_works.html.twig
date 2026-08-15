@@ -22,86 +22,44 @@
     <a href="#securite" class="guide-toc__link">Sécurité</a>
 </nav>
 
-{# Ordre = parcours réel d’un membre : découverte → usage → compte → installation → rôles internes #}
+{# Ordre = numérotation des Vidéo-Tuto (1→7) #}
 {% set guideVideos = [
     {
         id: 'video-mobile',
         file: 'soukexpat-tutoriel-mobile.mp4',
         poster: 'soukexpat-tutoriel-mobile.jpg',
         title: 'Découvrir SoukExpat',
-        audience: 'Tous les membres',
+        audience: 'Pour commencer',
         duration: '≈ 3 min',
-        text: 'Le tour d’horizon à voir en premier : page d’accueil, navigation par catégories, recherche d’un produit, lecture d’une fiche annonce, prise de contact avec le vendeur et premiers conseils de sécurité.',
+        text: 'Le premier tutoriel à regarder : page d’accueil, catégories, recherche, fiche annonce, contact vendeur et conseils de sécurité. Une visite guidée pour comprendre la plateforme en quelques minutes.',
         points: [
-            'Comprendre la page d’accueil et le menu',
-            'Rechercher un produit et filtrer les résultats',
-            'Ouvrir une annonce : photos, prix, ville, vendeur'
+            'Découvrir l’accueil et la navigation',
+            'Rechercher un produit et ouvrir une annonce',
+            'Contacter un vendeur en toute sécurité'
         ]
     },
     {
         id: 'video-user',
         file: 'soukexpat-guide-user.mp4',
         poster: 'soukexpat-guide-user.jpg',
-        title: 'Acheter et vendre au quotidien',
-        audience: 'Membres (USER)',
+        title: 'Parcourir & vendre',
+        audience: 'Guide utilisateur',
         duration: 'Guide complet',
-        text: 'Le parcours complet du membre, de la connexion à la publication. Vous voyez comment contacter un vendeur, déposer votre propre annonce avec photos et prix, puis suivre son statut dans « Mes annonces ».',
+        text: 'Le parcours membre : se connecter, parcourir les annonces, contacter un vendeur, publier sa propre annonce avec photos et prix, puis suivre le statut dans Mes annonces.',
         points: [
-            'Se connecter et naviguer dans son espace',
+            'Parcourir les annonces et contacter un vendeur',
             'Déposer une annonce (photos, prix, ville)',
             'Suivre ses publications dans Mes annonces'
-        ]
-    },
-    {
-        id: 'video-messaging',
-        file: 'soukexpat-guide-messaging.mp4',
-        poster: 'soukexpat-guide-messaging.jpg',
-        title: 'Validation, notifications et messagerie',
-        audience: 'Acheteurs & vendeurs',
-        duration: 'Guide complet',
-        text: 'Ce qui se passe après la publication : votre annonce passe en attente, puis elle est validée ou refusée. Vous recevez une notification et un e-mail. La vidéo montre ensuite la messagerie interne, liée à chaque annonce.',
-        points: [
-            'Cycle d’une annonce : en attente, validée, refusée',
-            'Notifications dans l’app et e-mails reçus',
-            'Échanger par message : texte, photos, position'
-        ]
-    },
-    {
-        id: 'video-profile',
-        file: 'soukexpat-guide-profile.mp4',
-        poster: 'soukexpat-guide-profile.jpg',
-        title: 'Gérer son profil et son mot de passe',
-        audience: 'Tous les comptes',
-        duration: 'Guide pratique',
-        text: 'Tenez votre compte à jour : photo, nom, e-mail et WhatsApp. La vidéo détaille aussi la récupération d’accès — « mot de passe oublié », e-mail de réinitialisation valable une heure, puis choix d’un nouveau mot de passe.',
-        points: [
-            'Compléter son profil pour rassurer les acheteurs',
-            'Réinitialiser un mot de passe oublié',
-            'Changer son mot de passe depuis son espace'
-        ]
-    },
-    {
-        id: 'video-pwa',
-        file: 'soukexpat-guide-pwa.mp4',
-        poster: 'soukexpat-guide-pwa.jpg',
-        title: 'Installer SoukExpat comme une application',
-        audience: 'Mobile, tablette & ordinateur',
-        duration: 'Guide pratique',
-        text: 'SoukExpat s’adapte à tous les écrans et s’installe comme une vraie application. La vidéo montre l’installation sur Android via la bannière, sur iPhone ou iPad avec « Sur l’écran d’accueil », et sur ordinateur avec Chrome ou Edge.',
-        points: [
-            'Android : installer depuis la bannière',
-            'iPhone / iPad : Partager → Sur l’écran d’accueil',
-            'Ordinateur : installation Chrome ou Edge'
         ]
     },
     {
         id: 'video-editor',
         file: 'soukexpat-guide-editor.mp4',
         poster: 'soukexpat-guide-editor.jpg',
-        title: 'Rôle éditeur — modération et contenu',
-        audience: 'Équipe (EDITOR)',
+        title: 'Modérer les annonces',
+        audience: 'Guide éditeur',
         duration: 'Guide interne',
-        text: 'Réservé à l’équipe : le tableau de bord, la file des annonces en attente à valider ou refuser, la gestion des catégories et des villes, les messages de contact, les conversations, le slider et les paramètres du site.',
+        text: 'Réservé à l’équipe éditoriale : tableau de bord, file des annonces en attente à valider ou refuser, catégories, villes, contacts, conversations, slider et paramètres — sans gestion des comptes.',
         points: [
             'Valider ou refuser les annonces en attente',
             'Gérer catégories, villes, slider et contacts',
@@ -112,14 +70,56 @@
         id: 'video-admin',
         file: 'soukexpat-guide-admin.mp4',
         poster: 'soukexpat-guide-admin.jpg',
-        title: 'Rôle administrateur — piloter la plateforme',
-        audience: 'Équipe (ADMIN)',
+        title: 'Gérer la plateforme',
+        audience: 'Guide admin',
         duration: 'Guide interne',
-        text: 'Tout ce que fait un éditeur, plus la gestion des comptes : consulter les membres, attribuer le rôle éditeur ou administrateur, bloquer un compte, et suivre l’activité globale grâce aux analytics et au rapport d’annonces.',
+        text: 'Le rôle administrateur : tout ce qu’un éditeur peut faire, plus la gestion des utilisateurs (rôles, blocage), le suivi global via analytics et le rapport d’annonces.',
         points: [
             'Gérer les utilisateurs et leurs rôles',
             'Suivre l’activité via analytics et rapports',
             'Piloter l’ensemble des réglages du site'
+        ]
+    },
+    {
+        id: 'video-messaging',
+        file: 'soukexpat-guide-messaging.mp4',
+        poster: 'soukexpat-guide-messaging.jpg',
+        title: 'Validation & messages',
+        audience: 'Messagerie',
+        duration: 'Guide complet',
+        text: 'Après la publication : l’annonce passe en attente, puis est validée ou refusée. Notifications, e-mails, puis messagerie interne liée à l’annonce (texte, photos, position).',
+        points: [
+            'Cycle d’une annonce : en attente, validée, refusée',
+            'Notifications dans l’app et e-mails reçus',
+            'Échanger par message : texte, photos, position'
+        ]
+    },
+    {
+        id: 'video-profile',
+        file: 'soukexpat-guide-profile.mp4',
+        poster: 'soukexpat-guide-profile.jpg',
+        title: 'Profil & mot de passe',
+        audience: 'Compte',
+        duration: 'Guide pratique',
+        text: 'Mettre à jour son profil (photo, WhatsApp, infos) et récupérer un accès perdu : mot de passe oublié, e-mail de réinitialisation, puis changement de mot de passe depuis Mon profil.',
+        points: [
+            'Compléter son profil pour rassurer les acheteurs',
+            'Réinitialiser un mot de passe oublié',
+            'Changer son mot de passe depuis son espace'
+        ]
+    },
+    {
+        id: 'video-pwa',
+        file: 'soukexpat-guide-pwa.mp4',
+        poster: 'soukexpat-guide-pwa.jpg',
+        title: 'Responsive & PWA',
+        audience: 'Application',
+        duration: 'Guide pratique',
+        text: 'SoukExpat s’adapte à tous les écrans et s’installe comme une application : Android via la bannière, iPhone/iPad avec « Sur l’écran d’accueil », ordinateur avec Chrome ou Edge.',
+        points: [
+            'Android : installer depuis la bannière',
+            'iPhone / iPad : Partager → Sur l’écran d’accueil',
+            'Ordinateur : installation Chrome ou Edge'
         ]
     }
 ] %}

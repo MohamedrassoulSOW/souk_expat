@@ -29,12 +29,12 @@ foreach (['C:/Windows/Fonts/segoeuib.ttf', 'C:/Windows/Fonts/arialbd.ttf', '/usr
 
 $posters = [
     'soukexpat-tutoriel-mobile' => ['num' => 1, 'kicker' => 'Pour commencer', 'title' => 'Découvrir SoukExpat'],
-    'soukexpat-guide-user' => ['num' => 2, 'kicker' => 'Membres', 'title' => "Acheter et vendre\nau quotidien"],
-    'soukexpat-guide-messaging' => ['num' => 3, 'kicker' => 'Acheteurs & vendeurs', 'title' => "Validation et\nmessagerie"],
-    'soukexpat-guide-profile' => ['num' => 4, 'kicker' => 'Votre compte', 'title' => "Profil et\nmot de passe"],
-    'soukexpat-guide-pwa' => ['num' => 5, 'kicker' => 'Mobile & ordinateur', 'title' => "Installer\nl'application"],
-    'soukexpat-guide-editor' => ['num' => 6, 'kicker' => 'Équipe', 'title' => "Rôle éditeur\nmodération"],
-    'soukexpat-guide-admin' => ['num' => 7, 'kicker' => 'Équipe', 'title' => "Rôle\nadministrateur"],
+    'soukexpat-guide-user' => ['num' => 2, 'kicker' => 'Guide utilisateur', 'title' => "Parcourir &\nvendre"],
+    'soukexpat-guide-editor' => ['num' => 3, 'kicker' => 'Guide éditeur', 'title' => "Modérer\nles annonces"],
+    'soukexpat-guide-admin' => ['num' => 4, 'kicker' => 'Guide admin', 'title' => "Gérer la\nplateforme"],
+    'soukexpat-guide-messaging' => ['num' => 5, 'kicker' => 'Messagerie', 'title' => "Validation &\nmessages"],
+    'soukexpat-guide-profile' => ['num' => 6, 'kicker' => 'Compte', 'title' => "Profil &\nmot de passe"],
+    'soukexpat-guide-pwa' => ['num' => 7, 'kicker' => 'Application', 'title' => "Responsive\n& PWA"],
 ];
 
 if (!is_dir($outputDir) && !mkdir($outputDir, 0775, true) && !is_dir($outputDir)) {
