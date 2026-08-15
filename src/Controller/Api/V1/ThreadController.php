@@ -161,8 +161,15 @@ final class ThreadController extends AbstractController
         $base64Image = $payload['imageBase64'] ?? $payload['photoBase64'] ?? null;
 
         if ($photo instanceof UploadedFile && $photo->isValid()) {
-            $mime = (string) $photo->getMimeType();
-            if (!\in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
+            $mime = '';
+            if (\function_exists('finfo_open')) {
+                $detected = (new \finfo(FILEINFO_MIME_TYPE))->file($photo->getPathname());
+                $mime = \is_string($detected) ? $detected : '';
+            }
+            if ($mime === '') {
+                $mime = (string) $photo->getMimeType();
+            }
+            if (!\in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true) || @getimagesize($photo->getPathname()) === false) {
                 return $this->json([
                     'error' => 'validation_error',
                     'message' => 'Image invalide (jpeg/png/webp).',

@@ -28,13 +28,16 @@ foreach (['C:/Windows/Fonts/segoeuib.ttf', 'C:/Windows/Fonts/arialbd.ttf', '/usr
 }
 
 $posters = [
-    'soukexpat-tutoriel-mobile' => ['num' => 1, 'kicker' => 'Pour commencer', 'title' => 'Découvrir SoukExpat'],
-    'soukexpat-guide-user' => ['num' => 2, 'kicker' => 'Guide utilisateur', 'title' => "Parcourir &\nvendre"],
-    'soukexpat-guide-editor' => ['num' => 3, 'kicker' => 'Guide éditeur', 'title' => "Modérer\nles annonces"],
-    'soukexpat-guide-admin' => ['num' => 4, 'kicker' => 'Guide admin', 'title' => "Gérer la\nplateforme"],
-    'soukexpat-guide-messaging' => ['num' => 5, 'kicker' => 'Messagerie', 'title' => "Validation &\nmessages"],
-    'soukexpat-guide-profile' => ['num' => 6, 'kicker' => 'Compte', 'title' => "Profil &\nmot de passe"],
-    'soukexpat-guide-pwa' => ['num' => 7, 'kicker' => 'Application', 'title' => "Responsive\n& PWA"],
+    'soukexpat-01-story-idee' => ['num' => 1, 'kicker' => 'Le projet', 'title' => "L’idée\ngénérale", 'footer' => 'PRÉSENTATION'],
+    'soukexpat-02-story-impact' => ['num' => 2, 'kicker' => 'Communauté', 'title' => "Impact au\nquotidien", 'footer' => 'PRÉSENTATION'],
+    'soukexpat-03-story-social' => ['num' => 3, 'kicker' => 'Réseaux sociaux', 'title' => "Présentation\nSoukExpat", 'footer' => 'PRÉSENTATION'],
+    'soukexpat-04-tutoriel-mobile' => ['num' => 4, 'kicker' => 'Pour commencer', 'title' => 'Découvrir SoukExpat'],
+    'soukexpat-05-guide-user' => ['num' => 5, 'kicker' => 'Guide utilisateur', 'title' => "Parcourir &\nvendre"],
+    'soukexpat-06-guide-messaging' => ['num' => 6, 'kicker' => 'Messagerie', 'title' => "Validation &\nmessages"],
+    'soukexpat-07-guide-profile' => ['num' => 7, 'kicker' => 'Compte', 'title' => "Profil &\nmot de passe"],
+    'soukexpat-08-guide-pwa' => ['num' => 8, 'kicker' => 'Application', 'title' => "Responsive\n& PWA"],
+    'soukexpat-09-guide-editor' => ['num' => 9, 'kicker' => 'Guide éditeur', 'title' => "Modérer\nles annonces"],
+    'soukexpat-10-guide-admin' => ['num' => 10, 'kicker' => 'Guide admin', 'title' => "Gérer la\nplateforme"],
 ];
 
 if (!is_dir($outputDir) && !mkdir($outputDir, 0775, true) && !is_dir($outputDir)) {
@@ -157,7 +160,7 @@ function drawPlayButton(\GdImage $image): void
 }
 
 /**
- * @param array{num: int, kicker: string, title: string} $meta
+ * @param array{num: int, kicker: string, title: string, footer?: string} $meta
  */
 function drawTexts(\GdImage $image, ?string $font, array $meta): void
 {
@@ -188,7 +191,7 @@ function drawTexts(\GdImage $image, ?string $font, array $meta): void
     }
 
     // Pied de page
-    centeredText($image, $font, 30, (int) (HEIGHT * 0.93), 'VIDÉO TUTORIEL', $soft, 8);
+    centeredText($image, $font, 30, (int) (HEIGHT * 0.93), $meta['footer'] ?? 'VIDÉO TUTORIEL', $soft, 8);
 }
 
 function centeredText(

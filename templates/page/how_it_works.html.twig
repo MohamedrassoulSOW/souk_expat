@@ -14,6 +14,7 @@
 
 {# Sommaire rapide #}
 <nav class="guide-toc mb-5" aria-label="Sommaire du guide">
+    <a href="#presentation" class="guide-toc__link">Présentation</a>
     <a href="#videos" class="guide-toc__link">Vidéo-Tuto</a>
     <a href="#vue-ensemble" class="guide-toc__link">Vue d’ensemble</a>
     <a href="#acheter" class="guide-toc__link">Acheter</a>
@@ -22,118 +23,182 @@
     <a href="#securite" class="guide-toc__link">Sécurité</a>
 </nav>
 
-{# Ordre = numérotation des Vidéo-Tuto (1→7) #}
-{% set guideVideos = [
+{# Ordre = numérotation officielle des couvertures (1→10) #}
+{% set videoSections = [
     {
-        id: 'video-mobile',
-        file: 'soukexpat-tutoriel-mobile.mp4',
-        poster: 'soukexpat-tutoriel-mobile.jpg',
-        title: 'Découvrir SoukExpat',
-        audience: 'Pour commencer',
-        duration: '≈ 3 min',
-        text: 'Le premier tutoriel à regarder : page d’accueil, catégories, recherche, fiche annonce, contact vendeur et conseils de sécurité. Une visite guidée pour comprendre la plateforme en quelques minutes.',
-        points: [
-            'Découvrir l’accueil et la navigation',
-            'Rechercher un produit et ouvrir une annonce',
-            'Contacter un vendeur en toute sécurité'
+        id: 'presentation',
+        title: 'Présentation',
+        intro: 'Trois courtes vidéos pour comprendre l’idée de ' ~ brand ~ ', son impact au quotidien, puis la présentation destinée aux réseaux sociaux.',
+        videos: [
+            {
+                id: 'video-idee',
+                num: 1,
+                file: 'soukexpat-01-story-idee.mp4',
+                poster: 'soukexpat-01-story-idee.jpg',
+                title: 'L’idée générale',
+                audience: 'Le projet',
+                duration: 'Présentation',
+                text: 'SoukExpat part d’une idée simple : faciliter les échanges entre expatriés au Maroc. Une communauté qui s’entraide, avec des annonces claires et une messagerie interne — un souk digital, local et humain.',
+                points: [
+                    'Mettre en relation acheteurs et vendeurs expatriés',
+                    'S’équiper à l’arrivée, revendre avant un départ',
+                    'Une expérience pensée pour le quotidien au Maroc'
+                ]
+            },
+            {
+                id: 'video-impact',
+                num: 2,
+                file: 'soukexpat-02-story-impact.mp4',
+                poster: 'soukexpat-02-story-impact.jpg',
+                title: 'Impact au quotidien',
+                audience: 'Communauté',
+                duration: 'Présentation',
+                text: 'Trouver rapidement ce dont on a besoin change la vie d’expatrié : une recherche, une annonce, un message. Moins de gaspillage, plus de réemploi, et des échanges utiles entre voisins d’expatriation.',
+                points: [
+                    'Gagner du temps pour s’équiper ou revendre',
+                    'Faire circuler les objets dans la communauté',
+                    'Renforcer le lien local, ici au Maroc'
+                ]
+            },
+            {
+                id: 'video-social',
+                num: 3,
+                file: 'soukexpat-03-story-social.mp4',
+                poster: 'soukexpat-03-story-social.jpg',
+                title: 'Présentation SoukExpat',
+                audience: 'Réseaux sociaux',
+                duration: 'Présentation',
+                text: 'La version courte à partager : les expatriés au Maroc achètent et vendent entre eux. Meubles, véhicules, électroménager… consultez une annonce, contactez le vendeur, ou déposez la vôtre en quelques minutes.',
+                points: [
+                    'Acheter et vendre près de chez soi',
+                    'Annonces claires : photos, prix, ville',
+                    'Accessible sur téléphone, ordinateur ou application'
+                ]
+            }
         ]
     },
     {
-        id: 'video-user',
-        file: 'soukexpat-guide-user.mp4',
-        poster: 'soukexpat-guide-user.jpg',
-        title: 'Parcourir & vendre',
-        audience: 'Guide utilisateur',
-        duration: 'Guide complet',
-        text: 'Le parcours membre : se connecter, parcourir les annonces, contacter un vendeur, publier sa propre annonce avec photos et prix, puis suivre le statut dans Mes annonces.',
-        points: [
-            'Parcourir les annonces et contacter un vendeur',
-            'Déposer une annonce (photos, prix, ville)',
-            'Suivre ses publications dans Mes annonces'
-        ]
-    },
-    {
-        id: 'video-editor',
-        file: 'soukexpat-guide-editor.mp4',
-        poster: 'soukexpat-guide-editor.jpg',
-        title: 'Modérer les annonces',
-        audience: 'Guide éditeur',
-        duration: 'Guide interne',
-        text: 'Réservé à l’équipe éditoriale : tableau de bord, file des annonces en attente à valider ou refuser, catégories, villes, contacts, conversations, slider et paramètres — sans gestion des comptes.',
-        points: [
-            'Valider ou refuser les annonces en attente',
-            'Gérer catégories, villes, slider et contacts',
-            'Sans accès à la gestion des comptes'
-        ]
-    },
-    {
-        id: 'video-admin',
-        file: 'soukexpat-guide-admin.mp4',
-        poster: 'soukexpat-guide-admin.jpg',
-        title: 'Gérer la plateforme',
-        audience: 'Guide admin',
-        duration: 'Guide interne',
-        text: 'Le rôle administrateur : tout ce qu’un éditeur peut faire, plus la gestion des utilisateurs (rôles, blocage), le suivi global via analytics et le rapport d’annonces.',
-        points: [
-            'Gérer les utilisateurs et leurs rôles',
-            'Suivre l’activité via analytics et rapports',
-            'Piloter l’ensemble des réglages du site'
-        ]
-    },
-    {
-        id: 'video-messaging',
-        file: 'soukexpat-guide-messaging.mp4',
-        poster: 'soukexpat-guide-messaging.jpg',
-        title: 'Validation & messages',
-        audience: 'Messagerie',
-        duration: 'Guide complet',
-        text: 'Après la publication : l’annonce passe en attente, puis est validée ou refusée. Notifications, e-mails, puis messagerie interne liée à l’annonce (texte, photos, position).',
-        points: [
-            'Cycle d’une annonce : en attente, validée, refusée',
-            'Notifications dans l’app et e-mails reçus',
-            'Échanger par message : texte, photos, position'
-        ]
-    },
-    {
-        id: 'video-profile',
-        file: 'soukexpat-guide-profile.mp4',
-        poster: 'soukexpat-guide-profile.jpg',
-        title: 'Profil & mot de passe',
-        audience: 'Compte',
-        duration: 'Guide pratique',
-        text: 'Mettre à jour son profil (photo, WhatsApp, infos) et récupérer un accès perdu : mot de passe oublié, e-mail de réinitialisation, puis changement de mot de passe depuis Mon profil.',
-        points: [
-            'Compléter son profil pour rassurer les acheteurs',
-            'Réinitialiser un mot de passe oublié',
-            'Changer son mot de passe depuis son espace'
-        ]
-    },
-    {
-        id: 'video-pwa',
-        file: 'soukexpat-guide-pwa.mp4',
-        poster: 'soukexpat-guide-pwa.jpg',
-        title: 'Responsive & PWA',
-        audience: 'Application',
-        duration: 'Guide pratique',
-        text: 'SoukExpat s’adapte à tous les écrans et s’installe comme une application : Android via la bannière, iPhone/iPad avec « Sur l’écran d’accueil », ordinateur avec Chrome ou Edge.',
-        points: [
-            'Android : installer depuis la bannière',
-            'iPhone / iPad : Partager → Sur l’écran d’accueil',
-            'Ordinateur : installation Chrome ou Edge'
+        id: 'videos',
+        title: 'Vidéo-Tuto',
+        intro: 'Ces tutoriels suivent l’ordre logique d’utilisation de ' ~ brand ~ ' : découverte, usage quotidien, compte, application, puis les rôles internes. Cliquez sur une vidéo pour la lire en grand, ou téléchargez-la pour la regarder hors ligne.',
+        videos: [
+            {
+                id: 'video-mobile',
+                num: 4,
+                file: 'soukexpat-04-tutoriel-mobile.mp4',
+                poster: 'soukexpat-04-tutoriel-mobile.jpg',
+                title: 'Découvrir SoukExpat',
+                audience: 'Pour commencer',
+                duration: '≈ 3 min',
+                text: 'Le premier tutoriel à regarder : page d’accueil, catégories, recherche, fiche annonce, contact vendeur et conseils de sécurité. Une visite guidée pour comprendre la plateforme en quelques minutes.',
+                points: [
+                    'Découvrir l’accueil et la navigation',
+                    'Rechercher un produit et ouvrir une annonce',
+                    'Contacter un vendeur en toute sécurité'
+                ]
+            },
+            {
+                id: 'video-user',
+                num: 5,
+                file: 'soukexpat-05-guide-user.mp4',
+                poster: 'soukexpat-05-guide-user.jpg',
+                title: 'Parcourir & vendre',
+                audience: 'Guide utilisateur',
+                duration: 'Guide complet',
+                text: 'Le parcours membre : se connecter, parcourir les annonces, contacter un vendeur, publier sa propre annonce avec photos et prix, puis suivre le statut dans Mes annonces.',
+                points: [
+                    'Parcourir les annonces et contacter un vendeur',
+                    'Déposer une annonce (photos, prix, ville)',
+                    'Suivre ses publications dans Mes annonces'
+                ]
+            },
+            {
+                id: 'video-messaging',
+                num: 6,
+                file: 'soukexpat-06-guide-messaging.mp4',
+                poster: 'soukexpat-06-guide-messaging.jpg',
+                title: 'Validation & messages',
+                audience: 'Messagerie',
+                duration: 'Guide complet',
+                text: 'Après la publication : l’annonce passe en attente, puis est validée ou refusée. Notifications, e-mails, puis messagerie interne liée à l’annonce (texte, photos, position).',
+                points: [
+                    'Cycle d’une annonce : en attente, validée, refusée',
+                    'Notifications dans l’app et e-mails reçus',
+                    'Échanger par message : texte, photos, position'
+                ]
+            },
+            {
+                id: 'video-profile',
+                num: 7,
+                file: 'soukexpat-07-guide-profile.mp4',
+                poster: 'soukexpat-07-guide-profile.jpg',
+                title: 'Profil & mot de passe',
+                audience: 'Compte',
+                duration: 'Guide pratique',
+                text: 'Mettre à jour son profil (photo, WhatsApp, infos) et récupérer un accès perdu : mot de passe oublié, e-mail de réinitialisation, puis changement de mot de passe depuis Mon profil.',
+                points: [
+                    'Compléter son profil pour rassurer les acheteurs',
+                    'Réinitialiser un mot de passe oublié',
+                    'Changer son mot de passe depuis son espace'
+                ]
+            },
+            {
+                id: 'video-pwa',
+                num: 8,
+                file: 'soukexpat-08-guide-pwa.mp4',
+                poster: 'soukexpat-08-guide-pwa.jpg',
+                title: 'Responsive & PWA',
+                audience: 'Application',
+                duration: 'Guide pratique',
+                text: 'SoukExpat s’adapte à tous les écrans et s’installe comme une application : Android via la bannière, iPhone/iPad avec « Sur l’écran d’accueil », ordinateur avec Chrome ou Edge.',
+                points: [
+                    'Android : installer depuis la bannière',
+                    'iPhone / iPad : Partager → Sur l’écran d’accueil',
+                    'Ordinateur : installation Chrome ou Edge'
+                ]
+            },
+            {
+                id: 'video-editor',
+                num: 9,
+                file: 'soukexpat-09-guide-editor.mp4',
+                poster: 'soukexpat-09-guide-editor.jpg',
+                title: 'Modérer les annonces',
+                audience: 'Guide éditeur',
+                duration: 'Guide interne',
+                text: 'Réservé à l’équipe éditoriale : tableau de bord, file des annonces en attente à valider ou refuser, catégories, villes, contacts, conversations, slider et paramètres — sans gestion des comptes.',
+                points: [
+                    'Valider ou refuser les annonces en attente',
+                    'Gérer catégories, villes, slider et contacts',
+                    'Sans accès à la gestion des comptes'
+                ]
+            },
+            {
+                id: 'video-admin',
+                num: 10,
+                file: 'soukexpat-10-guide-admin.mp4',
+                poster: 'soukexpat-10-guide-admin.jpg',
+                title: 'Gérer la plateforme',
+                audience: 'Guide admin',
+                duration: 'Guide interne',
+                text: 'Le rôle administrateur : tout ce qu’un éditeur peut faire, plus la gestion des utilisateurs (rôles, blocage), le suivi global via analytics et le rapport d’annonces.',
+                points: [
+                    'Gérer les utilisateurs et leurs rôles',
+                    'Suivre l’activité via analytics et rapports',
+                    'Piloter l’ensemble des réglages du site'
+                ]
+            }
         ]
     }
 ] %}
 
-<section id="videos" class="mb-5">
-    <h2 class="guide-section-title">Vidéo-Tuto</h2>
-    <p class="text-secondary mb-4">
-        Ces tutoriels suivent l’ordre logique d’utilisation de {{ brand }} : commencez par la première pour découvrir
-        la plateforme, puis avancez selon vos besoins. Cliquez sur une vidéo pour la lire en grand,
-        ou téléchargez-la pour la regarder hors ligne.
-    </p>
+<div data-guide-video-list>
+{% for section in videoSections %}
+<section id="{{ section.id }}" class="mb-5">
+    <h2 class="guide-section-title">{{ section.title }}</h2>
+    <p class="text-secondary mb-4">{{ section.intro }}</p>
 
-    <div class="guide-video-list" data-guide-video-list>
-        {% for video in guideVideos %}
+    <div class="guide-video-list">
+        {% for video in section.videos %}
             <article class="guide-video-row" id="{{ video.id }}">
                 <div class="row g-4 align-items-center">
                     <div class="col-12 col-md-5 col-xl-4">
@@ -165,7 +230,7 @@
                     <div class="col-12 col-md-7 col-xl-8">
                         <div class="guide-video-row__body">
                             <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                                <span class="guide-video-row__num">{{ loop.index }}</span>
+                                <span class="guide-video-row__num">{{ video.num }}</span>
                                 <span class="badge rounded-pill guide-step-badge">{{ video.audience }}</span>
                                 <span class="badge rounded-pill guide-video-row__meta">{{ video.duration }}</span>
                             </div>
@@ -203,6 +268,8 @@
         {% endfor %}
     </div>
 </section>
+{% endfor %}
+</div>
 
 {# Lecteur agrandi #}
 <div class="modal fade" id="guideVideoModal" tabindex="-1" aria-labelledby="guideVideoModalTitle" aria-hidden="true">
@@ -575,9 +642,10 @@
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
     }
     .guide-video-row__num {
-        width: 1.85rem;
+        min-width: 1.85rem;
         height: 1.85rem;
-        border-radius: 50%;
+        padding: 0 0.4rem;
+        border-radius: 999px;
         display: inline-flex;
         align-items: center;
         justify-content: center;

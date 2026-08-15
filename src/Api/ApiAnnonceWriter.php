@@ -57,12 +57,16 @@ final class ApiAnnonceWriter
                 continue;
             }
 
-            $mime = (string) $file->getMimeType();
+            $mime = $this->detectMime($file);
             if (!\in_array($mime, self::ALLOWED_MIMES, true)) {
                 continue;
             }
 
             if ($file->getSize() !== false && $file->getSize() > self::MAX_BYTES) {
+                continue;
+            }
+
+            if (@getimagesize($file->getPathname()) === false) {
                 continue;
             }
 
@@ -202,6 +206,25 @@ final class ApiAnnonceWriter
             return null;
         }
 
-        return ['binary' => $binary, 'mime' => $mime];
+        $info = @getimagesizefromstring($binary);
+        if ($info === false || !isset($info['mime']) || !\in_array($info['mime'], self::ALLOWED_MIMES, true)) {
+            return null;
+        }
+
+        return ['binary' => $binary, 'mime' => $info['mime']];
+    }
+
+    private function detectMime(UploadedFile $file): string
+    {
+        $path = $file->getPathname();
+        if (\function_exists('finfo_open')) {
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $detected = $finfo->file($path);
+            if (\is_string($detected) && $detected !== '') {
+                return $detected;
+            }
+        }
+
+        return (string) $file->getMimeType();
     }
 }

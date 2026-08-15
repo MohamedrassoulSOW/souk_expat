@@ -41,6 +41,10 @@ security:
                 enable_csrf: true
                 csrf_token_id: authenticate
 
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
+
             logout:
                 path: app_logout
                 enable_csrf: true
@@ -78,3 +82,4 @@ security:
         - { path: ^/chat, roles: ROLE_USER }
         - { path: ^/notification, roles: ROLE_USER }
         - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/mon-profil, roles: ROLE_USER }

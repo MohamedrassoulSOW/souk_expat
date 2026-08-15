@@ -8,8 +8,10 @@ use App\Entity\Annonce;
 use App\Entity\User;
 use App\Form\MessageType;
 use App\Repository\ThreadRepository;
+use App\Service\SafeImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -80,7 +82,7 @@ class MessageController extends AbstractController
      * Affiche la discussion et diminue le compteur de notifications
      */
     #[Route('/thread/{id}', name: 'app_chat_view')]
-    public function view(Thread $thread, Request $request, EntityManagerInterface $em): Response 
+    public function view(Thread $thread, Request $request, EntityManagerInterface $em, SafeImageUploader $imageUploader): Response 
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
@@ -137,8 +139,23 @@ class MessageController extends AbstractController
 
             if ($photo instanceof UploadedFile) {
                 $newMessage->setKind(Message::KIND_IMAGE);
-                $filename = sprintf('%d_%s.%s', $thread->getId(), uniqid(), $photo->guessExtension() ?: 'jpg');
-                $photo->move($uploadRoot, $filename);
+                try {
+                    $filename = $imageUploader->store(
+                        $photo,
+                        $uploadRoot,
+                        4 * 1024 * 1024,
+                        ['image/jpeg', 'image/png', 'image/webp'],
+                        $thread->getId().'_',
+                    );
+                } catch (FileException) {
+                    $this->addFlash('danger', 'Impossible d’envoyer cette image.');
+
+                    return $this->render('message/view.html.twig', [
+                        'thread' => $thread,
+                        'form' => $form->createView(),
+                        'adminReadOnly' => false,
+                    ]);
+                }
                 $newMessage->setImageFilename($filename);
                 $newMessage->setContent($caption !== '' ? $caption : null);
             } elseif (($latRaw !== null && $latRaw !== '') && ($lngRaw !== null && $lngRaw !== '')) {

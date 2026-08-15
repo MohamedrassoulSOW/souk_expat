@@ -25,6 +25,8 @@ class ProfileType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
+                'disabled' => true,
+                'help' => 'L’e-mail de connexion ne peut pas être modifié ici. Contactez-nous si vous devez le changer.',
             ])
             ->add('whatsappPhone', TextType::class, [
                 'label' => 'WhatsApp',
@@ -44,7 +46,11 @@ class ProfileType extends AbstractType
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
-                    new Image(maxSize: '2M'),
+                    new Image(
+                        maxSize: '2M',
+                        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+                        mimeTypesMessage: 'Formats autorisés : JPG, PNG, WEBP',
+                    ),
                 ],
             ]);
     }

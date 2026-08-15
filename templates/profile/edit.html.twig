@@ -55,13 +55,14 @@
                                 <div class="text-danger small">{{ form_errors(form.lastName) }}</div>
                             </div>
 
-                            {# Email #}
+                            {# Email (non modifiable — évite le détournement de compte) #}
                             <div class="col-12 mb-3">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Adresse Email</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
-                                    {{ form_widget(form.email, {'attr': {'class': 'form-control border-start-0 ps-0 py-2', 'placeholder': 'nom@exemple.com'}}) }}
+                                    {{ form_widget(form.email, {'attr': {'class': 'form-control border-start-0 ps-0 py-2 bg-light', 'readonly': true}}) }}
                                 </div>
+                                <div class="form-text small">{{ form.email.vars.help }}</div>
                                 <div class="text-danger small">{{ form_errors(form.email) }}</div>
                             </div>
 

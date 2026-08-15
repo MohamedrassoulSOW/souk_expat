@@ -7,8 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use App\Security\PasswordConstraints;
 
 class ChangePasswordFormType extends AbstractType
 {
@@ -23,16 +22,7 @@ class ChangePasswordFormType extends AbstractType
                     ],
                 ],
                 'first_options' => [
-                    'constraints' => [
-                        new NotBlank(
-                            message: 'Veuillez entrer un mot de passe',
-                        ),
-                        new Length(
-                            min: 8,
-                            minMessage: 'Votre mot de passe doit faire au moins {{ limit }} caractères',
-                            max: 4096,
-                        ),
-                    ],
+                    'constraints' => PasswordConstraints::newPassword(),
                     'label' => 'Nouveau mot de passe',
                 ],
                 'second_options' => [

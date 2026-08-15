@@ -5,10 +5,12 @@ namespace App\Controller;
 use App\Entity\Category;
 use App\Form\CategoryFormType;
 use App\Repository\CategoryRepository;
+use App\Service\SafeImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -39,6 +41,7 @@ final class CategoryController extends AbstractController
         Request $request,
         SluggerInterface $slugger,
         CategoryRepository $categoryRepository,
+        SafeImageUploader $imageUploader,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
@@ -53,7 +56,15 @@ final class CategoryController extends AbstractController
             /** @var UploadedFile|null $imageFile */
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile instanceof UploadedFile) {
-                $category->setImageName($this->storeCategoryImage($imageFile));
+                try {
+                    $category->setImageName($this->storeCategoryImage($imageFile, $imageUploader));
+                } catch (FileException) {
+                    $this->addFlash('danger', 'Image de catégorie invalide.');
+
+                    return $this->render('category/new.html.twig', [
+                        'form' => $form->createView(),
+                    ]);
+                }
             }
 
             $entityManager->persist($category);
@@ -78,6 +89,7 @@ final class CategoryController extends AbstractController
         SluggerInterface $slugger,
         CategoryRepository $categoryRepository,
         Category $category,
+        SafeImageUploader $imageUploader,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_EDITOR');
 
@@ -95,8 +107,18 @@ final class CategoryController extends AbstractController
             /** @var UploadedFile|null $imageFile */
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile instanceof UploadedFile) {
+                try {
+                    $newName = $this->storeCategoryImage($imageFile, $imageUploader);
+                } catch (FileException) {
+                    $this->addFlash('danger', 'Image de catégorie invalide.');
+
+                    return $this->render('category/update.html.twig', [
+                        'form' => $form->createView(),
+                        'category' => $category,
+                    ]);
+                }
                 $this->deleteCategoryImageFile($category->getImageName());
-                $category->setImageName($this->storeCategoryImage($imageFile));
+                $category->setImageName($newName);
             }
 
             $entityManager->flush();
@@ -170,13 +192,15 @@ final class CategoryController extends AbstractController
         return $dir;
     }
 
-    private function storeCategoryImage(UploadedFile $imageFile): string
+    private function storeCategoryImage(UploadedFile $imageFile, SafeImageUploader $imageUploader): string
     {
-        $ext = $imageFile->guessExtension() ?: 'jpg';
-        $filename = uniqid('cat_', true) . '.' . $ext;
-        $imageFile->move($this->categoriesUploadDir(), $filename);
-
-        return $filename;
+        return $imageUploader->store(
+            $imageFile,
+            $this->categoriesUploadDir(),
+            4 * 1024 * 1024,
+            ['image/jpeg', 'image/png', 'image/webp'],
+            'cat_',
+        );
     }
 
     private function deleteCategoryImageFile(?string $imageName): void

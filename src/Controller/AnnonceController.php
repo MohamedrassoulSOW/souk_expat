@@ -12,9 +12,12 @@ use App\Repository\CityRepository;
 use App\Service\AnnonceDeletionService;
 use App\Service\AnnonceDisplayMixer;
 use App\Service\NotificationService;
+use App\Service\SafeImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -80,8 +83,8 @@ final class AnnonceController extends AbstractController
             return $this->redirectToRoute('app_dashboard');
         }
 
-        $title = trim((string) $request->request->get('title'));
-        $message = trim((string) $request->request->get('message'));
+        $title = mb_substr(trim((string) $request->request->get('title')), 0, 120);
+        $message = mb_substr(trim((string) $request->request->get('message')), 0, 500);
 
         if ($title !== '' && $message !== '') {
             $notifService->notifyAll($title, $message);
@@ -181,7 +184,8 @@ final class AnnonceController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger,
-        AnnonceRepository $annonceRepository
+        AnnonceRepository $annonceRepository,
+        SafeImageUploader $imageUploader,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
@@ -217,12 +221,22 @@ final class AnnonceController extends AbstractController
                 $images = $images ? [$images] : [];
             }
             $images = \array_slice($images, 0, 8);
+            $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/annonces';
             foreach ($images as $image) {
-                $filename = uniqid() . '.' . $image->guessExtension();
-                $image->move(
-                    $this->getParameter('kernel.project_dir') . '/public/uploads/annonces',
-                    $filename
-                );
+                if (!$image instanceof UploadedFile) {
+                    continue;
+                }
+                try {
+                    $filename = $imageUploader->store(
+                        $image,
+                        $uploadDir,
+                        4 * 1024 * 1024,
+                        ['image/jpeg', 'image/png', 'image/webp'],
+                    );
+                } catch (FileException) {
+                    $this->addFlash('warning', 'Une photo n’a pas pu être enregistrée (format ou fichier invalide).');
+                    continue;
+                }
 
                 $annonceImage = new AnnonceImage();
                 $annonceImage->setImadeName($filename);
@@ -273,7 +287,8 @@ final class AnnonceController extends AbstractController
         Annonce $annonce,
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger,
-        AnnonceRepository $annonceRepository
+        AnnonceRepository $annonceRepository,
+        SafeImageUploader $imageUploader,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
@@ -308,8 +323,20 @@ final class AnnonceController extends AbstractController
                 $images = \array_slice($images, 0, $remaining);
             }
             foreach ($images as $image) {
-                $filename = uniqid() . '.' . $image->guessExtension();
-                $image->move($this->getParameter('kernel.project_dir') . '/public/uploads/annonces', $filename);
+                if (!$image instanceof UploadedFile) {
+                    continue;
+                }
+                try {
+                    $filename = $imageUploader->store(
+                        $image,
+                        $this->getParameter('kernel.project_dir') . '/public/uploads/annonces',
+                        4 * 1024 * 1024,
+                        ['image/jpeg', 'image/png', 'image/webp'],
+                    );
+                } catch (FileException) {
+                    $this->addFlash('warning', 'Une photo n’a pas pu être enregistrée (format ou fichier invalide).');
+                    continue;
+                }
 
                 $annonceImage = new AnnonceImage();
                 $annonceImage->setImadeName($filename);

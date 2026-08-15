@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Contact;
 use App\Form\ContactType;
 use App\Service\PlatformMailer;
+use App\Security\AbuseLimiter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,7 @@ final class ContactController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         PlatformMailer $platformMailer,
+        AbuseLimiter $abuseLimiter,
     ): Response {
         $contact = new Contact();
         $form = $this->createForm(ContactType::class, $contact);
@@ -31,6 +33,8 @@ final class ContactController extends AbstractController
 
                 return $this->redirectToRoute('app_contact');
             }
+
+            $abuseLimiter->assertContactForm($request);
 
             // Anti-spam simple : max 3 envois / 10 min par session
             $session = $request->getSession();

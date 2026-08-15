@@ -6,18 +6,27 @@ namespace App\Controller\Api\V1;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/v1')]
 final class IndexController extends AbstractController
 {
+    public function __construct(
+        private readonly KernelInterface $kernel,
+    ) {
+    }
+
     #[Route('', name: 'api_v1_index', methods: ['GET'])]
     public function __invoke(): JsonResponse
     {
-        return $this->json([
+        $payload = [
             'name' => 'SoukExpat Mobile API',
             'version' => 'v1',
-            'endpoints' => [
+        ];
+
+        if ($this->kernel->getEnvironment() !== 'prod') {
+            $payload['endpoints'] = [
                 'POST /api/v1/auth/login' => 'Connexion (email + password) → JWT',
                 'POST /api/v1/auth/register' => 'Inscription → JWT',
                 'GET /api/v1/me' => 'Profil connecté (Bearer)',
@@ -37,11 +46,13 @@ final class IndexController extends AbstractController
                 'POST /api/v1/annonces/{id}/thread' => 'Ouvrir / créer un thread sur une annonce',
                 'GET /api/v1/threads/{id}' => 'Messages d’une conversation',
                 'POST /api/v1/threads/{id}/messages' => 'Envoyer texte / photo (BLOB) / position',
-            ],
-            'storage' => [
+            ];
+            $payload['storage'] = [
                 'mobileMedia' => 'database',
                 'note' => 'Les images uploadées via /api/v1 sont stockées en BLOB (pas dans public/uploads).',
-            ],
-        ]);
+            ];
+        }
+
+        return $this->json($payload);
     }
 }

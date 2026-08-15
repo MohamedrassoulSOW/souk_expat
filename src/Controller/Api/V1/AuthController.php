@@ -8,6 +8,8 @@ use App\Api\ApiResourceFactory;
 use App\Api\JwtTokenManager;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Security\AbuseLimiter;
+use App\Security\PasswordConstraints;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,12 +30,14 @@ final class AuthController extends AbstractController
         private readonly ApiResourceFactory $resources,
         private readonly EntityManagerInterface $em,
         private readonly ValidatorInterface $validator,
+        private readonly AbuseLimiter $abuseLimiter,
     ) {
     }
 
     #[Route('/login', name: 'api_v1_auth_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
+        $this->abuseLimiter->assertApiLogin($request);
         $payload = $this->jsonBody($request);
         $email = mb_strtolower(trim((string) ($payload['email'] ?? '')));
         $password = (string) ($payload['password'] ?? '');
@@ -66,6 +70,7 @@ final class AuthController extends AbstractController
     #[Route('/register', name: 'api_v1_auth_register', methods: ['POST'])]
     public function register(Request $request): JsonResponse
     {
+        $this->abuseLimiter->assertApiRegister($request);
         $payload = $this->jsonBody($request);
 
         $email = mb_strtolower(trim((string) ($payload['email'] ?? '')));
@@ -84,7 +89,7 @@ final class AuthController extends AbstractController
             ],
             new Assert\Collection([
                 'email' => [new Assert\NotBlank(), new Assert\Email()],
-                'password' => [new Assert\NotBlank(), new Assert\Length(min: 8, max: 72)],
+                'password' => PasswordConstraints::newPassword(),
                 'firstName' => [new Assert\NotBlank(), new Assert\Length(max: 191)],
                 'lastName' => [new Assert\NotBlank(), new Assert\Length(max: 191)],
                 'acceptTerms' => [new Assert\IsTrue(message: 'Vous devez accepter les conditions d’utilisation.')],

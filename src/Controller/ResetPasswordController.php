@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\ChangePasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
 use App\Service\PlatformMailer;
+use App\Security\AbuseLimiter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -30,12 +31,13 @@ class ResetPasswordController extends AbstractController
     }
 
     #[Route('', name: 'app_forgot_password_request')]
-    public function request(Request $request, PlatformMailer $platformMailer, TranslatorInterface $translator): Response
+    public function request(Request $request, PlatformMailer $platformMailer, TranslatorInterface $translator, AbuseLimiter $abuseLimiter): Response
     {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $abuseLimiter->assertPasswordReset($request);
             $email = $form->get('email')->getData();
 
             return $this->processSendingPasswordResetEmail($request, $email, $platformMailer);

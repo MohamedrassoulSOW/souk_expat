@@ -13,6 +13,9 @@ parameters:
     env(JWT_ISSUER): 'soukexpat-api'
     env(GOOGLE_CLIENT_ID): ''
     env(GOOGLE_CLIENT_SECRET): ''
+    env(CORS_ALLOW_ORIGINS): ''
+    env(DEFAULT_URI): ''
+    env(MERCURE_PUBLIC_URL): ''
 
 services:
     # default configuration for services in *this* file
@@ -34,6 +37,13 @@ services:
             $secret: '%env(default:kernel.secret:JWT_SECRET)%'
             $issuer: '%env(JWT_ISSUER)%'
             $ttlSeconds: '%env(int:JWT_TTL)%'
+
+    App\Security\AbuseLimiter:
+        arguments:
+            $apiLoginLimiter: '@limiter.api_login'
+            $apiRegisterLimiter: '@limiter.api_register'
+            $passwordResetLimiter: '@limiter.password_reset'
+            $contactFormLimiter: '@limiter.contact_form'
 
     App\Service\MessageRetentionService:
         arguments:

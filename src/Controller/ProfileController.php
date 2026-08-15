@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Form\ChangePasswordType;
 use App\Form\AvatarType;
+use App\Service\SafeImageUploader;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 
 final class ProfileController extends AbstractController
@@ -39,9 +42,9 @@ final class ProfileController extends AbstractController
 
     #[Route('/profile/avatar/update', name: 'app_profile_avatar_update', methods: ['POST'])]
     public function updateAvatar(
-        Request $request, 
-        EntityManagerInterface $entityManager, 
-        \Symfony\Component\String\Slugger\SluggerInterface $slugger
+        Request $request,
+        EntityManagerInterface $entityManager,
+        SafeImageUploader $imageUploader,
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         
@@ -53,19 +56,26 @@ final class ProfileController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $avatarFile = $form->get('avatar')->getData();
 
-            if ($avatarFile) {
-                // Suppression de l'ancien fichier
-                if ($user->getAvatar()) {
-                    $oldPath = $this->getParameter('kernel.project_dir').'/public/uploads/avatars/'.$user->getAvatar();
-                    if (file_exists($oldPath)) { unlink($oldPath); }
+            if ($avatarFile instanceof UploadedFile) {
+                try {
+                    $newFilename = $imageUploader->store(
+                        $avatarFile,
+                        $this->getParameter('kernel.project_dir').'/public/uploads/avatars',
+                        2 * 1024 * 1024,
+                        ['image/jpeg', 'image/png', 'image/webp'],
+                    );
+                } catch (FileException) {
+                    $this->addFlash('danger', 'Impossible d’enregistrer cette image.');
+
+                    return $this->redirectToRoute('app_profile');
                 }
 
-                // Upload du nouveau fichier
-                $newFilename = uniqid().'-'.$slugger->slug($user->getFirstName()).'.'.$avatarFile->guessExtension();
-                $avatarFile->move(
-                    $this->getParameter('kernel.project_dir').'/public/uploads/avatars',
-                    $newFilename
-                );
+                if ($user->getAvatar()) {
+                    $oldPath = $this->getParameter('kernel.project_dir').'/public/uploads/avatars/'.$user->getAvatar();
+                    if (is_file($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
 
                 $user->setAvatar($newFilename);
                 $entityManager->flush();
@@ -79,7 +89,8 @@ final class ProfileController extends AbstractController
     #[Route('/profile/edit', name: 'app_profile_edit')]
     public function edit(
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        SafeImageUploader $imageUploader,
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -91,16 +102,31 @@ final class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // Gestion avatar (optionnel)
             $avatarFile = $form->get('avatar')->getData();
 
-            if ($avatarFile) {
-                $filename = uniqid().'.'.$avatarFile->guessExtension();
+            if ($avatarFile instanceof UploadedFile) {
+                try {
+                    $filename = $imageUploader->store(
+                        $avatarFile,
+                        $this->getParameter('kernel.project_dir').'/public/uploads/avatars',
+                        2 * 1024 * 1024,
+                        ['image/jpeg', 'image/png', 'image/webp'],
+                    );
+                } catch (FileException) {
+                    $this->addFlash('danger', 'Impossible d’enregistrer cette image.');
 
-                $avatarFile->move(
-                    $this->getParameter('kernel.project_dir').'/public/uploads/avatars',
-                    $filename
-                );
+                    return $this->render('profile/edit.html.twig', [
+                        'form' => $form->createView(),
+                        'user' => $user,
+                    ]);
+                }
+
+                if ($user->getAvatar()) {
+                    $oldPath = $this->getParameter('kernel.project_dir').'/public/uploads/avatars/'.$user->getAvatar();
+                    if (is_file($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
                 $user->setAvatar($filename);
             }
 

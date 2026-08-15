@@ -14,6 +14,13 @@ server {
     root /var/www/souk_expat/public;
     index index.php;
 
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), payment=(), usb=(), geolocation=(self)" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Permitted-Cross-Domain-Policies "none" always;
+
     # PWA — SW + manifest toujours revalidés
     location = /sw.js {
         add_header Cache-Control "no-cache, no-store, must-revalidate";
@@ -44,9 +51,20 @@ server {
         return 404;
     }
 
-    location ~* \.(?:css|js|jpg|jpeg|gif|png|svg|ico|woff2?|ttf|eot)$ {
+    location ~* \.(?:css|js|jpg|jpeg|gif|png|svg|ico|woff2?|ttf|eot|webp)$ {
         expires 1y;
         add_header Cache-Control "public";
+        try_files $uri =404;
+    }
+
+    # Uploads : jamais d’exécution PHP
+    location ^~ /uploads/ {
+        location ~* \.(?:php|phtml|phar|cgi|pl|py|asp|aspx|sh)$ {
+            deny all;
+        }
+        location ~ \.php$ {
+            deny all;
+        }
         try_files $uri =404;
     }
 }

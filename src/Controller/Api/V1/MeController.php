@@ -46,6 +46,8 @@ final class MeController extends AbstractController
             $payload = [];
         }
 
+        unset($payload['email'], $payload['password'], $payload['roles']);
+
         if (isset($payload['firstName'])) {
             $firstName = trim((string) $payload['firstName']);
             if ($firstName === '') {
