@@ -44,6 +44,7 @@ services:
             $apiRegisterLimiter: '@limiter.api_register'
             $passwordResetLimiter: '@limiter.password_reset'
             $contactFormLimiter: '@limiter.contact_form'
+            $totpChallengeLimiter: '@limiter.totp_challenge'
 
     App\Service\MessageRetentionService:
         arguments:

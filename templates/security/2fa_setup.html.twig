@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Activer la 2FA admin — SoukExpat{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="p-4 text-center text-white" style="background: linear-gradient(135deg, #4B79A1 0%, #1B2E4B 100%);">
+                    <i class="bi bi-qr-code-scan fs-1 d-block mb-2"></i>
+                    <h1 class="h4 fw-bold mb-0">Double authentification admin</h1>
+                    <p class="small mb-0 opacity-75">Obligatoire pour les comptes administrateur</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    {% for message in app.flashes('danger') %}
+                        <div class="alert alert-danger border-0 small">{{ message }}</div>
+                    {% endfor %}
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success border-0 small">{{ message }}</div>
+                    {% endfor %}
+
+                    {% if alreadyEnabled %}
+                        <p class="text-secondary">La 2FA est déjà active sur ce compte. Elle sera demandée à chaque connexion.</p>
+                        <a href="{{ path('app_dashboard') }}" class="btn btn-custom-cyan rounded-pill">Retour au tableau de bord</a>
+                    {% else %}
+                        <ol class="small text-secondary mb-4 ps-3">
+                            <li class="mb-2">Ouvrez Google Authenticator, Authy ou une app TOTP.</li>
+                            <li class="mb-2">Scannez le QR code (ou saisissez la clé manuellement).</li>
+                            <li>Entrez le code à 6 chiffres pour confirmer.</li>
+                        </ol>
+                        <div class="text-center mb-3">
+                            <canvas id="totp-qr" class="bg-white rounded-3 p-2" width="192" height="192" aria-label="QR code 2FA"></canvas>
+                        </div>
+                        <p class="small text-muted text-center mb-4">Clé manuelle : <code class="user-select-all">{{ secret }}</code></p>
+                        <form method="post" autocomplete="off">
+                            <input type="hidden" name="_token" value="{{ csrf_token('admin_2fa_setup') }}">
+                            <label class="form-label small fw-bold text-muted text-uppercase" for="code">Code de confirmation</label>
+                            <input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+                                   class="form-control form-control-lg text-center mb-4" required autofocus
+                                   autocomplete="one-time-code">
+                            <button type="submit" class="btn btn-custom-cyan w-100 rounded-pill py-2 fw-bold">Activer la 2FA</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{{ include('layouts/footer.html.twig') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% if otpauthUri %}
+        <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+        <script>
+            (function () {
+                var canvas = document.getElementById('totp-qr');
+                if (!canvas || typeof QRCode === 'undefined') return;
+                QRCode.toCanvas(canvas, {{ otpauthUri|json_encode|raw }}, { width: 192, margin: 1 }, function () {});
+            })();
+        </script>
+    {% endif %}
+{% endblock %}

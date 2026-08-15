@@ -55,6 +55,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 30, nullable: true)]
     private ?string $whatsappPhone = null;
 
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $totpSecret = null;
+
     public function getAvatar(): ?string
     {
         return $this->avatar;
@@ -166,6 +169,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password !== null && $this->password !== '';
     }
 
+    public function getTotpSecret(): ?string
+    {
+        return $this->totpSecret;
+    }
+
+    public function setTotpSecret(?string $totpSecret): static
+    {
+        $this->totpSecret = $totpSecret;
+
+        return $this;
+    }
+
+    public function isTotpEnabled(): bool
+    {
+        return $this->totpSecret !== null && $this->totpSecret !== '';
+    }
+
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
      */
@@ -173,6 +193,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $data = (array) $this;
         $data["\0".self::class."\0password"] = hash('crc32c', (string) $this->password);
+        $data["\0".self::class."\0totpSecret"] = null;
 
         return $data;
     }

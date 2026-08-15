@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Double authentification — SoukExpat{% endblock %}
+
+{% block body %}
+{{ include('layouts/navBar.html.twig') }}
+
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-5">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="p-4 text-center text-white" style="background: linear-gradient(135deg, #4B79A1 0%, #1B2E4B 100%);">
+                    <i class="bi bi-shield-lock fs-1 d-block mb-2"></i>
+                    <h1 class="h4 fw-bold mb-0">Vérification admin</h1>
+                    <p class="small mb-0 opacity-75">Entrez le code de votre application d’authentification</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    {% for message in app.flashes('danger') %}
+                        <div class="alert alert-danger border-0 small">{{ message }}</div>
+                    {% endfor %}
+                    <form method="post" autocomplete="off">
+                        <input type="hidden" name="_token" value="{{ csrf_token('admin_2fa_challenge') }}">
+                        <label class="form-label small fw-bold text-muted text-uppercase" for="code">Code à 6 chiffres</label>
+                        <input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+                               class="form-control form-control-lg text-center mb-4" required autofocus
+                               autocomplete="one-time-code">
+                        <button type="submit" class="btn btn-custom-cyan w-100 rounded-pill py-2 fw-bold">Valider</button>
+                    </form>
+                    <p class="text-center small text-muted mt-4 mb-0">
+                        <a href="{{ path('app_logout') }}" class="text-decoration-none" data-turbo="false"
+                           onclick="event.preventDefault(); document.getElementById('logout-2fa').submit();">Se déconnecter</a>
+                    </p>
+                    <form id="logout-2fa" action="{{ path('app_logout') }}" method="post" class="d-none" data-turbo="false">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{{ include('layouts/footer.html.twig') }}
+{% endblock %}

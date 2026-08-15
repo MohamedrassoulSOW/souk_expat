@@ -112,6 +112,14 @@
                                         <i class="bi bi-chevron-right small opacity-50"></i>
                                     </div>
                                 </a>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('app_2fa_setup') }}" class="btn btn-action-profile-outline py-3 px-4">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span><i class="bi bi-shield-lock me-2"></i> Double authentification</span>
+                                            <i class="bi bi-chevron-right small opacity-50"></i>
+                                        </div>
+                                    </a>
+                                {% endif %}
                                 <a href="{{ path('app_how_it_works') }}#videos" class="btn btn-action-profile-outline py-3 px-4">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span><i class="bi bi-play-btn me-2"></i> Vidéo-Tuto</span>

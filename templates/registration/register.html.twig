@@ -71,6 +71,27 @@
                             <div class="form-text extra-small text-muted mt-2">8 caractères minimum conseillés.</div>
                         </div>
 
+                        {# Captcha #}
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted" for="{{ registrationForm.captcha.vars.id }}">Code de sécurité</label>
+                            <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
+                                <img id="captcha-img" src="{{ path('app_captcha') }}?t={{ 'now'|date('U') }}"
+                                     width="200" height="64" alt="Code de sécurité" class="rounded-3 border shadow-sm">
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" id="captcha-refresh">
+                                    <i class="bi bi-arrow-clockwise me-1"></i> Nouveau code
+                                </button>
+                            </div>
+                            {{ form_widget(registrationForm.captcha, {
+                                attr: { class: 'form-control form-control-lg border-light-subtle bg-light shadow-none ps-3 rounded-3 text-uppercase' }
+                            }) }}
+                            {{ form_errors(registrationForm.captcha) }}
+                            <div class="form-text extra-small text-muted mt-1">Saisissez les 5 caractères affichés (sans distinction de casse).</div>
+                        </div>
+
+                        <div class="contact-honeypot-wrap" aria-hidden="true">
+                            {{ form_widget(registrationForm.website) }}
+                        </div>
+
                         {# CGU #}
                         <div class="form-check mb-4 custom-checkbox">
                             {{ form_widget(registrationForm.agreeTerms, {
@@ -141,10 +162,32 @@
         border-color: #4B79A1;
     }
 
+    .contact-honeypot-wrap {
+        position: absolute !important;
+        left: -10000px !important;
+        width: 1px !important;
+        height: 1px !important;
+        overflow: hidden !important;
+    }
+
     @media (max-width: 576px) {
         .card-body { padding: 1.5rem !important; }
     }
 </style>
 
 {{ include('layouts/footer.html.twig') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        (function () {
+            var img = document.getElementById('captcha-img');
+            var btn = document.getElementById('captcha-refresh');
+            if (!img || !btn) return;
+            btn.addEventListener('click', function () {
+                img.src = {{ path('app_captcha', {refresh: 1})|json_encode|raw }} + '&t=' + Date.now();
+            });
+        })();
+    </script>
 {% endblock %}

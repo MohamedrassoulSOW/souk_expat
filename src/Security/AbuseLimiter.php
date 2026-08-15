@@ -18,6 +18,7 @@ final class AbuseLimiter
         private readonly RateLimiterFactoryInterface $apiRegisterLimiter,
         private readonly RateLimiterFactoryInterface $passwordResetLimiter,
         private readonly RateLimiterFactoryInterface $contactFormLimiter,
+        private readonly RateLimiterFactoryInterface $totpChallengeLimiter,
     ) {
     }
 
@@ -39,6 +40,11 @@ final class AbuseLimiter
     public function assertContactForm(Request $request): void
     {
         $this->consume($this->contactFormLimiter, $this->clientKey($request));
+    }
+
+    public function assertTotpChallenge(Request $request, string $userId): void
+    {
+        $this->consume($this->totpChallengeLimiter, $this->clientKey($request).'-'.$userId);
     }
 
     private function consume(RateLimiterFactoryInterface $factory, string $key): void

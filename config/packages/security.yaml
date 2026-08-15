@@ -43,7 +43,7 @@ security:
 
             login_throttling:
                 max_attempts: 5
-                interval: '15 minutes'
+                interval: '1 hour'
 
             logout:
                 path: app_logout
@@ -72,6 +72,8 @@ security:
         - { path: ^/connect/google, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/captcha, roles: PUBLIC_ACCESS }
+        - { path: ^/2fa, roles: ROLE_ADMIN }
         - { path: ^/annonce/?$, roles: PUBLIC_ACCESS }
         - { path: ^/annonce/new, roles: ROLE_USER }
         - { path: ^/annonce/mes-annonces, roles: ROLE_USER }

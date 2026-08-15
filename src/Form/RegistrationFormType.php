@@ -8,8 +8,10 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use App\Security\PasswordConstraints;
+use App\Validator\CaptchaChallenge;
 
 class RegistrationFormType extends AbstractType
 {
@@ -41,6 +43,31 @@ class RegistrationFormType extends AbstractType
                 'label' => 'Mot de passe',
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => PasswordConstraints::newPassword(),
+            ])
+            ->add('captcha', TextType::class, [
+                'mapped' => false,
+                'label' => 'Code de sécurité',
+                'attr' => [
+                    'autocomplete' => 'off',
+                    'inputmode' => 'text',
+                    'autocapitalize' => 'characters',
+                    'placeholder' => '5 caractères',
+                    'maxlength' => 8,
+                ],
+                'constraints' => [
+                    new CaptchaChallenge(),
+                ],
+            ])
+            ->add('website', TextType::class, [
+                'mapped' => false,
+                'required' => false,
+                'label' => false,
+                'attr' => [
+                    'autocomplete' => 'off',
+                    'tabindex' => '-1',
+                    'aria-hidden' => 'true',
+                    'class' => 'contact-honeypot',
+                ],
             ]);
     }
 
