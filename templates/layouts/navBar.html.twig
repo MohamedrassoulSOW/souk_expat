@@ -122,11 +122,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ route == 'app_how_it_works' ? 'active' : '' }}" href="{{ path('app_how_it_works') }}#videos">
-                            <i class="bi bi-play-btn nav-link-ic" aria-hidden="true"></i><span>Vidéo-Tuto</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link {{ route == 'app_about' ? 'active' : '' }}" href="{{ path('app_about') }}">
                             <i class="bi bi-info-circle nav-link-ic" aria-hidden="true"></i><span>À propos</span>
                         </a>
@@ -163,6 +158,7 @@
                                 <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_annonce_new') }}"><i class="bi bi-plus-lg me-2 opacity-50"></i>Vendre</a></li>
                                 <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_mes_annonces') }}"><i class="bi bi-stack me-2 opacity-50"></i>Mes annonces</a></li>
                                 <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_profile') }}"><i class="bi bi-person-gear me-2 opacity-50"></i>Paramètres</a></li>
+                                <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_how_it_works') }}#videos"><i class="bi bi-play-btn me-2 opacity-50"></i>Vidéo-Tuto</a></li>
                                 {% if is_granted('ROLE_EDITOR') %}
                                     <li><hr class="dropdown-divider opacity-50"></li>
                                     <li><a class="dropdown-item rounded-3 py-2 fw-medium text-cyan" href="{{ path('app_dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Tableau de bord</a></li>

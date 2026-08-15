@@ -112,6 +112,12 @@
                                         <i class="bi bi-chevron-right small opacity-50"></i>
                                     </div>
                                 </a>
+                                <a href="{{ path('app_how_it_works') }}#videos" class="btn btn-action-profile-outline py-3 px-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="bi bi-play-btn me-2"></i> Vidéo-Tuto</span>
+                                        <i class="bi bi-chevron-right small opacity-50"></i>
+                                    </div>
+                                </a>
                                 {% if user.avatar %}
                                     <form method="post" action="{{ path('app_profile_avatar_delete') }}" class="text-center mt-2" onsubmit="return confirm('Supprimer la photo ?');">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete_avatar') }}">
