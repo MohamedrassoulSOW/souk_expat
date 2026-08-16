@@ -6,15 +6,20 @@ use App\Entity\User;
 use App\Repository\MessageRepository;
 use App\Repository\NotificationRepository;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class MessageExtension extends AbstractExtension
 {
+    private const COUNT_TTL = 45;
+
     public function __construct(
         private Security $security,
         private MessageRepository $messageRepository,
         private NotificationRepository $notificationRepository,
+        private CacheInterface $cache,
     ) {
     }
 
@@ -30,21 +35,33 @@ class MessageExtension extends AbstractExtension
     public function getUnreadCount(): int
     {
         $user = $this->security->getUser();
-        if (!$user instanceof User) {
+        if (!$user instanceof User || $user->getId() === null) {
             return 0;
         }
 
-        return $this->messageRepository->countUnreadMessages($user);
+        $userId = $user->getId();
+
+        return (int) $this->cache->get('nav.unread_msg.'.$userId, function (ItemInterface $item) use ($user): int {
+            $item->expiresAfter(self::COUNT_TTL);
+
+            return $this->messageRepository->countUnreadMessages($user);
+        });
     }
 
     public function getUnreadNotificationsCount(): int
     {
         $user = $this->security->getUser();
-        if (!$user instanceof User) {
+        if (!$user instanceof User || $user->getId() === null) {
             return 0;
         }
 
-        return $this->notificationRepository->countUnreadForUser($user);
+        $userId = $user->getId();
+
+        return (int) $this->cache->get('nav.unread_notif.'.$userId, function (ItemInterface $item) use ($user): int {
+            $item->expiresAfter(self::COUNT_TTL);
+
+            return $this->notificationRepository->countUnreadForUser($user);
+        });
     }
 
     /**

@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 
 final class GoogleOAuthController extends AbstractController
 {
@@ -121,7 +122,8 @@ final class GoogleOAuthController extends AbstractController
             : 'Connexion Google réussie. Bon retour !'
         );
 
-        return $this->security->login($user, 'form_login', 'main') ?? $this->redirectToRoute('app_home');
+        return $this->security->login($user, 'form_login', 'main', [new RememberMeBadge()])
+            ?? $this->redirectToRoute('app_home');
     }
 
     private function storeGoogleAvatar(?string $pictureUrl): ?string

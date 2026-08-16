@@ -318,26 +318,23 @@ export function initGuideVideosHint() {
 
 /**
  * Select catégorie / ville : saisie pour filtrer (Tom Select).
- * Compatible Turbo (évite le double init).
+ * Charge Tom Select à la demande si des selects sont présents.
  */
 export function initSearchableSelects() {
-    if (typeof TomSelect === 'undefined') {
-        if (!window.__soukTomSelectRetry) {
-            window.__soukTomSelectRetry = 0;
-        }
-        if (window.__soukTomSelectRetry < 20) {
-            window.__soukTomSelectRetry += 1;
-            window.setTimeout(initSearchableSelects, 75);
-        }
+    const selects = document.querySelectorAll('select.js-searchable-select');
+    if (!selects.length) {
         return;
     }
-    window.__soukTomSelectRetry = 0;
 
-    document.querySelectorAll('select.js-searchable-select').forEach((el) => {
+    if (typeof TomSelect === 'undefined') {
+        ensureTomSelectLoaded(() => initSearchableSelects());
+        return;
+    }
+
+    selects.forEach((el) => {
         if (!(el instanceof HTMLSelectElement)) {
             return;
         }
-        // Déjà initialisé, ou déjà encapsulé (évite flèches / wrappers multiples)
         if (el.tomselect || el.classList.contains('tomselected') || el.closest('.ts-wrapper')) {
             return;
         }
@@ -371,6 +368,125 @@ export function initSearchableSelects() {
             },
         });
     });
+}
+
+function ensureTomSelectLoaded(onReady) {
+    if (typeof TomSelect !== 'undefined') {
+        onReady();
+        return;
+    }
+    if (window.__soukTomSelectLoading) {
+        window.setTimeout(() => ensureTomSelectLoaded(onReady), 80);
+        return;
+    }
+    window.__soukTomSelectLoading = true;
+    const local = window.__soukVendorLocal || {};
+    const cdn = window.__soukVendorCdn || {};
+    const cssHref = local.tomSelectCss || cdn.tomSelectCss;
+    const jsSrc = local.tomSelectJs || cdn.tomSelectJs;
+    if (cssHref && typeof window.__soukLoadCss === 'function') {
+        window.__soukLoadCss(cssHref);
+    }
+    if (jsSrc && typeof window.__soukLoadJs === 'function') {
+        window.__soukLoadJs(jsSrc, () => {
+            window.__soukTomSelectLoading = false;
+            onReady();
+        });
+        return;
+    }
+    window.__soukTomSelectLoading = false;
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/**
+ * Charge la liste des notifications au premier ouverture du dropdown (évite 1 requête SQL / page).
+ */
+export function initDeferredNotifications() {
+    const root = document.querySelector('.nav-notif-dropdown[data-notif-preview-url]');
+    if (!root || root.dataset.notifBound === '1') {
+        return;
+    }
+    root.dataset.notifBound = '1';
+    let loaded = false;
+
+    const load = () => {
+        if (loaded) {
+            return;
+        }
+        loaded = true;
+        const url = root.getAttribute('data-notif-preview-url');
+        const list = root.querySelector('.js-notif-list');
+        if (!url || !list) {
+            return;
+        }
+
+        fetch(url, { headers: { Accept: 'application/json' }, credentials: 'same-origin' })
+            .then((r) => (r.ok ? r.json() : Promise.reject()))
+            .then((data) => {
+                const items = Array.isArray(data.items) ? data.items : [];
+                if (!items.length) {
+                    list.innerHTML =
+                        '<li class="text-center py-5 text-muted"><i class="bi bi-bell-slash fs-2 d-block mb-2 opacity-25"></i><span class="small">Aucune notification</span></li>';
+                } else {
+                    const readTpl = String(data.readUrlTemplate || '').replace(/\/0(\/?)$/, '/');
+                    list.innerHTML = items
+                        .map((n) => {
+                            const unread = !n.isRead;
+                            const action = `${readTpl}${n.id}`;
+                            return `<li class="px-2">
+                                <form method="post" action="${escapeHtml(action)}" class="m-0">
+                                    <input type="hidden" name="_token" value="${escapeHtml(n.csrf || '')}">
+                                    <button type="submit" class="dropdown-item rounded-3 py-3 mb-1 text-start w-100 border-0 ${unread ? 'bg-body-tertiary border-start border-info border-3' : 'opacity-75'}" style="white-space:normal;">
+                                        <div class="d-flex gap-2">
+                                            <div class="flex-grow-1">
+                                                <div class="small text-body mb-1 fw-medium">${escapeHtml(n.message || '')}</div>
+                                                <div class="text-muted d-flex align-items-center" style="font-size:0.7rem;"><i class="bi bi-clock me-1"></i>${escapeHtml(n.createdAt || '')}</div>
+                                            </div>
+                                            ${unread ? '<div class="bg-info rounded-circle" style="width:8px;height:8px;flex-shrink:0;margin-top:5px;"></div>' : ''}
+                                        </div>
+                                    </button>
+                                </form>
+                            </li>`;
+                        })
+                        .join('');
+                }
+
+                const delSlot = root.querySelector('.js-notif-delete-all-slot');
+                if (delSlot && items.length) {
+                    delSlot.innerHTML = `<form method="post" action="${escapeHtml(data.deleteAllUrl || '')}" class="m-0" onsubmit="return confirm('Supprimer toutes les notifications ?');">
+                        <input type="hidden" name="_token" value="${escapeHtml(data.csrfDeleteAll || '')}">
+                        <button type="submit" class="btn btn-link text-danger small text-decoration-none p-0" title="Tout supprimer"><i class="bi bi-trash3"></i></button>
+                    </form>`;
+                }
+
+                const readAllSlot = root.querySelector('.js-notif-read-all-slot');
+                const hasUnread = items.some((n) => !n.isRead);
+                if (readAllSlot && hasUnread) {
+                    readAllSlot.innerHTML = `<li><hr class="dropdown-divider"></li><li>
+                        <form method="post" action="${escapeHtml(data.readAllUrl || '')}" class="m-0">
+                            <input type="hidden" name="_token" value="${escapeHtml(data.csrfReadAll || '')}">
+                            <button type="submit" class="dropdown-item text-center small text-cyan fw-bold py-2 border-0 w-100 bg-transparent">Tout marquer comme lu</button>
+                        </form>
+                    </li>`;
+                }
+            })
+            .catch(() => {
+                loaded = false;
+                if (list) {
+                    list.innerHTML = '<li class="text-center py-4 text-muted small">Impossible de charger les notifications</li>';
+                }
+            });
+    };
+
+    root.addEventListener('show.bs.dropdown', load);
 }
 
 export function initAdminTableSearch() {

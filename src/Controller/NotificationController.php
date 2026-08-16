@@ -7,12 +7,46 @@ use App\Entity\User;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class NotificationController extends AbstractController
 {
+    /**
+     * Liste légère pour le dropdown navbar (chargée au premier clic).
+     */
+    #[Route('/notification/preview', name: 'app_notification_preview', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function preview(NotificationRepository $notifRepo, CsrfTokenManagerInterface $csrf): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $items = [];
+        foreach ($notifRepo->findLatestForUser($user, 8) as $notification) {
+            $id = (int) $notification->getId();
+            $items[] = [
+                'id' => $id,
+                'message' => $notification->getMessage() ?? 'Nouvelle notification',
+                'isRead' => (bool) $notification->isRead(),
+                'createdAt' => $notification->getCreatedAt()?->format('d/m à H:i') ?? '',
+                'csrf' => $csrf->getToken('notif_read'.$id)->getValue(),
+            ];
+        }
+
+        return $this->json([
+            'items' => $items,
+            'csrfDeleteAll' => $csrf->getToken('notif_delete_all')->getValue(),
+            'csrfReadAll' => $csrf->getToken('notif_read_all')->getValue(),
+            'readUrlTemplate' => $this->generateUrl('app_notification_read', ['id' => 0]),
+            'readAllUrl' => $this->generateUrl('app_notification_read_all'),
+            'deleteAllUrl' => $this->generateUrl('app_notification_delete_all'),
+        ]);
+    }
+
     #[Route('/notification/read/{id}', name: 'app_notification_read', methods: ['POST'])]
     public function read(Notification $notification, Request $request, EntityManagerInterface $em): Response
     {

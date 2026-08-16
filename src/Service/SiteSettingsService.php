@@ -7,31 +7,46 @@ namespace App\Service;
 use App\Entity\SiteSettings;
 use App\Repository\SiteSettingsRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final class SiteSettingsService
 {
-    private ?SiteSettings $cache = null;
+    private const CACHE_KEY = 'app.site_settings';
+    private const CACHE_TTL = 900; // 15 min
+
+    private ?SiteSettings $requestCache = null;
 
     public function __construct(
         private readonly SiteSettingsRepository $repository,
         private readonly EntityManagerInterface $em,
+        private readonly CacheInterface $cache,
     ) {
     }
 
     public function get(): SiteSettings
     {
-        if ($this->cache instanceof SiteSettings) {
-            return $this->cache;
+        if ($this->requestCache instanceof SiteSettings) {
+            return $this->requestCache;
         }
 
-        $settings = $this->repository->getSingleton();
-        if (!$settings) {
-            $settings = new SiteSettings();
-            $this->em->persist($settings);
-            $this->em->flush();
-        }
+        $settings = $this->cache->get(self::CACHE_KEY, function (ItemInterface $item): SiteSettings {
+            $item->expiresAfter(self::CACHE_TTL);
 
-        return $this->cache = $settings;
+            $settings = $this->repository->getSingleton();
+            if (!$settings) {
+                $settings = new SiteSettings();
+                $this->em->persist($settings);
+                $this->em->flush();
+            }
+
+            // Détaché : sérialisable dans le cache filesystem Hostinger
+            $this->em->detach($settings);
+
+            return $settings;
+        });
+
+        return $this->requestCache = $settings;
     }
 
     public function save(SiteSettings $settings): void
@@ -39,6 +54,7 @@ final class SiteSettingsService
         $settings->touch();
         $this->em->persist($settings);
         $this->em->flush();
-        $this->cache = $settings;
+        $this->requestCache = $settings;
+        $this->cache->delete(self::CACHE_KEY);
     }
 }

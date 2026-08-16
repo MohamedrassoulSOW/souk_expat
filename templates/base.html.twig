@@ -68,12 +68,24 @@
               onerror="this.onerror=null;window.__soukLoadCss(window.__soukVendorCdn.bootstrapCss)">
         <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/css/bootstrap-icons.min.css') }}"
               onerror="this.onerror=null;window.__soukLoadCss(window.__soukVendorCdn.bootstrapIconsCss)">
+        {% if not souk_auth_light|default(false) %}
         <link rel="stylesheet" href="{{ asset('vendor/tom-select/tom-select.bootstrap5.min.css') }}"
-              onerror="this.onerror=null;window.__soukLoadCss(window.__soukVendorCdn.tomSelectCss)">
+              onerror="this.onerror=null;window.__soukLoadCss(window.__soukVendorCdn.tomSelectCss)"
+              data-souk-tom-select-css>
+        {% endif %}
         <script defer src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"
                 onerror="this.onerror=null;window.__soukLoadJs(window.__soukVendorCdn.bootstrapJs)"></script>
+        {% if not souk_auth_light|default(false) %}
         <script defer src="{{ asset('vendor/tom-select/tom-select.complete.min.js') }}"
-                onerror="this.onerror=null;window.__soukLoadJs(window.__soukVendorCdn.tomSelectJs)"></script>
+                onerror="this.onerror=null;window.__soukLoadJs(window.__soukVendorCdn.tomSelectJs)"
+                data-souk-tom-select-js></script>
+        {% endif %}
+        <script>
+            window.__soukVendorLocal = {
+                tomSelectCss: {{ asset('vendor/tom-select/tom-select.bootstrap5.min.css')|json_encode|raw }},
+                tomSelectJs: {{ asset('vendor/tom-select/tom-select.complete.min.js')|json_encode|raw }},
+            };
+        </script>
         <style>
             /* Secours si Bootstrap ne charge pas (prod sans /vendor/) */
             @media (min-width: 768px) {
@@ -151,19 +163,25 @@
             </script>
         {% endblock %}
     </head>
-    <body{% block body_attributes %}{% endblock %}>
+    <body{% block body_attributes %}{% if souk_auth_light|default(false) %} data-turbo="false" class="souk-auth-light"{% endif %}{% endblock %}>
         {{ include('layouts/flush_message.html.twig') }}
         <div id="app-toast-stack" class="toast-container position-fixed bottom-0 end-0 p-3 pb-4 pe-3" style="z-index: 1090;" aria-live="polite" aria-atomic="false"></div>
 
         {% block body %}{% endblock %}
         {% block whatsapp_fab %}
-            {{ include('layouts/_whatsapp_fab.html.twig') }}
+            {% if not souk_auth_light|default(false) %}
+                {{ include('layouts/_whatsapp_fab.html.twig') }}
+            {% endif %}
         {% endblock %}
         {% block safety_disclaimer %}
-            {{ include('layouts/_safety_disclaimer_modal.html.twig') }}
+            {% if not souk_auth_light|default(false) %}
+                {{ include('layouts/_safety_disclaimer_modal.html.twig') }}
+            {% endif %}
         {% endblock %}
         {% block guide_videos_hint %}
-            {{ include('layouts/_guide_videos_hint_modal.html.twig') }}
+            {% if not souk_auth_light|default(false) %}
+                {{ include('layouts/_guide_videos_hint_modal.html.twig') }}
+            {% endif %}
         {% endblock %}
     </body>
 </html>

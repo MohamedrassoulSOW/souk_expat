@@ -11,8 +11,7 @@
 
             {% if app.user %}
                 {% set unreadNotifsCount = unread_notifications_count() %}
-                {% set latestNotifs = latest_notifications(8) %}
-                <div class="dropdown nav-notif-dropdown">
+                <div class="dropdown nav-notif-dropdown" data-notif-preview-url="{{ path('app_notification_preview') }}">
                     <a href="#"
                        class="nav-icon-link position-relative d-flex align-items-center justify-content-center"
                        id="notifDropdown"
@@ -28,53 +27,12 @@
                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2 p-2 rounded-4 animate slideIn nav-notif-menu">
                         <li class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center mb-2">
                             <h6 class="mb-0 fw-bold">Notifications</h6>
-                            {% if latestNotifs|length > 0 %}
-                                <form method="post" action="{{ path('app_notification_delete_all') }}" class="m-0" onsubmit="return confirm('Supprimer toutes les notifications ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('notif_delete_all') }}">
-                                    <button type="submit" class="btn btn-link text-danger small text-decoration-none p-0" title="Tout supprimer">
-                                        <i class="bi bi-trash3"></i>
-                                    </button>
-                                </form>
-                            {% endif %}
+                            <div class="js-notif-delete-all-slot"></div>
                         </li>
-                        <div class="notif-scroll">
-                            {% for notification in latestNotifs %}
-                                <li class="px-2">
-                                    <form method="post" action="{{ path('app_notification_read', {id: notification.id}) }}" class="m-0">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('notif_read' ~ notification.id) }}">
-                                        <button type="submit"
-                                                class="dropdown-item rounded-3 py-3 mb-1 text-start w-100 border-0 {{ not notification.isRead ? 'bg-body-tertiary border-start border-info border-3' : 'opacity-75' }}"
-                                                style="white-space: normal;">
-                                            <div class="d-flex gap-2">
-                                                <div class="flex-grow-1">
-                                                    <div class="small text-body mb-1 fw-medium">{{ notification.message|default('Nouvelle notification') }}</div>
-                                                    <div class="text-muted d-flex align-items-center" style="font-size: 0.7rem;">
-                                                        <i class="bi bi-clock me-1"></i>{{ notification.createdAt|date('d/m à H:i') }}
-                                                    </div>
-                                                </div>
-                                                {% if not notification.isRead %}
-                                                    <div class="bg-info rounded-circle" style="width: 8px; height: 8px; flex-shrink: 0; margin-top: 5px;"></div>
-                                                {% endif %}
-                                            </div>
-                                        </button>
-                                    </form>
-                                </li>
-                            {% else %}
-                                <li class="text-center py-5 text-muted">
-                                    <i class="bi bi-bell-slash fs-2 d-block mb-2 opacity-25"></i>
-                                    <span class="small">Aucune notification</span>
-                                </li>
-                            {% endfor %}
+                        <div class="notif-scroll js-notif-list">
+                            <li class="text-center py-4 text-muted small js-notif-loading">Chargement…</li>
                         </div>
-                        {% if unreadNotifsCount > 0 %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="post" action="{{ path('app_notification_read_all') }}" class="m-0">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('notif_read_all') }}">
-                                    <button type="submit" class="dropdown-item text-center small text-cyan fw-bold py-2 border-0 w-100 bg-transparent">Tout marquer comme lu</button>
-                                </form>
-                            </li>
-                        {% endif %}
+                        <div class="js-notif-read-all-slot"></div>
                     </ul>
                 </div>
 

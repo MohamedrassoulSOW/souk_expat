@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 
 class RegistrationController extends AbstractController
 {
@@ -52,7 +53,7 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
             $captcha->consume($session);
 
-            return $security->login($user, 'form_login', 'main');
+            return $security->login($user, 'form_login', 'main', [new RememberMeBadge()]);
         }
 
         if ($form->isSubmitted()) {
