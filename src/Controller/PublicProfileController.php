@@ -40,7 +40,7 @@ final class PublicProfileController extends AbstractController
         $annonces = $paginator->paginate(
             $qb,
             $request->query->getInt('page', 1),
-            12,
+            self::resolveListingPerPage($request),
         );
 
         $items = iterator_to_array($annonces->getItems());
@@ -59,5 +59,12 @@ final class PublicProfileController extends AbstractController
             'category_filter' => $categoryFilter > 0 ? $categoryFilter : null,
             'is_own_profile' => $currentUser instanceof User && $currentUser->getId() === $user->getId(),
         ]);
+    }
+
+    private static function resolveListingPerPage(Request $request): int
+    {
+        $userAgent = mb_strtolower((string) $request->headers->get('User-Agent', ''));
+
+        return preg_match('/mobile|android|iphone|ipod|iemobile|blackberry|opera mini/i', $userAgent) ? 16 : 24;
     }
 }

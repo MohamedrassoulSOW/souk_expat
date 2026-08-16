@@ -40,8 +40,8 @@ final class AnnonceController extends AbstractController
     ): Response {
         $filters = AnnonceSearchFilters::fromRequest($request);
         $page = $request->query->getInt('page', 1);
-        $perPage = 12;
-        $poolSize = max(60, $perPage * 8);
+        $perPage = self::resolveListingPerPage($request);
+        $poolSize = max(24, $perPage * 2);
 
         $qb = $annonceRepository->createApprovedSearchQueryBuilder(
             $filters->q,
@@ -117,8 +117,8 @@ final class AnnonceController extends AbstractController
 
         $filters = AnnonceSearchFilters::fromRequest($request);
         $page = $request->query->getInt('page', 1);
-        $perPage = 12;
-        $poolSize = max(60, $perPage * 8);
+    $perPage = self::resolveListingPerPage($request);
+        $poolSize = max(24, $perPage * 2);
 
         $qb = $annonceRepository->createApprovedSearchQueryBuilder(
             $filters->q,
@@ -148,6 +148,13 @@ final class AnnonceController extends AbstractController
             'cities' => $cityRepository->findAllOrderedByName(),
             'search_filters' => $filters,
         ]);
+    }
+
+    private static function resolveListingPerPage(Request $request): int
+    {
+        $userAgent = mb_strtolower((string) $request->headers->get('User-Agent', ''));
+
+        return preg_match('/mobile|android|iphone|ipod|iemobile|blackberry|opera mini/i', $userAgent) ? 16 : 24;
     }
 
     /**

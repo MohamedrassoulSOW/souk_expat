@@ -32,8 +32,8 @@ final class HomeController extends AbstractController
 
         // Accueil : dernières annonces (pool), mélange aléatoire, max 3 d’affilée / vendeur
         $page = $request->query->getInt('page', 1);
-        $perPage = 12;
-        $poolSize = max(60, $perPage * 8);
+        $perPage = self::resolveListingPerPage($request);
+        $poolSize = max(24, $perPage * 2);
 
         $qb = $annonceRepository->createApprovedSearchQueryBuilder(
             $filters->q,
@@ -64,5 +64,12 @@ final class HomeController extends AbstractController
             'sliders' => $sliderRepository->findBy(['isActive' => true], ['id' => 'DESC'], 12),
             'search_filters' => $filters,
         ]);
+    }
+
+    private static function resolveListingPerPage(Request $request): int
+    {
+        $userAgent = mb_strtolower((string) $request->headers->get('User-Agent', ''));
+
+        return preg_match('/mobile|android|iphone|ipod|iemobile|blackberry|opera mini/i', $userAgent) ? 16 : 24;
     }
 }

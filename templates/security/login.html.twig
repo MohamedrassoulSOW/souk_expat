@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% set souk_auth_light = true %}
+
 {% block title %}Connexion | SoukExpat{% endblock %}
 
 {% block body %}
-{{ include('layouts/navBar.html.twig') }}
-
 <main class="container py-5">
     <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
         <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
@@ -76,7 +76,7 @@
                         <button type="submit" class="btn btn-login-custom btn-lg w-100 py-3 rounded-pill fw-bold shadow-sm">
                             Se connecter
                         </button>
-                        <p class="small text-muted text-center mt-3 mb-0">5 tentatives maximum par heure.</p>
+                        <p class="small text-muted text-center mt-3 mb-0">Vous restez connecté jusqu’à déconnexion. 5 tentatives max. / heure.</p>
 
                         {{ include('security/_google_button.html.twig', {label: 'Continuer avec Google'}) }}
 
